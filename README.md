@@ -9,8 +9,8 @@
 proc(main)
 {
 	$files = getfilelist();
-		begin("开始脚本处理");
-		looplist($files){
+	begin("开始脚本处理");
+	looplist($files){
 		$file=$$;
 		beginfile($file,"开始对"+$file+"进行修改。。。");
 		beginreplace($file);
