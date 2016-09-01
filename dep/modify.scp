@@ -1,0 +1,22 @@
+proc(main)
+{
+	$files = getfilelist();
+	begin("开始脚本处理");
+	looplist($files){
+		$file=$$;
+		beginfile($file,"开始对"+$file+"进行修改。。。");
+		beginreplace($file);
+		replace($file,"Game","GamePatch");
+		endreplace($file);
+		beginmodify($file);
+		writeloadarg($file,"PlayerController","Update",0x38,0);
+		writeloadfield($file,"PlayerController","Update",0x39,"PlayerController","m_player");
+		writeloadarg($file,"PlayerController","Update",0x3e,0);
+		writeloadfield($file,"PlayerController","Update",0x3f,"PlayerController","m_moveElapseTime");
+		writecall($file,"PlayerController","Update",0x44,"DebugConsoleHelper","Move");
+		writenops($file,"PlayerController","Update",0x49,0x22);
+		endmodify($file);
+		endfile($file);
+	};
+	end("结束脚本处理");
+};
