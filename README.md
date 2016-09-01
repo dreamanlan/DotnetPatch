@@ -6,28 +6,28 @@
 
 对方法的修改主要是插入调用指令，此时通过基于dsl的简单脚本来处理，示例如下：
 
-proc(main)
-{
-	$files = getfilelist();
-	begin("开始脚本处理");
-	looplist($files){
-		$file=$$;
-		beginfile($file,"开始对"+$file+"进行修改。。。");
-		beginreplace($file);
-		replace($file,"Game","GamePatch");
-		endreplace($file);
-		beginmodify($file);
-		writeloadarg($file,"PlayerController","Update",0x38,0);
-		writeloadfield($file,"PlayerController","Update",0x39,"PlayerController","m_player");
-		writeloadarg($file,"PlayerController","Update",0x3e,0);
-		writeloadfield($file,"PlayerController","Update",0x3f,"PlayerController","m_moveElapseTime");
-		writecall($file,"PlayerController","Update",0x44,"DebugConsoleHelper","Move");
-		writenops($file,"PlayerController","Update",0x49,0x22);
-		endmodify($file);
-		endfile($file);
-	};
-	end("结束脚本处理");
-};
+		proc(main)
+		{
+			$files = getfilelist();
+			begin("开始脚本处理");
+			looplist($files){
+				$file=$$;
+				beginfile($file,"开始对"+$file+"进行修改。。。");
+				beginreplace($file);
+				replace($file,"Game","GamePatch");
+				endreplace($file);
+				beginmodify($file);
+				writeloadarg($file,"PlayerController","Update",0x38,0);
+				writeloadfield($file,"PlayerController","Update",0x39,"PlayerController","m_player");
+				writeloadarg($file,"PlayerController","Update",0x3e,0);
+				writeloadfield($file,"PlayerController","Update",0x3f,"PlayerController","m_moveElapseTime");
+				writecall($file,"PlayerController","Update",0x44,"DebugConsoleHelper","Move");
+				writenops($file,"PlayerController","Update",0x49,0x22);
+				endmodify($file);
+				endfile($file);
+			};
+			end("结束脚本处理");
+		};
 
 脚本处理时首先取到由玩家添加的待处理的文件，然后依次对各文件进行处理，脚本处理可以进行方法替换、扩展某个方法的大小或对某个方法的指令进行修改。
 脚本支持的命令有：
