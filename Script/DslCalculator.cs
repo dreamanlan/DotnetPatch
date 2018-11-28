@@ -30,6 +30,7 @@ namespace Calculator
         public bool Load(Dsl.ISyntaxComponent dsl, DslCalculator calculator)
         {
             m_Calculator = calculator;
+            m_Dsl = dsl;
             Dsl.ValueData valueData = dsl as Dsl.ValueData;
             if (null != valueData) {
                 return Load(valueData);
@@ -61,6 +62,10 @@ namespace Calculator
             }
             return false;
         }
+        public override string ToString()
+        {
+            return string.Format("{0} line:{1}", base.ToString(), m_Dsl.GetLine());
+        }
         protected virtual bool Load(Dsl.ValueData valData) { return false; }
         protected virtual bool Load(Dsl.CallData callData) { return false; }
         protected virtual bool Load(IList<IExpression> exps) { return false; }
@@ -73,6 +78,7 @@ namespace Calculator
         }
 
         private DslCalculator m_Calculator = null;
+        private Dsl.ISyntaxComponent m_Dsl = null;
 
         protected static double ToDouble(object v)
         {
@@ -180,65 +186,126 @@ namespace Calculator
 
         private IList<IExpression> m_Exps = null;
     }
+    internal sealed class ArgsGet : AbstractExpression
+    {
+        public override object Calc()
+        {
+            object ret = Calculator.Arguments;
+            return ret;
+        }
+        protected override bool Load(Dsl.CallData callData)
+        {
+            return true;
+        }
+    }
+    internal sealed class ArgGet : AbstractExpression
+    {
+        public override object Calc()
+        {
+            object ret = null;
+            var ix = (int)Convert.ChangeType(m_ArgIndex.Calc(), typeof(int));
+            var args = Calculator.Arguments;
+            if (ix >= 0 && ix < args.Count) {
+                ret = args[ix];
+            }
+            return ret;
+        }
+        protected override bool Load(Dsl.CallData callData)
+        {
+            m_ArgIndex = Calculator.Load(callData.GetParam(0));
+            return true;
+        }
+
+        private IExpression m_ArgIndex;
+    }
+    internal sealed class ArgNumGet : AbstractExpression
+    {
+        public override object Calc()
+        {
+            object ret = Calculator.Arguments.Count;
+            return ret;
+        }
+        protected override bool Load(Dsl.CallData callData)
+        {
+            return true;
+        }
+    }
     internal sealed class VarSet : AbstractExpression
     {
         public override object Calc()
         {
+            var varId = m_VarId.Calc();
             object v = m_Op.Calc();
-            m_Variables[m_VarId] = v;
+            if(varId is int) {
+                int id = (int)Convert.ChangeType(varId, typeof(int));
+                Calculator.SetVariable(id, v);
+            } else {
+                var str = varId as string;
+                if (null != str) {
+                    Calculator.SetVariable(str, v);
+                }
+            }
             return v;
         }
         protected override bool Load(Dsl.CallData callData)
         {
             Dsl.CallData param1 = callData.GetParam(0) as Dsl.CallData;
             Dsl.ISyntaxComponent param2 = callData.GetParam(1);
-            m_Variables = Calculator.Variables;
-            m_VarId = int.Parse(param1.GetParamId(0));
+            m_VarId = Calculator.Load(param1.GetParam(0));
             m_Op = Calculator.Load(param2);
             return true;
         }
 
-        private Dictionary<int, object> m_Variables;
-        private int m_VarId;
+        private IExpression m_VarId;
         private IExpression m_Op;
     }
     internal sealed class VarGet : AbstractExpression
     {
         public override object Calc()
         {
-            object ret = 0;
-            m_Variables.TryGetValue(m_VarId, out ret);
-            return ret;
+            var varId = m_VarId.Calc();
+            object v = null;
+            if (varId is int) {
+                int id = (int)Convert.ChangeType(varId, typeof(int));
+                v = Calculator.GetVariable(id);
+            } else {
+                var str = varId as string;
+                if (null != str) {
+                    v = Calculator.GetVariable(str);
+                }
+            }
+            return v;
         }
         protected override bool Load(Dsl.CallData callData)
         {
-            m_Variables = Calculator.Variables;
-            m_VarId = int.Parse(callData.GetParamId(0));
+            m_VarId = Calculator.Load(callData.GetParam(0));
             return true;
         }
 
-        private Dictionary<int, object> m_Variables;
-        private int m_VarId;
+        private IExpression m_VarId;
     }
     internal sealed class NamedVarSet : AbstractExpression
     {
         public override object Calc()
         {
             object v = m_Op.Calc();
-            m_Variables[m_VarId] = v;
+            if (m_VarId.Length > 0) {
+                Calculator.SetVariable(m_VarId, v);
+                if (null != v && m_VarId[0] != '@' && m_VarId[0] != '$') {
+                    Environment.SetEnvironmentVariable(m_VarId, v.ToString());
+                }
+            }
             return v;
         }
         protected override bool Load(Dsl.CallData callData)
         {
             Dsl.ISyntaxComponent param1 = callData.GetParam(0);
             Dsl.ISyntaxComponent param2 = callData.GetParam(1);
-            m_Variables = Calculator.NamedVariables;
             m_VarId = param1.GetId();
             m_Op = Calculator.Load(param2);
             return true;
         }
 
-        private Dictionary<string, object> m_Variables;
         private string m_VarId;
         private IExpression m_Op;
     }
@@ -247,17 +314,24 @@ namespace Calculator
         public override object Calc()
         {
             object ret = 0;
-            m_Variables.TryGetValue(m_VarId, out ret);
+            if (m_VarId == "break") {
+                Calculator.RunState = RunStateEnum.Break;
+            } else if (m_VarId == "continue") {
+                Calculator.RunState = RunStateEnum.Continue;
+            } else if (m_VarId.Length > 0) {
+                ret = Calculator.GetVariable(m_VarId);
+                if (null == ret && m_VarId[0] != '@' && m_VarId[0] != '$') {
+                    ret = Environment.GetEnvironmentVariable(m_VarId);
+                }
+            }
             return ret;
         }
         protected override bool Load(Dsl.ValueData valData)
         {
-            m_Variables = Calculator.NamedVariables;
             m_VarId = valData.GetId();
             return true;
         }
 
-        private Dictionary<string, object> m_Variables;
         private string m_VarId;
     }
     internal sealed class ConstGet : AbstractExpression
@@ -958,12 +1032,18 @@ namespace Calculator
                     if (ToLong(condVal) != 0) {
                         for (int index = 0; index < clause.Expressions.Count; ++index) {
                             v = clause.Expressions[index].Calc();
+                            if (Calculator.RunState != RunStateEnum.Normal) {
+                                return v;
+                            }
                         }
                         break;
                     }
                 } else if (ix == m_Clauses.Count - 1) {
                     for (int index = 0; index < clause.Expressions.Count; ++index) {
                         v = clause.Expressions[index].Calc();
+                        if (Calculator.RunState != RunStateEnum.Normal) {
+                            return v;
+                        }
                     }
                     break;
                 }
@@ -984,6 +1064,30 @@ namespace Calculator
         }
         protected override bool Load(Dsl.StatementData statementData)
         {
+            //简化语法if(exp) func(args);语法的处理
+            int funcNum = statementData.GetFunctionNum();
+            if (funcNum == 2) {
+                var first = statementData.First;
+                var second = statementData.Second;
+                var firstId = first.GetId();
+                var secondId = second.GetId();
+                if (firstId == "if" && !first.HaveStatement() && !first.HaveExternScript() &&
+                        !string.IsNullOrEmpty(secondId) && !second.HaveStatement() && !second.HaveExternScript()) {
+                    IfExp.Clause item = new IfExp.Clause();
+                    if (first.Call.GetParamNum() > 0) {
+                        Dsl.ISyntaxComponent cond = first.Call.GetParam(0);
+                        item.Condition = Calculator.Load(cond);
+                    } else {
+                        //error
+                        Console.WriteLine("DslCalculator error, {0} line {1}", first.ToScriptString(false), first.GetLine());
+                    }
+                    IExpression subExp = Calculator.Load(second);
+                    item.Expressions.Add(subExp);
+                    m_Clauses.Add(item);
+                    return true;
+                }
+            }
+            //标准if语句的处理
             foreach (var fData in statementData.Functions) {
                 if (fData.GetId() == "if" || fData.GetId() == "elseif") {
                     IfExp.Clause item = new IfExp.Clause();
@@ -1037,6 +1141,14 @@ namespace Calculator
                 if (ToLong(condVal) != 0) {
                     for (int index = 0; index < m_Expressions.Count; ++index) {
                         v = m_Expressions[index].Calc();
+                        if (Calculator.RunState == RunStateEnum.Continue) {
+                            Calculator.RunState = RunStateEnum.Normal;
+                            break;
+                        } else if (Calculator.RunState != RunStateEnum.Normal) {
+                            if (Calculator.RunState == RunStateEnum.Break)
+                                Calculator.RunState = RunStateEnum.Normal;
+                            return v;
+                        }
                     }
                 } else {
                     break;
@@ -1054,6 +1166,30 @@ namespace Calculator
             }
             return true;
         }
+        protected override bool Load(Dsl.StatementData statementData)
+        {
+            //简化语法while(exp) func(args);语法的处理
+            if (statementData.GetFunctionNum() == 2) {
+                var first = statementData.First;
+                var second = statementData.Second;
+                var firstId = first.GetId();
+                var secondId = second.GetId();
+                if (firstId == "while" && !first.HaveStatement() && !first.HaveExternScript() &&
+                        !string.IsNullOrEmpty(secondId) && !second.HaveStatement() && !second.HaveExternScript()) {
+                    if (first.Call.GetParamNum() > 0) {
+                        Dsl.ISyntaxComponent cond = first.Call.GetParam(0);
+                        m_Condition = Calculator.Load(cond);
+                    } else {
+                        //error
+                        Console.WriteLine("DslCalculator error, {0} line {1}", first.ToScriptString(false), first.GetLine());
+                    }
+                    IExpression subExp = Calculator.Load(second);
+                    m_Expressions.Add(subExp);
+                    return true;
+                }
+            }
+            return false;
+        }
 
         private IExpression m_Condition;
         private List<IExpression> m_Expressions = new List<IExpression>();
@@ -1066,9 +1202,17 @@ namespace Calculator
             object count = m_Count.Calc();
             long ct = ToLong(count);
             for (int i = 0; i < ct; ++i) {
-                Calculator.NamedVariables["$$"] = i;
+                Calculator.SetVariable("$$", i);
                 for (int index = 0; index < m_Expressions.Count; ++index) {
                     v = m_Expressions[index].Calc();
+                    if(Calculator.RunState == RunStateEnum.Continue) {
+                        Calculator.RunState = RunStateEnum.Normal;
+                        break;
+                    } else if(Calculator.RunState != RunStateEnum.Normal) {
+                        if (Calculator.RunState == RunStateEnum.Break)
+                            Calculator.RunState = RunStateEnum.Normal;
+                        return v;
+                    }
                 }
             }
             return v;
@@ -1082,6 +1226,30 @@ namespace Calculator
                 m_Expressions.Add(subExp);
             }
             return true;
+        }
+        protected override bool Load(Dsl.StatementData statementData)
+        {
+            //简化语法loop(exp) func(args);语法的处理
+            if (statementData.GetFunctionNum() == 2) {
+                var first = statementData.First;
+                var second = statementData.Second;
+                var firstId = first.GetId();
+                var secondId = second.GetId();
+                if (firstId == "loop" && !first.HaveStatement() && !first.HaveExternScript() &&
+                        !string.IsNullOrEmpty(secondId) && !second.HaveStatement() && !second.HaveExternScript()) {
+                    if (first.Call.GetParamNum() > 0) {
+                        Dsl.ISyntaxComponent exp = first.Call.GetParam(0);
+                        m_Count = Calculator.Load(exp);
+                    } else {
+                        //error
+                        Console.WriteLine("DslCalculator error, {0} line {1}", first.ToScriptString(false), first.GetLine());
+                    }
+                    IExpression subExp = Calculator.Load(second);
+                    m_Expressions.Add(subExp);
+                    return true;
+                }
+            }
+            return false;
         }
 
         private IExpression m_Count;
@@ -1098,9 +1266,17 @@ namespace Calculator
                 IEnumerator enumer = obj.GetEnumerator();
                 while (enumer.MoveNext()) {
                     object val = enumer.Current;
-                    Calculator.NamedVariables["$$"] = val;
+                    Calculator.SetVariable("$$", val);
                     for (int index = 0; index < m_Expressions.Count; ++index) {
                         v = m_Expressions[index].Calc();
+                        if (Calculator.RunState == RunStateEnum.Continue) {
+                            Calculator.RunState = RunStateEnum.Normal;
+                            break;
+                        } else if (Calculator.RunState != RunStateEnum.Normal) {
+                            if (Calculator.RunState == RunStateEnum.Break)
+                                Calculator.RunState = RunStateEnum.Normal;
+                            return v;
+                        }
                     }
                 }
             }
@@ -1115,6 +1291,30 @@ namespace Calculator
                 m_Expressions.Add(subExp);
             }
             return true;
+        }
+        protected override bool Load(Dsl.StatementData statementData)
+        {
+            //简化语法looplist(exp) func(args);语法的处理
+            if (statementData.GetFunctionNum() == 2) {
+                var first = statementData.First;
+                var second = statementData.Second;
+                var firstId = first.GetId();
+                var secondId = second.GetId();
+                if (firstId == "looplist" && !first.HaveStatement() && !first.HaveExternScript() &&
+                        !string.IsNullOrEmpty(secondId) && !second.HaveStatement() && !second.HaveExternScript()) {
+                    if (first.Call.GetParamNum() > 0) {
+                        Dsl.ISyntaxComponent exp = first.Call.GetParam(0);
+                        m_List = Calculator.Load(exp);
+                    } else {
+                        //error
+                        Console.WriteLine("DslCalculator error, {0} line {1}", first.ToScriptString(false), first.GetLine());
+                    }
+                    IExpression subExp = Calculator.Load(second);
+                    m_Expressions.Add(subExp);
+                    return true;
+                }
+            }
+            return false;
         }
 
         private IExpression m_List;
@@ -1133,9 +1333,17 @@ namespace Calculator
             IEnumerator enumer = list.GetEnumerator();
             while (enumer.MoveNext()) {
                 object val = enumer.Current;
-                Calculator.NamedVariables["$$"] = val;
+                Calculator.SetVariable("$$", val);
                 for (int index = 0; index < m_Expressions.Count; ++index) {
                     v = m_Expressions[index].Calc();
+                    if (Calculator.RunState == RunStateEnum.Continue) {
+                        Calculator.RunState = RunStateEnum.Normal;
+                        break;
+                    } else if (Calculator.RunState != RunStateEnum.Normal) {
+                        if (Calculator.RunState == RunStateEnum.Break)
+                            Calculator.RunState = RunStateEnum.Normal;
+                        return v;
+                    }
                 }
             }
             return v;
@@ -1145,8 +1353,8 @@ namespace Calculator
             Dsl.CallData callData = funcData.Call;
             int num = callData.GetParamNum();
             for (int ix = 0; ix < num; ++ix) {
-                Dsl.ISyntaxComponent cond = funcData.Call.GetParam(ix);
-                m_Elements.Add(Calculator.Load(cond));
+                Dsl.ISyntaxComponent exp = funcData.Call.GetParam(ix);
+                m_Elements.Add(Calculator.Load(exp));
             }
             int fnum = funcData.GetStatementNum();
             for (int ix = 0; ix < fnum; ++ix) {
@@ -1154,6 +1362,33 @@ namespace Calculator
                 m_Expressions.Add(subExp);
             }
             return true;
+        }
+        protected override bool Load(Dsl.StatementData statementData)
+        {
+            //简化语法foreach(exp1,exp2,...) func(args);语法的处理
+            if (statementData.GetFunctionNum() == 2) {
+                var first = statementData.First;
+                var second = statementData.Second;
+                var firstId = first.GetId();
+                var secondId = second.GetId();
+                if (firstId == "foreach" && !first.HaveStatement() && !first.HaveExternScript() &&
+                        !string.IsNullOrEmpty(secondId) && !second.HaveStatement() && !second.HaveExternScript()) {
+                    int num = first.Call.GetParamNum();
+                    if (num > 0) {
+                        for (int ix = 0; ix < num; ++ix) {
+                            Dsl.ISyntaxComponent exp = first.Call.GetParam(ix);
+                            m_Elements.Add(Calculator.Load(exp));
+                        }
+                    } else {
+                        //error
+                        Console.WriteLine("DslCalculator error, {0} line {1}", first.ToScriptString(false), first.GetLine());
+                    }
+                    IExpression subExp = Calculator.Load(second);
+                    m_Expressions.Add(subExp);
+                    return true;
+                }
+            }
+            return false;
         }
 
         private List<IExpression> m_Elements = new List<IExpression>();
@@ -1672,12 +1907,12 @@ namespace Calculator
                         results.Add(val);
                     }
                     results.Sort((object o1, object o2) => {
-                        Calculator.NamedVariables["$$"] = o1;
+                        Calculator.SetVariable("$$", o1);
                         object r1 = null;
                         for (int index = 0; index < m_Expressions.Count; ++index) {
                             r1 = m_Expressions[index].Calc();
                         }
-                        Calculator.NamedVariables["$$"] = o2;
+                        Calculator.SetVariable("$$", o2);
                         object r2 = null;
                         for (int index = 0; index < m_Expressions.Count; ++index) {
                             r2 = m_Expressions[index].Calc();
@@ -1703,7 +1938,7 @@ namespace Calculator
                     while (enumer.MoveNext()) {
                         object val = enumer.Current;
 
-                        Calculator.NamedVariables["$$"] = val;
+                        Calculator.SetVariable("$$", val);
                         object r = null;
                         for (int index = 0; index < m_Expressions.Count; ++index) {
                             r = m_Expressions[index].Calc();
@@ -1947,6 +2182,103 @@ namespace Calculator
             if (operands.Count >= 1) {
                 var str = operands[0] as string;
                 r = str.ToUpper();
+            }
+            return r;
+        }
+    }
+    internal class StringReplaceExp : SimpleExpressionBase
+    {
+        protected override object OnCalc(IList<object> operands)
+        {
+            object r = null;
+            if (operands.Count >= 3) {
+                var str = operands[0] as string;
+                var key = operands[1] as string;
+                var val = operands[2] as string;
+                r = str.Replace(key, val);
+            }
+            return r;
+        }
+    }
+    internal class StringReplaceCharExp : SimpleExpressionBase
+    {
+        protected override object OnCalc(IList<object> operands)
+        {
+            object r = null;
+            if (operands.Count >= 3) {
+                var str = operands[0] as string;
+                var key = operands[1] as string;
+                var val = operands[2] as string;
+                if (null != str && !string.IsNullOrEmpty(key) && !string.IsNullOrEmpty(val)) {
+                    r = str.Replace(key[0], val[0]);
+                }
+            }
+            return r;
+        }
+    }
+    internal class MakeStringExp : SimpleExpressionBase
+    {
+        protected override object OnCalc(IList<object> operands)
+        {
+            List<char> chars = new List<char>();
+            for (int i = 0; i < operands.Count; ++i) {
+                var v = operands[i];
+                var str = v as string;
+                if (null != str) {
+                    char c = '\0';
+                    if (str.Length > 0) {
+                        c = str[0];
+                    }
+                    chars.Add(c);
+                } else {
+                    char c = (char)Convert.ChangeType(operands[i], typeof(char));
+                    chars.Add(c);
+                }
+            }
+            return new String(chars.ToArray());
+        }
+    }
+    internal class Str2IntExp : SimpleExpressionBase
+    {
+        protected override object OnCalc(IList<object> operands)
+        {
+            object r = null;
+            if (operands.Count >= 1) {
+                var str = operands[0] as string;
+                int v;
+                if (int.TryParse(str, out v)) {
+                    r = v;
+                }
+            }
+            return r;
+        }
+    }
+    internal class Str2FloatExp : SimpleExpressionBase
+    {
+        protected override object OnCalc(IList<object> operands)
+        {
+            object r = null;
+            if (operands.Count >= 1) {
+                var str = operands[0] as string;
+                float v;
+                if(float.TryParse(str, out v)) {
+                    r = v;
+                }
+            }
+            return r;
+        }
+    }
+    internal class Hex2IntExp : SimpleExpressionBase
+    {
+        protected override object OnCalc(IList<object> operands)
+        {
+            object r = null;
+            if (operands.Count >= 1) {
+                var str = operands[0] as string;
+                int v;
+                if(int.TryParse(str,System.Globalization.NumberStyles.AllowHexSpecifier, null, out v)) {
+                    r = v;
+                }
             }
             return r;
         }
@@ -2325,6 +2657,24 @@ namespace Calculator
             return r;
         }
     }
+    internal class ListHashtableExp : SimpleExpressionBase
+    {
+        protected override object OnCalc(IList<object> operands)
+        {
+            object r = null;
+            if (operands.Count >= 1) {
+                var dict = operands[0] as IDictionary;
+                if (null != dict) {
+                    var list = new ArrayList();
+                    foreach(var pair in dict){
+                        list.Add(pair);
+                    }
+                    r = list;
+                }
+            }
+            return r;
+        }
+    }
     internal class HashtableSplitExp : SimpleExpressionBase
     {
         protected override object OnCalc(IList<object> operands)
@@ -2360,6 +2710,345 @@ namespace Calculator
             return r;
         }
     }
+    //stack与queue共用peek函数
+    internal class PeekExp : SimpleExpressionBase
+    {
+        protected override object OnCalc(IList<object> operands)
+        {
+            object r = null;
+            if (operands.Count >= 1) {
+                var stack = operands[0] as Stack<object>;
+                var queue = operands[0] as Queue<object>;
+                if (null != stack) {
+                    r = stack.Peek();
+                } else if (null != queue) {
+                    r = queue.Peek();
+                }
+            }
+            return r;
+        }
+    }
+    internal class StackSizeExp : SimpleExpressionBase
+    {
+        protected override object OnCalc(IList<object> operands)
+        {
+            object r = 0;
+            if (operands.Count >= 1) {
+                var stack = operands[0] as Stack<object>;
+                if (null != stack) {
+                    r = stack.Count;
+                }
+            }
+            return r;
+        }
+    }
+    internal class StackExp : SimpleExpressionBase
+    {
+        protected override object OnCalc(IList<object> operands)
+        {
+            object r = null;
+            var stack = new Stack<object>();
+            for (int i = 0; i < operands.Count; ++i) {
+                stack.Push(operands[i]);
+            }
+            r = stack;
+            return r;
+        }
+    }
+    internal class PushExp : SimpleExpressionBase
+    {
+        protected override object OnCalc(IList<object> operands)
+        {
+            object r = null;
+            if (operands.Count >= 2) {
+                var stack = operands[0] as Stack<object>;
+                var val = operands[1];
+                if (null != stack) {
+                    stack.Push(val);
+                }
+            }
+            return r;
+        }
+    }
+    internal class PopExp : SimpleExpressionBase
+    {
+        protected override object OnCalc(IList<object> operands)
+        {
+            object r = null;
+            if (operands.Count >= 1) {
+                var stack = operands[0] as Stack<object>;
+                if (null != stack) {
+                    r = stack.Pop();
+                }
+            }
+            return r;
+        }
+    }
+    internal class StackClearExp : SimpleExpressionBase
+    {
+        protected override object OnCalc(IList<object> operands)
+        {
+            object r = null;
+            if (operands.Count >= 1) {
+                var stack = operands[0] as Stack<object>;
+                if (null != stack) {
+                    stack.Clear();
+                }
+            }
+            return r;
+        }
+    }
+    internal class QueueSizeExp : SimpleExpressionBase
+    {
+        protected override object OnCalc(IList<object> operands)
+        {
+            object r = 0;
+            if (operands.Count >= 1) {
+                var queue = operands[0] as Queue<object>;
+                if (null != queue) {
+                    r = queue.Count;
+                }
+            }
+            return r;
+        }
+    }
+    internal class QueueExp : SimpleExpressionBase
+    {
+        protected override object OnCalc(IList<object> operands)
+        {
+            object r = null;
+            var queue = new Queue<object>();
+            for (int i = 0; i < operands.Count; ++i) {
+                queue.Enqueue(operands[i]);
+            }
+            r = queue;
+            return r;
+        }
+    }
+    internal class EnqueueExp : SimpleExpressionBase
+    {
+        protected override object OnCalc(IList<object> operands)
+        {
+            object r = null;
+            if (operands.Count >= 2) {
+                var queue = operands[0] as Queue<object>;
+                var val = operands[1];
+                if (null != queue) {
+                    queue.Enqueue(val);
+                }
+            }
+            return r;
+        }
+    }
+    internal class DequeueExp : SimpleExpressionBase
+    {
+        protected override object OnCalc(IList<object> operands)
+        {
+            object r = null;
+            if (operands.Count >= 1) {
+                var queue = operands[0] as Queue<object>;
+                if (null != queue) {
+                    r = queue.Dequeue();
+                }
+            }
+            return r;
+        }
+    }
+    internal class QueueClearExp : SimpleExpressionBase
+    {
+        protected override object OnCalc(IList<object> operands)
+        {
+            object r = null;
+            if (operands.Count >= 1) {
+                var queue = operands[0] as Queue<object>;
+                if (null != queue) {
+                    queue.Clear();
+                }
+            }
+            return r;
+        }
+    }
+    internal class SetEnvironmentExp : SimpleExpressionBase
+    {
+        protected override object OnCalc(IList<object> operands)
+        {
+            object ret = null;
+            if (operands.Count >= 2) {
+                var key = operands[0] as string;
+                var val = operands[1] as string;
+                val = Environment.ExpandEnvironmentVariables(val);
+                Environment.SetEnvironmentVariable(key, val);
+            }
+            return ret;
+        }
+    }
+    internal class GetEnvironmentExp : SimpleExpressionBase
+    {
+        protected override object OnCalc(IList<object> operands)
+        {
+            object ret = string.Empty;
+            if (operands.Count >= 1) {
+                var key = operands[0] as string;
+                return Environment.GetEnvironmentVariable(key);
+            }
+            return ret;
+        }
+    }
+    internal class ExpandEnvironmentsExp : SimpleExpressionBase
+    {
+        protected override object OnCalc(IList<object> operands)
+        {
+            object ret = string.Empty;
+            if (operands.Count >= 1) {
+                var key = operands[0] as string;
+                return Environment.ExpandEnvironmentVariables(key);
+            }
+            return ret;
+        }
+    }
+    internal class EnvironmentsExp : SimpleExpressionBase
+    {
+        protected override object OnCalc(IList<object> operands)
+        {
+            return Environment.GetEnvironmentVariables();
+        }
+    }
+    internal class SetCurrentDirectoryExp : SimpleExpressionBase
+    {
+        protected override object OnCalc(IList<object> operands)
+        {
+            object ret = string.Empty;
+            if (operands.Count >= 1) {
+                var dir = operands[0] as string;
+                Environment.CurrentDirectory = Environment.ExpandEnvironmentVariables(dir);
+                ret = dir;
+            }
+            return ret;
+        }
+    }
+    internal class GetCurrentDirectoryExp : SimpleExpressionBase
+    {
+        protected override object OnCalc(IList<object> operands)
+        {
+            return Environment.CurrentDirectory;
+        }
+    }
+    internal class CommandLineExp : SimpleExpressionBase
+    {
+        protected override object OnCalc(IList<object> operands)
+        {
+            return Environment.CommandLine;
+        }
+    }
+    internal class CommandLineArgsExp : SimpleExpressionBase
+    {
+        protected override object OnCalc(IList<object> operands)
+        {
+            return Environment.GetCommandLineArgs();
+        }
+    }
+    internal class OsExp : SimpleExpressionBase
+    {
+        protected override object OnCalc(IList<object> operands)
+        {
+            return Environment.OSVersion.VersionString;
+        }
+    }
+    internal class OsPlatformExp : SimpleExpressionBase
+    {
+        protected override object OnCalc(IList<object> operands)
+        {
+            return Environment.OSVersion.Platform.ToString();
+        }
+    }
+    internal class OsVersionExp : SimpleExpressionBase
+    {
+        protected override object OnCalc(IList<object> operands)
+        {
+            return Environment.OSVersion.Version.ToString();
+        }
+    }
+    internal class GetFullPathExp : SimpleExpressionBase
+    {
+        protected override object OnCalc(IList<object> operands)
+        {
+            object ret = string.Empty;
+            if (operands.Count >= 1) {
+                var path = operands[0] as string;
+                if (null != path) {
+                    path = Environment.ExpandEnvironmentVariables(path);
+                    return Path.GetFullPath(path);
+                }
+            }
+            return ret;
+        }
+    }
+    internal class GetPathRootExp : SimpleExpressionBase
+    {
+        protected override object OnCalc(IList<object> operands)
+        {
+            object ret = string.Empty;
+            if (operands.Count >= 1) {
+                var path = operands[0] as string;
+                if (null != path) {
+                    path = Environment.ExpandEnvironmentVariables(path);
+                    return Path.GetPathRoot(path);
+                }
+            }
+            return ret;
+        }
+    }
+    internal class GetRandomFileNameExp : SimpleExpressionBase
+    {
+        protected override object OnCalc(IList<object> operands)
+        {
+            return Path.GetRandomFileName();
+        }
+    }
+    internal class GetTempFileNameExp : SimpleExpressionBase
+    {
+        protected override object OnCalc(IList<object> operands)
+        {
+            return Path.GetTempFileName();
+        }
+    }
+    internal class GetTempPathExp : SimpleExpressionBase
+    {
+        protected override object OnCalc(IList<object> operands)
+        {
+            return Path.GetTempPath();
+        }
+    }
+    internal class HasExtensionExp : SimpleExpressionBase
+    {
+        protected override object OnCalc(IList<object> operands)
+        {
+            object ret = false;
+            if (operands.Count >= 1) {
+                var path = operands[0] as string;
+                if (null != path) {
+                    path = Environment.ExpandEnvironmentVariables(path);
+                    return Path.HasExtension(path);
+                }
+            }
+            return ret;
+        }
+    }
+    internal class IsPathRootedExp : SimpleExpressionBase
+    {
+        protected override object OnCalc(IList<object> operands)
+        {
+            object ret = false;
+            if (operands.Count >= 1) {
+                var path = operands[0] as string;
+                if (null != path) {
+                    path = Environment.ExpandEnvironmentVariables(path);
+                    return Path.IsPathRooted(path);
+                }
+            }
+            return ret;
+        }
+    }
     internal class GetFileNameExp : SimpleExpressionBase
     {
         protected override object OnCalc(IList<object> operands)
@@ -2368,6 +3057,7 @@ namespace Calculator
             if (operands.Count >= 1) {
                 var path = operands[0] as string;
                 if (null != path) {
+                    path = Environment.ExpandEnvironmentVariables(path);
                     r = Path.GetFileName(path);
                 }
             }
@@ -2382,6 +3072,7 @@ namespace Calculator
             if (operands.Count >= 1) {
                 var path = operands[0] as string;
                 if (null != path) {
+                    path = Environment.ExpandEnvironmentVariables(path);
                     r = Path.GetFileNameWithoutExtension(path);
                 }
             }
@@ -2396,6 +3087,7 @@ namespace Calculator
             if (operands.Count >= 1) {
                 var path = operands[0] as string;
                 if (null != path) {
+                    path = Environment.ExpandEnvironmentVariables(path);
                     r = Path.GetExtension(path);
                 }
             }
@@ -2410,6 +3102,7 @@ namespace Calculator
             if (operands.Count >= 1) {
                 var path = operands[0] as string;
                 if (null != path) {
+                    path = Environment.ExpandEnvironmentVariables(path);
                     r = Path.GetDirectoryName(path);
                 }
             }
@@ -2425,32 +3118,116 @@ namespace Calculator
                 var path1 = operands[0] as string;
                 var path2 = operands[1] as string;
                 if (null != path1 && null != path2) {
+                    path1 = Environment.ExpandEnvironmentVariables(path1);
+                    path2 = Environment.ExpandEnvironmentVariables(path2);
                     r = Path.Combine(path1, path2);
                 }
             }
             return r;
         }
     }
-    internal class DebugLogExp : SimpleExpressionBase
+    internal class ChangeExtensionExp : SimpleExpressionBase
+    {
+        protected override object OnCalc(IList<object> operands)
+        {
+            object r = null;
+            if (operands.Count >= 2) {
+                var path = operands[0] as string;
+                var ext = operands[1] as string;
+                if (null != path && null != ext) {
+                    path = Environment.ExpandEnvironmentVariables(path);
+                    r = Path.ChangeExtension(path, ext);
+                }
+            }
+            return r;
+        }
+    }
+    internal class EchoExp : SimpleExpressionBase
     {
         protected override object OnCalc(IList<object> operands)
         {
             object r = null;
             if (operands.Count >= 1) {
-                var fmt = operands[0] as string;
-                ArrayList al = new ArrayList();
-                for(int i = 1; i < operands.Count; ++i) {
-                    al.Add(operands[i]);
+                var obj = operands[0];
+                if (null != obj) {
+                    var fmt = obj as string;
+                    if (operands.Count > 1 && null != fmt) {
+                        ArrayList arrayList = new ArrayList();
+                        for (int i = 1; i < operands.Count; ++i) {
+                            arrayList.Add(operands[i]);
+                        }
+                        Console.WriteLine(fmt, arrayList.ToArray());
+                    } else {
+                        Console.WriteLine(obj);
+                    }
                 }
-                Console.WriteLine(fmt, al.ToArray());
+            } else {
+                Console.WriteLine();
             }
             return r;
         }
+    }
+    internal class CallExp : SimpleExpressionBase
+    {
+        protected override object OnCalc(IList<object> operands)
+        {
+            object r = null;
+            if (operands.Count >= 1) {
+                var proc = operands[0] as string;
+                if (null != proc) {
+                    ArrayList arrayList = new ArrayList();
+                    for (int i = 1; i < operands.Count;++i){
+                        arrayList.Add(operands[i]);
+                    }
+                    r = Calculator.Calc(proc, arrayList.ToArray());
+                }
+            }
+            return r;
+        }
+    }
+    internal class ReturnExp : SimpleExpressionBase
+    {
+        protected override object OnCalc(IList<object> operands)
+        {
+            Calculator.RunState = RunStateEnum.Return;
+            object r = null;
+            if (operands.Count >= 1) {
+                r = operands[0];
+            }
+            return r;
+        }
+    }
+    internal class RedirectExp : SimpleExpressionBase
+    {
+        protected override object OnCalc(IList<object> operands)
+        {
+            Calculator.RunState = RunStateEnum.Redirect;
+            if (operands.Count >= 1) {
+                List<string> args = new List<string>();
+                for (int i = 0; i < operands.Count; ++i) {
+                    var arg = operands[i] as string;
+                    args.Add(arg);
+                }
+                return args;
+            }
+            return null;
+        }
+    }
+    public enum RunStateEnum
+    {
+        Normal = 0,
+        Break,
+        Continue,
+        Return,
+        Redirect,
     }
     public sealed class DslCalculator
     {
         public void Init()
         {
+            Register("args", new ExpressionFactoryHelper<ArgsGet>());
+            Register("arg", new ExpressionFactoryHelper<ArgGet>());
+            Register("argnum", new ExpressionFactoryHelper<ArgNumGet>());
             Register("var", new ExpressionFactoryHelper<VarGet>());
             Register("+", new ExpressionFactoryHelper<AddExp>());
             Register("-", new ExpressionFactoryHelper<SubExp>());
@@ -2513,6 +3290,12 @@ namespace Calculator
             Register("stringtrimend", new ExpressionFactoryHelper<StringTrimEndExp>());
             Register("stringlower", new ExpressionFactoryHelper<StringLowerExp>());
             Register("stringupper", new ExpressionFactoryHelper<StringUpperExp>());
+            Register("stringreplace", new ExpressionFactoryHelper<StringReplaceExp>());
+            Register("stringreplacechar", new ExpressionFactoryHelper<StringReplaceCharExp>());
+            Register("makestring", new ExpressionFactoryHelper<MakeStringExp>());
+            Register("str2int", new ExpressionFactoryHelper<Str2IntExp>());
+            Register("str2float", new ExpressionFactoryHelper<Str2FloatExp>());
+            Register("hex2int", new ExpressionFactoryHelper<Hex2IntExp>());
             Register("isnullorempty", new ExpressionFactoryHelper<IsNullOrEmptyExp>());
             Register("listsize", new ExpressionFactoryHelper<ListSizeExp>());
             Register("list", new ExpressionFactoryHelper<ListExp>());
@@ -2534,13 +3317,47 @@ namespace Calculator
             Register("hashtableclear", new ExpressionFactoryHelper<HashtableClearExp>());
             Register("hashtablekeys", new ExpressionFactoryHelper<HashtableKeysExp>());
             Register("hashtablevalues", new ExpressionFactoryHelper<HashtableValuesExp>());
+            Register("listhashtable", new ExpressionFactoryHelper<ListHashtableExp>());
             Register("hashtablesplit", new ExpressionFactoryHelper<HashtableSplitExp>());
+            Register("peek", new ExpressionFactoryHelper<PeekExp>());
+            Register("stacksize", new ExpressionFactoryHelper<StackSizeExp>());
+            Register("stack", new ExpressionFactoryHelper<StackExp>());
+            Register("push", new ExpressionFactoryHelper<PushExp>());
+            Register("pop", new ExpressionFactoryHelper<PopExp>());
+            Register("stackclear", new ExpressionFactoryHelper<StackClearExp>());
+            Register("queuesize", new ExpressionFactoryHelper<QueueSizeExp>());
+            Register("queue", new ExpressionFactoryHelper<QueueExp>());
+            Register("enqueue", new ExpressionFactoryHelper<EnqueueExp>());
+            Register("dequeue", new ExpressionFactoryHelper<DequeueExp>());
+            Register("queueclear", new ExpressionFactoryHelper<QueueClearExp>());
+            Register("setenv", new ExpressionFactoryHelper<SetEnvironmentExp>());
+            Register("getenv", new ExpressionFactoryHelper<GetEnvironmentExp>());
+            Register("expand", new ExpressionFactoryHelper<ExpandEnvironmentsExp>());
+            Register("envs", new ExpressionFactoryHelper<EnvironmentsExp>());
+            Register("cd", new ExpressionFactoryHelper<SetCurrentDirectoryExp>());
+            Register("pwd", new ExpressionFactoryHelper<GetCurrentDirectoryExp>());
+            Register("cmdline", new ExpressionFactoryHelper<CommandLineExp>());
+            Register("cmdlineargs", new ExpressionFactoryHelper<CommandLineArgsExp>());
+            Register("os", new ExpressionFactoryHelper<OsExp>());
+            Register("osplatform", new ExpressionFactoryHelper<OsPlatformExp>());
+            Register("osversion", new ExpressionFactoryHelper<OsVersionExp>());
+            Register("getfullpath", new ExpressionFactoryHelper<GetFullPathExp>());
+            Register("getpathroot", new ExpressionFactoryHelper<GetPathRootExp>());
+            Register("getrandomfilename", new ExpressionFactoryHelper<GetRandomFileNameExp>());
+            Register("gettempfilename", new ExpressionFactoryHelper<GetTempFileNameExp>());
+            Register("gettemppath", new ExpressionFactoryHelper<GetTempPathExp>());
+            Register("hasextension", new ExpressionFactoryHelper<HasExtensionExp>());
+            Register("ispathrooted", new ExpressionFactoryHelper<IsPathRootedExp>());
             Register("getfilename", new ExpressionFactoryHelper<GetFileNameExp>());
             Register("getfilenamewithoutextension", new ExpressionFactoryHelper<GetFileNameWithoutExtensionExp>());
             Register("getextension", new ExpressionFactoryHelper<GetExtensionExp>());
             Register("getdirectoryname", new ExpressionFactoryHelper<GetDirectoryNameExp>());
             Register("combinepath", new ExpressionFactoryHelper<CombinePathExp>());
-            Register("debuglog", new ExpressionFactoryHelper<DebugLogExp>());
+            Register("changeextension", new ExpressionFactoryHelper<ChangeExtensionExp>());
+            Register("echo", new ExpressionFactoryHelper<EchoExp>());
+            Register("call", new ExpressionFactoryHelper<CallExp>());
+            Register("return", new ExpressionFactoryHelper<ReturnExp>());
+            Register("redirect", new ExpressionFactoryHelper<RedirectExp>());
         }
         public void Register(string name, IExpressionFactory factory)
         {
@@ -2553,8 +3370,27 @@ namespace Calculator
         public void Cleanup()
         {
             m_Procs.Clear();
-            m_Variables.Clear();
-            m_NamedVariables.Clear();
+            m_Stack.Clear();
+            m_NamedGlobalVariables.Clear();
+        }
+        public void ClearGlobalVariables()
+        {
+            m_NamedGlobalVariables.Clear();
+        }
+        public bool TryGetGlobalVariable(string v, out object result)
+        {
+            return m_NamedGlobalVariables.TryGetValue(v, out result);
+        }
+        public object GetGlobalVariable(string v)
+        {
+            object result = null;
+            m_NamedGlobalVariables.TryGetValue(v, out result);
+            return result;
+        }
+        public void SetGlobalVariable(string v, object val)
+        {
+            var vars = m_NamedGlobalVariables;
+            vars[v] = val;
         }
         public void Load(string dslFile)
         {
@@ -2566,26 +3402,104 @@ namespace Calculator
                 }
             }
         }
-        public object Calc(string proc)
+        public object Calc(string proc, params object[] args)
         {
             object ret = 0;
-            m_Variables.Clear();
             List<IExpression> exps;
             if (m_Procs.TryGetValue(proc, out exps)) {
-                for (int i = 0; i < exps.Count; ++i) {
-                    ret = exps[i].Calc();
+                var si = new StackInfo();
+                si.Args = args;
+                m_Stack.Push(si);
+                try {
+                    for (int i = 0; i < exps.Count; ++i) {
+                        var exp = exps[i];
+                        try {                            
+                            ret = exp.Calc();
+                            if(m_RunState == RunStateEnum.Return) {
+                                m_RunState = RunStateEnum.Normal;
+                                break;
+                            } else if (m_RunState == RunStateEnum.Redirect) {
+                                break;
+                            }
+                        }catch(Exception ex) {
+                            Console.WriteLine("calc:[{0}] exception:{1}\n{2}", exp.ToString(), ex.Message, ex.StackTrace);
+                            ret = -1;
+                            break;
+                        }
+                    }
+                } finally {
+                    m_Stack.Pop();
                 }
             }
             return ret;
         }
-
-        public Dictionary<string, object> NamedVariables
+        public RunStateEnum RunState
         {
-            get { return m_NamedVariables; }
+            get { return m_RunState; }
+            internal set { m_RunState = value; }
         }
-        public Dictionary<int, object> Variables
+        internal IList<object> Arguments
         {
-            get { return m_Variables; }
+            get {
+                var stackInfo = m_Stack.Peek();
+                return stackInfo.Args;
+            }
+        }
+        internal bool TryGetVariable(int v, out object result)
+        {
+            return Variables.TryGetValue(v, out result);
+        }
+        internal object GetVariable(int v)
+        {
+            object result = null;
+            Variables.TryGetValue(v, out result);
+            return result;
+        }
+        internal void SetVariable(int v, object val)
+        {
+            Variables[v] = val;
+        }
+        internal bool TryGetVariable(string v, out object result)
+        {
+            bool ret = false;
+            if (v.Length > 0) {
+                if (v[0] == '@') {
+                    ret = TryGetGlobalVariable(v, out result);
+                } else if (v[0] == '$') {
+                    ret = NamedVariables.TryGetValue(v, out result);
+                } else {
+                    ret = TryGetGlobalVariable(v, out result);
+                }
+            } else {
+                result = null;
+            }
+            return ret;
+        }
+        internal object GetVariable(string v)
+        {
+            object result = null;
+            if (v.Length > 0) {
+                if (v[0] == '@') {
+                    result = GetGlobalVariable(v);
+                } else if (v[0] == '$') {
+                    NamedVariables.TryGetValue(v, out result);
+                } else {
+                    result = GetGlobalVariable(v);
+                }
+            }
+            return result;
+        }
+        internal void SetVariable(string v, object val)
+        {
+            if (v.Length > 0) {
+                if (v[0] == '@') {
+                    SetGlobalVariable(v, val);
+                } else if (v[0] == '$') {
+                    NamedVariables[v] = val;
+                } else {
+                    SetGlobalVariable(v, val);
+                }
+            }
         }
         internal IExpression Load(Dsl.ISyntaxComponent comp)
         {
@@ -2624,6 +3538,10 @@ namespace Calculator
                             default:
                                 return null;
                         }
+                    } else if (!callData.HaveParam()) {
+                        //退化
+                        valueData = callData.Name;
+                        return Load(valueData);
                     } else {
                         int paramClass = callData.GetParamClass();
                         string op = callData.GetId();
@@ -2742,12 +3660,23 @@ namespace Calculator
                     }
                 } else {
                     Dsl.FunctionData funcData = comp as Dsl.FunctionData;
-                    if (null != funcData && funcData.HaveStatement()) {
-                        callData = funcData.Call;
-                        if (null == callData || !callData.HaveParam()) {
-                            HashtableExp exp = new HashtableExp();
-                            exp.Load(comp, this);
-                            return exp;
+                    if (null != funcData) {
+                        if (funcData.HaveStatement()) {
+                            callData = funcData.Call;
+                            if (null == callData || !callData.HaveId() && !callData.HaveParam()) {
+                                HashtableExp exp = new HashtableExp();
+                                exp.Load(comp, this);
+                                return exp;
+                            }
+                        } else if (!funcData.HaveExternScript()) {
+                            //退化
+                            callData = funcData.Call;
+                            if (callData.HaveParam()) {
+                                return Load(callData);
+                            } else {
+                                valueData = callData.Name;
+                                return Load(valueData);
+                            }
                         }
                     }
                 }
@@ -2776,7 +3705,7 @@ namespace Calculator
         }
         private void Load(Dsl.DslInfo info)
         {
-            Dsl.FunctionData func = info.First;
+            var func = info.First;
             string id = func.Call.GetParamId(0);
             List<IExpression> list;
             if (!m_Procs.TryGetValue(id, out list)) {
@@ -2791,9 +3720,32 @@ namespace Calculator
             }
         }
 
+        private Dictionary<int, object> Variables
+        {
+            get {
+                var stackInfo = m_Stack.Peek();
+                return stackInfo.Vars;
+            }
+        }
+        private Dictionary<string, object> NamedVariables
+        {
+            get {
+                var stackInfo = m_Stack.Peek();
+                return stackInfo.NamedVars;
+            }
+        }
+
+        private class StackInfo
+        {
+            internal IList<object> Args = null;
+            internal Dictionary<int, object> Vars = new Dictionary<int, object>();
+            internal Dictionary<string, object> NamedVars = new Dictionary<string, object>();
+        }
+
+        private RunStateEnum m_RunState = RunStateEnum.Normal;
         private Dictionary<string, List<IExpression>> m_Procs = new Dictionary<string, List<IExpression>>();
-        private Dictionary<int, object> m_Variables = new Dictionary<int, object>();
-        private Dictionary<string, object> m_NamedVariables = new Dictionary<string, object>();
+        private Stack<StackInfo> m_Stack = new Stack<StackInfo>();
+        private Dictionary<string, object> m_NamedGlobalVariables = new Dictionary<string, object>();
         private Dictionary<string, IExpressionFactory> m_ExpressionFactories = new Dictionary<string, IExpressionFactory>();
     }
 }
