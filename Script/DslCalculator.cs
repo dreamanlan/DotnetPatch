@@ -3413,15 +3413,28 @@ namespace Calculator
                 try {
                     for (int i = 0; i < exps.Count; ++i) {
                         var exp = exps[i];
-                        try {                            
+                        try {
                             ret = exp.Calc();
-                            if(m_RunState == RunStateEnum.Return) {
+                            if (m_RunState == RunStateEnum.Return) {
                                 m_RunState = RunStateEnum.Normal;
                                 break;
                             } else if (m_RunState == RunStateEnum.Redirect) {
                                 break;
                             }
-                        }catch(Exception ex) {
+                        } catch (DirectoryNotFoundException ex5) {
+                            Console.WriteLine("calc:[{0}] exception:{1}\n{2}", exp.ToString(), ex5.Message, ex5.StackTrace);
+                        } catch (FileNotFoundException ex4) {
+                            Console.WriteLine("calc:[{0}] exception:{1}\n{2}", exp.ToString(), ex4.Message, ex4.StackTrace);
+                        } catch (IOException ex3) {
+                            Console.WriteLine("calc:[{0}] exception:{1}\n{2}", exp.ToString(), ex3.Message, ex3.StackTrace);
+                            ret = -1;
+                        } catch (UnauthorizedAccessException ex2) {
+                            Console.WriteLine("calc:[{0}] exception:{1}\n{2}", exp.ToString(), ex2.Message, ex2.StackTrace);
+                            ret = -1;
+                        } catch (NotSupportedException ex1) {
+                            Console.WriteLine("calc:[{0}] exception:{1}\n{2}", exp.ToString(), ex1.Message, ex1.StackTrace);
+                            ret = -1;
+                        } catch (Exception ex) {
                             Console.WriteLine("calc:[{0}] exception:{1}\n{2}", exp.ToString(), ex.Message, ex.StackTrace);
                             ret = -1;
                             break;
