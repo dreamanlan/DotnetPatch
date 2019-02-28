@@ -3392,6 +3392,10 @@ namespace Calculator
             var vars = m_NamedGlobalVariables;
             vars[v] = val;
         }
+        public void RemoveGlobalVariable(string v)
+        {
+            m_NamedGlobalVariables.Remove(v);
+        }
         public void Load(string dslFile)
         {
             Dsl.DslFile file = new Dsl.DslFile();
@@ -3472,6 +3476,10 @@ namespace Calculator
         {
             Variables[v] = val;
         }
+        internal void RemoveVariable(int v)
+        {
+            Variables.Remove(v);
+        }
         internal bool TryGetVariable(string v, out object result)
         {
             bool ret = false;
@@ -3511,6 +3519,18 @@ namespace Calculator
                     NamedVariables[v] = val;
                 } else {
                     SetGlobalVariable(v, val);
+                }
+            }
+        }
+        internal void RemoveVariable(string v)
+        {
+            if (v.Length > 0) {
+                if (v[0] == '@') {
+                    RemoveGlobalVariable(v);
+                } else if (v[0] == '$') {
+                    NamedVariables.Remove(v);
+                } else {
+                    RemoveGlobalVariable(v);
                 }
             }
         }
