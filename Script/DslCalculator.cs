@@ -3392,9 +3392,9 @@ namespace Calculator
             var vars = m_NamedGlobalVariables;
             vars[v] = val;
         }
-        public void RemoveGlobalVariable(string v)
+        public bool RemoveGlobalVariable(string v)
         {
-            m_NamedGlobalVariables.Remove(v);
+            return m_NamedGlobalVariables.Remove(v);
         }
         public void Load(string dslFile)
         {
@@ -3476,9 +3476,9 @@ namespace Calculator
         {
             Variables[v] = val;
         }
-        internal void RemoveVariable(int v)
+        internal bool RemoveVariable(int v)
         {
-            Variables.Remove(v);
+            return Variables.Remove(v);
         }
         internal bool TryGetVariable(string v, out object result)
         {
@@ -3522,17 +3522,19 @@ namespace Calculator
                 }
             }
         }
-        internal void RemoveVariable(string v)
+        internal bool RemoveVariable(string v)
         {
+            bool ret = false;
             if (v.Length > 0) {
                 if (v[0] == '@') {
-                    RemoveGlobalVariable(v);
+                    ret = RemoveGlobalVariable(v);
                 } else if (v[0] == '$') {
-                    NamedVariables.Remove(v);
+                    ret = NamedVariables.Remove(v);
                 } else {
-                    RemoveGlobalVariable(v);
+                    ret = RemoveGlobalVariable(v);
                 }
             }
+            return ret;
         }
         internal IExpression Load(Dsl.ISyntaxComponent comp)
         {
