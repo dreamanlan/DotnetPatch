@@ -2120,7 +2120,7 @@ namespace Calculator
                             cs[i] = '\0';
                         }
                     }
-                    str.Split(cs);
+                    r = str.Split(cs);
                 }
             }
             return r;
