@@ -3223,6 +3223,10 @@ namespace Calculator
     }
     public sealed class DslCalculator
     {
+        public IDictionary<string, object> NamedGlobalVariables
+        {
+            get { return m_NamedGlobalVariables; }
+        }
         public void Init()
         {
             Register("args", new ExpressionFactoryHelper<ArgsGet>());
