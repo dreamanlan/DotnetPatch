@@ -3410,6 +3410,34 @@ namespace Calculator
                 }
             }
         }
+        public void Load(string proc, Dsl.FunctionData func)
+        {
+            Load(proc, null, func);
+        }
+        public void Load(string proc, IList<string> argNames, Dsl.FunctionData func)
+        {
+            if (null != argNames && argNames.Count > 0) {
+                List<string> names;
+                if(!m_ProcArgNames.TryGetValue(proc, out names)) {
+                    names = new List<string>(argNames);
+                    m_ProcArgNames.Add(proc, names);
+                } else {
+                    names.Clear();
+                    names.AddRange(argNames);
+                }
+            }
+            List<IExpression> list;
+            if (!m_Procs.TryGetValue(proc, out list)) {
+                list = new List<IExpression>();
+                m_Procs.Add(proc, list);
+            }
+            foreach (Dsl.ISyntaxComponent comp in func.Statements) {
+                var exp = Load(comp);
+                if (null != exp) {
+                    list.Add(exp);
+                }
+            }
+        }
         public object Calc(string proc, params object[] args)
         {
             object ret = 0;
@@ -3419,6 +3447,15 @@ namespace Calculator
                 si.Args = args;
                 m_Stack.Push(si);
                 try {
+                    List<string> names;
+                    if(m_ProcArgNames.TryGetValue(proc, out names)) {
+                        for (int i = 0; i < names.Count; ++i) {
+                            if (i < args.Length)
+                                SetVariable(names[i], args[i]);
+                            else
+                                SetVariable(names[i], null);
+                        }
+                    }
                     for (int i = 0; i < exps.Count; ++i) {
                         var exp = exps[i];
                         try {
@@ -3744,8 +3781,34 @@ namespace Calculator
         }
         private void Load(Dsl.DslInfo info)
         {
-            var func = info.First;
-            string id = func.Call.GetParamId(0);
+            if (info.GetId() != "script")
+                return;
+            string id = info.First.Call.GetParamId(0);
+            Dsl.FunctionData func = null;
+            if (info.GetFunctionNum() == 1) {
+                func = info.First;
+            } else if (info.GetFunctionNum() == 2) {
+                func = info.Second;
+
+                if (func.GetId() == "args") {
+                    if (func.Call.GetParamNum() > 0) {
+                        List<string> names;
+                        if (!m_ProcArgNames.TryGetValue(id, out names)) {
+                            names = new List<string>();
+                            m_ProcArgNames.Add(id, names);
+                        } else {
+                            names.Clear();
+                        }
+                        foreach (var p in func.Call.Params) {
+                            names.Add(p.GetId());
+                        }
+                    }
+                } else {
+                    return;
+                }
+            } else {
+                return;
+            }
             List<IExpression> list;
             if (!m_Procs.TryGetValue(id, out list)) {
                 list = new List<IExpression>();
@@ -3782,6 +3845,7 @@ namespace Calculator
         }
 
         private RunStateEnum m_RunState = RunStateEnum.Normal;
+        private Dictionary<string, List<string>> m_ProcArgNames = new Dictionary<string, List<string>>();
         private Dictionary<string, List<IExpression>> m_Procs = new Dictionary<string, List<IExpression>>();
         private Stack<StackInfo> m_Stack = new Stack<StackInfo>();
         private Dictionary<string, object> m_NamedGlobalVariables = new Dictionary<string, object>();
