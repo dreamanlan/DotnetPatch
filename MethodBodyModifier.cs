@@ -458,7 +458,7 @@ namespace DotnetPatch
             s_FileList.AddRange(files);
             s_OutputPath = outputPath;
             
-            s_Calculator.Load(scpFile);
+            s_Calculator.LoadDsl(scpFile);
             s_Calculator.Calc("main");
         }
         public static IList<string> GetFileList()

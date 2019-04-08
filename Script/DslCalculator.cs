@@ -3400,21 +3400,63 @@ namespace Calculator
         {
             return m_NamedGlobalVariables.Remove(v);
         }
-        public void Load(string dslFile)
+        public void LoadDsl(string dslFile)
         {
             Dsl.DslFile file = new Dsl.DslFile();
             string path = dslFile;
             if (file.Load(path, (string s) => { Console.WriteLine(s); })) {
                 foreach (Dsl.DslInfo info in file.DslInfos) {
-                    Load(info);
+                    LoadDsl(info);
                 }
             }
         }
-        public void Load(string proc, Dsl.FunctionData func)
+        public void LoadDsl(Dsl.DslInfo info)
         {
-            Load(proc, null, func);
+            if (info.GetId() != "script")
+                return;
+            string id = info.First.Call.GetParamId(0);
+            Dsl.FunctionData func = null;
+            if (info.GetFunctionNum() == 1) {
+                func = info.First;
+            } else if (info.GetFunctionNum() == 2) {
+                func = info.Second;
+
+                if (func.GetId() == "args") {
+                    if (func.Call.GetParamNum() > 0) {
+                        List<string> names;
+                        if (!m_ProcArgNames.TryGetValue(id, out names)) {
+                            names = new List<string>();
+                            m_ProcArgNames.Add(id, names);
+                        } else {
+                            names.Clear();
+                        }
+                        foreach (var p in func.Call.Params) {
+                            names.Add(p.GetId());
+                        }
+                    }
+                } else {
+                    return;
+                }
+            } else {
+                return;
+            }
+            List<IExpression> list;
+            if (!m_Procs.TryGetValue(id, out list)) {
+                list = new List<IExpression>();
+                m_Procs.Add(id, list);
+            }
+            foreach (Dsl.ISyntaxComponent comp in func.Statements) {
+                var exp = Load(comp);
+                if (null != exp) {
+                    list.Add(exp);
+                }
+            }
         }
-        public void Load(string proc, IList<string> argNames, Dsl.FunctionData func)
+        public void LoadDsl(string proc, Dsl.FunctionData func)
+        {
+            LoadDsl(proc, null, func);
+        }
+        public void LoadDsl(string proc, IList<string> argNames, Dsl.FunctionData func)
         {
             if (null != argNames && argNames.Count > 0) {
                 List<string> names;
@@ -3778,48 +3820,6 @@ namespace Calculator
                 ret = factory.Create();
             }
             return ret;
-        }
-        private void Load(Dsl.DslInfo info)
-        {
-            if (info.GetId() != "script")
-                return;
-            string id = info.First.Call.GetParamId(0);
-            Dsl.FunctionData func = null;
-            if (info.GetFunctionNum() == 1) {
-                func = info.First;
-            } else if (info.GetFunctionNum() == 2) {
-                func = info.Second;
-
-                if (func.GetId() == "args") {
-                    if (func.Call.GetParamNum() > 0) {
-                        List<string> names;
-                        if (!m_ProcArgNames.TryGetValue(id, out names)) {
-                            names = new List<string>();
-                            m_ProcArgNames.Add(id, names);
-                        } else {
-                            names.Clear();
-                        }
-                        foreach (var p in func.Call.Params) {
-                            names.Add(p.GetId());
-                        }
-                    }
-                } else {
-                    return;
-                }
-            } else {
-                return;
-            }
-            List<IExpression> list;
-            if (!m_Procs.TryGetValue(id, out list)) {
-                list = new List<IExpression>();
-                m_Procs.Add(id, list);
-            }
-            foreach (Dsl.ISyntaxComponent comp in func.Statements) {
-                var exp = Load(comp);
-                if (null != exp) {
-                    list.Add(exp);
-                }
-            }
         }
 
         private Dictionary<int, object> Variables
