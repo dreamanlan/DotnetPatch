@@ -2967,7 +2967,19 @@ namespace Calculator
     {
         protected override object OnCalc(IList<object> operands)
         {
-            return Environment.GetCommandLineArgs();
+            if (operands.Count >= 1) {
+                string name = operands[0] as string;
+                if (!string.IsNullOrEmpty(name)) {
+                    string[] args = System.Environment.GetCommandLineArgs();
+                    int suffixIndex = Array.FindIndex(args, item => item == name);
+                    if (suffixIndex != -1 && suffixIndex < args.Length - 1) {
+                        return args[suffixIndex + 1];
+                    }
+                }
+                return string.Empty;
+            } else {
+                return Environment.GetCommandLineArgs();
+            }
         }
     }
     internal class OsExp : SimpleExpressionBase
