@@ -3671,7 +3671,7 @@ namespace Calculator
             } else {
                 Dsl.CallData callData = comp as Dsl.CallData;
                 if (null != callData) {
-                    if (!callData.HaveId()) {
+                    if (!callData.HaveId() && !callData.IsHighOrder && (callData.GetParamClass() == (int)Dsl.CallData.ParamClassEnum.PARAM_CLASS_PARENTHESIS || callData.GetParamClass() == (int)Dsl.CallData.ParamClassEnum.PARAM_CLASS_BRACKET)) {
                         switch (callData.GetParamClass()) {
                             case (int)Dsl.CallData.ParamClassEnum.PARAM_CLASS_PARENTHESIS:
                                 int num = callData.GetParamNum();
