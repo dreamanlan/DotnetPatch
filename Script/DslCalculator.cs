@@ -26,7 +26,17 @@ namespace Calculator
     }
     public abstract class AbstractExpression : IExpression
     {
-        public abstract object Calc();
+        public object Calc()
+        {
+            object ret = null;
+            try {
+                ret = DoCalc();
+            } catch (Exception ex) {
+                Console.WriteLine("calc:[{0}] exception:{1}\n{2}", ToString(), ex.Message, ex.StackTrace);
+                throw ex;
+            }
+            return ret;
+        }
         public bool Load(Dsl.ISyntaxComponent dsl, DslCalculator calculator)
         {
             m_Calculator = calculator;
@@ -71,6 +81,7 @@ namespace Calculator
         protected virtual bool Load(IList<IExpression> exps) { return false; }
         protected virtual bool Load(Dsl.FunctionData funcData) { return false; }
         protected virtual bool Load(Dsl.StatementData statementData) { return false; }
+        protected abstract object DoCalc();
 
         protected DslCalculator Calculator
         {
@@ -191,7 +202,7 @@ namespace Calculator
     }
     public abstract class SimpleExpressionBase : AbstractExpression
     {
-        public override object Calc()
+        protected override object DoCalc()
         {
             List<object> operands = new List<object>();
             for (int i = 0; i < m_Exps.Count; ++i) {
@@ -211,7 +222,7 @@ namespace Calculator
     }
     internal sealed class ArgsGet : AbstractExpression
     {
-        public override object Calc()
+        protected override object DoCalc()
         {
             object ret = Calculator.Arguments;
             return ret;
@@ -223,7 +234,7 @@ namespace Calculator
     }
     internal sealed class ArgGet : AbstractExpression
     {
-        public override object Calc()
+        protected override object DoCalc()
         {
             object ret = null;
             var ix = (int)Convert.ChangeType(m_ArgIndex.Calc(), typeof(int));
@@ -243,7 +254,7 @@ namespace Calculator
     }
     internal sealed class ArgNumGet : AbstractExpression
     {
-        public override object Calc()
+        protected override object DoCalc()
         {
             object ret = Calculator.Arguments.Count;
             return ret;
@@ -255,7 +266,7 @@ namespace Calculator
     }
     internal sealed class VarSet : AbstractExpression
     {
-        public override object Calc()
+        protected override object DoCalc()
         {
             var varId = m_VarId.Calc();
             object v = m_Op.Calc();
@@ -284,7 +295,7 @@ namespace Calculator
     }
     internal sealed class VarGet : AbstractExpression
     {
-        public override object Calc()
+        protected override object DoCalc()
         {
             var varId = m_VarId.Calc();
             object v = null;
@@ -309,7 +320,7 @@ namespace Calculator
     }
     internal sealed class NamedVarSet : AbstractExpression
     {
-        public override object Calc()
+        protected override object DoCalc()
         {
             object v = m_Op.Calc();
             if (m_VarId.Length > 0) {
@@ -334,7 +345,7 @@ namespace Calculator
     }
     internal sealed class NamedVarGet : AbstractExpression
     {
-        public override object Calc()
+        protected override object DoCalc()
         {
             object ret = 0;
             if (m_VarId == "break") {
@@ -359,7 +370,7 @@ namespace Calculator
     }
     internal sealed class ConstGet : AbstractExpression
     {
-        public override object Calc()
+        protected override object DoCalc()
         {
             object v = m_Val;
             return v;
@@ -403,7 +414,7 @@ namespace Calculator
     }
     internal sealed class AddExp : AbstractExpression
     {
-        public override object Calc()
+        protected override object DoCalc()
         {
             object v1 = m_Op1.Calc();
             object v2 = m_Op2.Calc();
@@ -427,7 +438,7 @@ namespace Calculator
     }
     internal sealed class SubExp : AbstractExpression
     {
-        public override object Calc()
+        protected override object DoCalc()
         {
             object v1 = m_Op1.Calc();
             object v2 = m_Op2.Calc();
@@ -446,7 +457,7 @@ namespace Calculator
     }
     internal sealed class MulExp : AbstractExpression
     {
-        public override object Calc()
+        protected override object DoCalc()
         {
             object v1 = m_Op1.Calc();
             object v2 = m_Op2.Calc();
@@ -465,7 +476,7 @@ namespace Calculator
     }
     internal sealed class DivExp : AbstractExpression
     {
-        public override object Calc()
+        protected override object DoCalc()
         {
             object v1 = m_Op1.Calc();
             object v2 = m_Op2.Calc();
@@ -484,7 +495,7 @@ namespace Calculator
     }
     internal sealed class ModExp : AbstractExpression
     {
-        public override object Calc()
+        protected override object DoCalc()
         {
             object v1 = m_Op1.Calc();
             object v2 = m_Op2.Calc();
@@ -503,7 +514,7 @@ namespace Calculator
     }
     internal sealed class BitAndExp : AbstractExpression
     {
-        public override object Calc()
+        protected override object DoCalc()
         {
             object v1 = m_Op1.Calc();
             object v2 = m_Op2.Calc();
@@ -522,7 +533,7 @@ namespace Calculator
     }
     internal sealed class BitOrExp : AbstractExpression
     {
-        public override object Calc()
+        protected override object DoCalc()
         {
             object v1 = m_Op1.Calc();
             object v2 = m_Op2.Calc();
@@ -541,7 +552,7 @@ namespace Calculator
     }
     internal sealed class BitXorExp : AbstractExpression
     {
-        public override object Calc()
+        protected override object DoCalc()
         {
             object v1 = m_Op1.Calc();
             object v2 = m_Op2.Calc();
@@ -560,7 +571,7 @@ namespace Calculator
     }
     internal sealed class BitNotExp : AbstractExpression
     {
-        public override object Calc()
+        protected override object DoCalc()
         {
             object v1 = m_Op1.Calc();
             object v = ~ToLong(v1);
@@ -576,7 +587,7 @@ namespace Calculator
     }
     internal sealed class LShiftExp : AbstractExpression
     {
-        public override object Calc()
+        protected override object DoCalc()
         {
             object v1 = m_Op1.Calc();
             object v2 = m_Op2.Calc();
@@ -595,7 +606,7 @@ namespace Calculator
     }
     internal sealed class RShiftExp : AbstractExpression
     {
-        public override object Calc()
+        protected override object DoCalc()
         {
             object v1 = m_Op1.Calc();
             object v2 = m_Op2.Calc();
@@ -614,7 +625,7 @@ namespace Calculator
     }
     internal sealed class MaxExp : AbstractExpression
     {
-        public override object Calc()
+        protected override object DoCalc()
         {
             double v1 = ToDouble(m_Op1.Calc());
             double v2 = ToDouble(m_Op2.Calc());
@@ -633,7 +644,7 @@ namespace Calculator
     }
     internal sealed class MinExp : AbstractExpression
     {
-        public override object Calc()
+        protected override object DoCalc()
         {
             double v1 = ToDouble(m_Op1.Calc());
             double v2 = ToDouble(m_Op2.Calc());
@@ -652,7 +663,7 @@ namespace Calculator
     }
     internal sealed class AbsExp : AbstractExpression
     {
-        public override object Calc()
+        protected override object DoCalc()
         {
             double v1 = ToDouble(m_Op.Calc());
             object v = v1 >= 0 ? v1 : -v1;
@@ -668,7 +679,7 @@ namespace Calculator
     }
     internal sealed class PowExp : AbstractExpression
     {
-        public override object Calc()
+        protected override object DoCalc()
         {
             double v1 = ToDouble(m_Op1.Calc());
             double v2 = ToDouble(m_Op2.Calc());
@@ -687,7 +698,7 @@ namespace Calculator
     }
     internal sealed class SqrtExp : AbstractExpression
     {
-        public override object Calc()
+        protected override object DoCalc()
         {
             double v1 = ToDouble(m_Op1.Calc());
             object v = (double)Math.Sqrt((float)v1);
@@ -703,7 +714,7 @@ namespace Calculator
     }
     internal sealed class LogExp : AbstractExpression
     {
-        public override object Calc()
+        protected override object DoCalc()
         {
             double v1 = ToDouble(m_Op1.Calc());
             object v = (double)Math.Log((float)v1);
@@ -719,7 +730,7 @@ namespace Calculator
     }
     internal sealed class Log10Exp : AbstractExpression
     {
-        public override object Calc()
+        protected override object DoCalc()
         {
             double v1 = ToDouble(m_Op1.Calc());
             object v = (double)Math.Log10((float)v1);
@@ -735,7 +746,7 @@ namespace Calculator
     }
     internal sealed class FloorExp : AbstractExpression
     {
-        public override object Calc()
+        protected override object DoCalc()
         {
             double v1 = ToDouble(m_Op1.Calc());
             object v = Math.Floor(v1);
@@ -751,7 +762,7 @@ namespace Calculator
     }
     internal sealed class CeilExp : AbstractExpression
     {
-        public override object Calc()
+        protected override object DoCalc()
         {
             double v1 = ToDouble(m_Op1.Calc());
             object v = Math.Ceiling(v1);
@@ -767,7 +778,7 @@ namespace Calculator
     }
     internal sealed class ClampExp : AbstractExpression
     {
-        public override object Calc()
+        protected override object DoCalc()
         {
             double v1 = ToDouble(m_Op1.Calc());
             double v2 = ToDouble(m_Op2.Calc());
@@ -795,7 +806,7 @@ namespace Calculator
     }
     internal sealed class DistExp : AbstractExpression
     {
-        public override object Calc()
+        protected override object DoCalc()
         {
             float x1 = (float)ToDouble(m_Op1.Calc());
             float y1 = (float)ToDouble(m_Op2.Calc());
@@ -820,7 +831,7 @@ namespace Calculator
     }
     internal sealed class DistSqrExp : AbstractExpression
     {
-        public override object Calc()
+        protected override object DoCalc()
         {
             float x1 = (float)ToDouble(m_Op1.Calc());
             float y1 = (float)ToDouble(m_Op2.Calc());
@@ -845,7 +856,7 @@ namespace Calculator
     }
     internal sealed class GreatExp : AbstractExpression
     {
-        public override object Calc()
+        protected override object DoCalc()
         {
             double v1 = ToDouble(m_Op1.Calc());
             double v2 = ToDouble(m_Op2.Calc());
@@ -864,7 +875,7 @@ namespace Calculator
     }
     internal sealed class GreatEqualExp : AbstractExpression
     {
-        public override object Calc()
+        protected override object DoCalc()
         {
             double v1 = ToDouble(m_Op1.Calc());
             double v2 = ToDouble(m_Op2.Calc());
@@ -883,7 +894,7 @@ namespace Calculator
     }
     internal sealed class LessExp : AbstractExpression
     {
-        public override object Calc()
+        protected override object DoCalc()
         {
             double v1 = ToDouble(m_Op1.Calc());
             double v2 = ToDouble(m_Op2.Calc());
@@ -902,7 +913,7 @@ namespace Calculator
     }
     internal sealed class LessEqualExp : AbstractExpression
     {
-        public override object Calc()
+        protected override object DoCalc()
         {
             double v1 = ToDouble(m_Op1.Calc());
             double v2 = ToDouble(m_Op2.Calc());
@@ -921,7 +932,7 @@ namespace Calculator
     }
     internal sealed class EqualExp : AbstractExpression
     {
-        public override object Calc()
+        protected override object DoCalc()
         {
             object v1 = m_Op1.Calc();
             object v2 = m_Op2.Calc();
@@ -940,7 +951,7 @@ namespace Calculator
     }
     internal sealed class NotEqualExp : AbstractExpression
     {
-        public override object Calc()
+        protected override object DoCalc()
         {
             object v1 = m_Op1.Calc();
             object v2 = m_Op2.Calc();
@@ -959,7 +970,7 @@ namespace Calculator
     }
     internal sealed class AndExp : AbstractExpression
     {
-        public override object Calc()
+        protected override object DoCalc()
         {
             long v1 = ToLong(m_Op1.Calc());
             long v2 = 0;
@@ -978,7 +989,7 @@ namespace Calculator
     }
     internal sealed class OrExp : AbstractExpression
     {
-        public override object Calc()
+        protected override object DoCalc()
         {
             long v1 = ToLong(m_Op1.Calc());
             long v2 = 0;
@@ -997,7 +1008,7 @@ namespace Calculator
     }
     internal sealed class NotExp : AbstractExpression
     {
-        public override object Calc()
+        protected override object DoCalc()
         {
             long val = ToLong(m_Op.Calc());
             object v = val == 0 ? 1 : 0;
@@ -1013,7 +1024,7 @@ namespace Calculator
     }
     internal sealed class CondExp : AbstractExpression
     {
-        public override object Calc()
+        protected override object DoCalc()
         {
             object v1 = m_Op1.Calc();
             object v2 = null;
@@ -1045,7 +1056,7 @@ namespace Calculator
     }
     internal sealed class IfExp : AbstractExpression
     {
-        public override object Calc()
+        protected override object DoCalc()
         {
             object v = 0;
             for (int ix = 0; ix < m_Clauses.Count; ++ix) {
@@ -1156,7 +1167,7 @@ namespace Calculator
     }
     internal sealed class WhileExp : AbstractExpression
     {
-        public override object Calc()
+        protected override object DoCalc()
         {
             object v = 0;
             for (; ; ) {
@@ -1219,7 +1230,7 @@ namespace Calculator
     }
     internal sealed class LoopExp : AbstractExpression
     {
-        public override object Calc()
+        protected override object DoCalc()
         {
             object v = 0;
             object count = m_Count.Calc();
@@ -1280,7 +1291,7 @@ namespace Calculator
     }
     internal sealed class LoopListExp : AbstractExpression
     {
-        public override object Calc()
+        protected override object DoCalc()
         {
             object v = 0;
             object list = m_List.Calc();
@@ -1345,7 +1356,7 @@ namespace Calculator
     }
     internal sealed class ForeachExp : AbstractExpression
     {
-        public override object Calc()
+        protected override object DoCalc()
         {
             object v = 0;
             List<object> list = new List<object>();
@@ -1419,7 +1430,7 @@ namespace Calculator
     }
     internal sealed class ParenthesisExp : AbstractExpression
     {
-        public override object Calc()
+        protected override object DoCalc()
         {
             object v = 0;
             for (int ix = 0; ix < m_Expressions.Count; ++ix) {
@@ -1441,7 +1452,7 @@ namespace Calculator
     }
     internal sealed class FormatExp : AbstractExpression
     {
-        public override object Calc()
+        protected override object DoCalc()
         {
             object v = 0;
             string fmt = string.Empty;
@@ -1470,7 +1481,7 @@ namespace Calculator
     }
     internal sealed class GetTypeAssemblyNameExp : AbstractExpression
     {
-        public override object Calc()
+        protected override object DoCalc()
         {
             object ret = null;
             if (m_Expressions.Count >= 1) {
@@ -1496,7 +1507,7 @@ namespace Calculator
     }
     internal sealed class GetTypeFullNameExp : AbstractExpression
     {
-        public override object Calc()
+        protected override object DoCalc()
         {
             object ret = null;
             if (m_Expressions.Count >= 1) {
@@ -1522,7 +1533,7 @@ namespace Calculator
     }
     internal sealed class GetTypeNameExp : AbstractExpression
     {
-        public override object Calc()
+        protected override object DoCalc()
         {
             object ret = null;
             if (m_Expressions.Count >= 1) {
@@ -1548,7 +1559,7 @@ namespace Calculator
     }
     internal sealed class GetTypeExp : AbstractExpression
     {
-        public override object Calc()
+        protected override object DoCalc()
         {
             object ret = null;
             if (m_Expressions.Count >= 1) {
@@ -1577,7 +1588,7 @@ namespace Calculator
     }
     internal sealed class ChangeTypeExp : AbstractExpression
     {
-        public override object Calc()
+        protected override object DoCalc()
         {
             object ret = null;
             if (m_Expressions.Count >= 2) {
@@ -1635,7 +1646,7 @@ namespace Calculator
     }
     internal sealed class ParseEnumExp : AbstractExpression
     {
-        public override object Calc()
+        protected override object DoCalc()
         {
             object ret = null;
             if (m_Expressions.Count >= 2) {
@@ -1667,7 +1678,7 @@ namespace Calculator
     }
     internal sealed class DotnetCallExp : AbstractExpression
     {
-        public override object Calc()
+        protected override object DoCalc()
         {
             object ret = null;
             object obj = null;
@@ -1756,7 +1767,7 @@ namespace Calculator
     }
     internal sealed class DotnetSetExp : AbstractExpression
     {
-        public override object Calc()
+        protected override object DoCalc()
         {
             object ret = null;
             object obj = null;
@@ -1834,7 +1845,7 @@ namespace Calculator
     }
     internal sealed class DotnetGetExp : AbstractExpression
     {
-        public override object Calc()
+        protected override object DoCalc()
         {
             object ret = null;
             object obj = null;
@@ -1914,7 +1925,7 @@ namespace Calculator
     }
     internal sealed class LinqExp : AbstractExpression
     {
-        public override object Calc()
+        protected override object DoCalc()
         {
             object v = 0;
             object list = m_List.Calc();
@@ -2010,7 +2021,7 @@ namespace Calculator
     }
     internal sealed class IsNullExp : AbstractExpression
     {
-        public override object Calc()
+        protected override object DoCalc()
         {
             object ret = null;
             if (m_Expressions.Count >= 1) {
@@ -2527,7 +2538,7 @@ namespace Calculator
     }
     internal class HashtableExp : AbstractExpression
     {
-        public override object Calc()
+        protected override object DoCalc()
         {
             object r = null;
             Hashtable dict = new Hashtable();
