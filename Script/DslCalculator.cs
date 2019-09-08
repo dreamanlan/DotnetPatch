@@ -32,8 +32,8 @@ namespace Calculator
             try {
                 ret = DoCalc();
             } catch (Exception ex) {
-                Console.WriteLine("calc:[{0}] exception:{1}\n{2}", ToString(), ex.Message, ex.StackTrace);
-                throw ex;
+                var msg = string.Format("calc:[{0}]", ToString());
+                throw new Exception(msg, ex);
             }
             return ret;
         }
@@ -3249,9 +3249,9 @@ namespace Calculator
         {
             Calculator.RunState = RunStateEnum.Redirect;
             if (operands.Count >= 1) {
-                List<string> args = new List<string>();
+                ArrayList args = new ArrayList();
                 for (int i = 0; i < operands.Count; ++i) {
-                    var arg = operands[i] as string;
+                    var arg = operands[i];
                     args.Add(arg);
                 }
                 return args;
@@ -3556,19 +3556,25 @@ namespace Calculator
                             }
                         } catch (DirectoryNotFoundException ex5) {
                             Console.WriteLine("calc:[{0}] exception:{1}\n{2}", exp.ToString(), ex5.Message, ex5.StackTrace);
+                            OutputInnerException(ex5);
                         } catch (FileNotFoundException ex4) {
                             Console.WriteLine("calc:[{0}] exception:{1}\n{2}", exp.ToString(), ex4.Message, ex4.StackTrace);
+                            OutputInnerException(ex4);
                         } catch (IOException ex3) {
                             Console.WriteLine("calc:[{0}] exception:{1}\n{2}", exp.ToString(), ex3.Message, ex3.StackTrace);
+                            OutputInnerException(ex3);
                             ret = -1;
                         } catch (UnauthorizedAccessException ex2) {
                             Console.WriteLine("calc:[{0}] exception:{1}\n{2}", exp.ToString(), ex2.Message, ex2.StackTrace);
+                            OutputInnerException(ex2);
                             ret = -1;
                         } catch (NotSupportedException ex1) {
                             Console.WriteLine("calc:[{0}] exception:{1}\n{2}", exp.ToString(), ex1.Message, ex1.StackTrace);
+                            OutputInnerException(ex1);
                             ret = -1;
                         } catch (Exception ex) {
                             Console.WriteLine("calc:[{0}] exception:{1}\n{2}", exp.ToString(), ex.Message, ex.StackTrace);
+                            OutputInnerException(ex);
                             ret = -1;
                             break;
                         }
@@ -3866,6 +3872,13 @@ namespace Calculator
                 ret = factory.Create();
             }
             return ret;
+        }
+        private void OutputInnerException(Exception ex)
+        {
+            while (null != ex.InnerException) {
+                ex = ex.InnerException;
+                Console.WriteLine("\t=> exception:{0} stack:{1}", ex.Message, ex.StackTrace);
+            }
         }
 
         private Dictionary<int, object> Variables
