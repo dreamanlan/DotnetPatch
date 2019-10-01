@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Reflection;
 using System.Text;
 using System.IO;
+using System.Security.Cryptography;
 using System.Linq;
 
 namespace Calculator
@@ -3259,6 +3260,38 @@ namespace Calculator
             return null;
         }
     }
+    internal class CalcMd5Exp : SimpleExpressionBase
+    {
+        protected override object OnCalc(IList<object> operands)
+        {
+            object r = null;
+            if (operands.Count >= 1) {
+                var file = operands[0] as string;
+                if (null != file) {
+                    r = CalcMD5(file);
+                }
+            }
+            return r;
+        }
+        public string CalcMD5(string file)
+        {
+            byte[] array = null;
+            using(var stream = new FileStream(file, FileMode.Open, FileAccess.Read, FileShare.ReadWrite)) {
+                MD5 md5 = MD5.Create();
+                array = md5.ComputeHash(stream);
+                stream.Close();
+            }
+            if (null != array) {
+                StringBuilder stringBuilder = new StringBuilder();
+                for (int i = 0; i < array.Length; i++) {
+                    stringBuilder.Append(array[i].ToString("x2"));
+                }
+                return stringBuilder.ToString();
+            } else {
+                return string.Empty;
+            }
+        }
+    }
     public enum RunStateEnum
     {
         Normal = 0,
@@ -3408,6 +3441,7 @@ namespace Calculator
             Register("call", new ExpressionFactoryHelper<CallExp>());
             Register("return", new ExpressionFactoryHelper<ReturnExp>());
             Register("redirect", new ExpressionFactoryHelper<RedirectExp>());
+            Register("calcmd5", new ExpressionFactoryHelper<CalcMd5Exp>());
         }
         public void Register(string name, IExpressionFactory factory)
         {
