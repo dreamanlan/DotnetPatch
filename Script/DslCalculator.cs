@@ -3934,12 +3934,12 @@ namespace Calculator
                                     newCall.SetParamClass((int)Dsl.CallData.ParamClassEnum.PARAM_CLASS_PARENTHESIS);
                                     if (innerCall.IsHighOrder) {
                                         newCall.Params.Add(innerCall.Call);
-                                        newCall.Params.Add(ConvertMember(innerCall.GetParam(0)));
+                                        newCall.Params.Add(ConvertMember(innerCall.GetParam(0), innerCall.GetParamClass()));
                                         newCall.Params.Add(callData.GetParam(1));
                                     }
                                     else {
                                         newCall.Params.Add(innerCall.Name);
-                                        newCall.Params.Add(ConvertMember(innerCall.GetParam(0)));
+                                        newCall.Params.Add(ConvertMember(innerCall.GetParam(0), innerCall.GetParamClass()));
                                         newCall.Params.Add(callData.GetParam(1));
                                     }
 
@@ -3989,7 +3989,7 @@ namespace Calculator
                                     newCall.SetParamClass((int)Dsl.CallData.ParamClassEnum.PARAM_CLASS_PARENTHESIS);
                                     if (innerCall.IsHighOrder) {
                                         newCall.Params.Add(innerCall.Call);
-                                        newCall.Params.Add(ConvertMember(innerCall.GetParam(0)));
+                                        newCall.Params.Add(ConvertMember(innerCall.GetParam(0), innerCall.GetParamClass()));
                                         for (int i = 0; i < callData.GetParamNum(); ++i) {
                                             Dsl.ISyntaxComponent p = callData.Params[i];
                                             newCall.Params.Add(p);
@@ -3997,7 +3997,7 @@ namespace Calculator
                                     }
                                     else {
                                         newCall.Params.Add(innerCall.Name);
-                                        newCall.Params.Add(ConvertMember(innerCall.GetParam(0)));
+                                        newCall.Params.Add(ConvertMember(innerCall.GetParam(0), innerCall.GetParamClass()));
                                         for (int i = 0; i < callData.GetParamNum(); ++i) {
                                             Dsl.ISyntaxComponent p = callData.Params[i];
                                             newCall.Params.Add(p);
@@ -4027,11 +4027,11 @@ namespace Calculator
                                 newCall.SetParamClass((int)Dsl.CallData.ParamClassEnum.PARAM_CLASS_PARENTHESIS);
                                 if (callData.IsHighOrder) {
                                     newCall.Params.Add(callData.Call);
-                                    newCall.Params.Add(ConvertMember(callData.GetParam(0)));
+                                    newCall.Params.Add(ConvertMember(callData.GetParam(0), callData.GetParamClass()));
                                 }
                                 else {
                                     newCall.Params.Add(callData.Name);
-                                    newCall.Params.Add(ConvertMember(callData.GetParam(0)));
+                                    newCall.Params.Add(ConvertMember(callData.GetParam(0), callData.GetParamClass()));
                                 }
 
                                 var getExp = new DotnetGetExp();
@@ -4079,10 +4079,12 @@ namespace Calculator
             }
             return ret;
         }
-        private Dsl.ISyntaxComponent ConvertMember(Dsl.ISyntaxComponent p)
+        private Dsl.ISyntaxComponent ConvertMember(Dsl.ISyntaxComponent p, int paramClass)
         {
             var pvd = p as Dsl.ValueData;
-            if (null != pvd && pvd.IsId()) {
+            if (null != pvd && pvd.IsId() && (paramClass == (int)Dsl.CallData.ParamClassEnum.PARAM_CLASS_PERIOD
+                || paramClass == (int)Dsl.CallData.ParamClassEnum.PARAM_CLASS_POINTER
+                || paramClass == (int)Dsl.CallData.ParamClassEnum.PARAM_CLASS_QUESTION_PERIOD)) {
                 pvd.SetType(Dsl.ValueData.STRING_TOKEN);
                 return pvd;
             }
