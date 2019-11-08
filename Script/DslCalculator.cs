@@ -2416,6 +2416,52 @@ namespace Calculator
             return r;
         }
     }
+    internal class DatetimeStrExp : SimpleExpressionBase
+    {
+        protected override object OnCalc(IList<object> operands)
+        {
+            object r = null;
+            if (operands.Count >= 1) {
+                var fmt = operands[0] as string;
+                r = DateTime.Now.ToString(fmt);
+            } else {
+                r = DateTime.Now.ToString();
+            }
+            return r;
+        }
+    }
+    internal class LongDateStrExp : SimpleExpressionBase
+    {
+        protected override object OnCalc(IList<object> operands)
+        {
+            object r = DateTime.Now.ToLongDateString();
+            return r;
+        }
+    }
+    internal class LongTimeStrExp : SimpleExpressionBase
+    {
+        protected override object OnCalc(IList<object> operands)
+        {
+            object r = DateTime.Now.ToShortDateString();
+            return r;
+        }
+    }
+    internal class ShortDateStrExp : SimpleExpressionBase
+    {
+        protected override object OnCalc(IList<object> operands)
+        {
+            object r = DateTime.Now.ToShortDateString();
+            return r;
+        }
+    }
+    internal class ShortTimeStrExp : SimpleExpressionBase
+    {
+        protected override object OnCalc(IList<object> operands)
+        {
+            object r = DateTime.Now.ToShortTimeString();
+            return r;
+        }
+    }
     internal class IsNullOrEmptyExp : SimpleExpressionBase
     {
         protected override object OnCalc(IList<object> operands)
@@ -3515,6 +3561,11 @@ namespace Calculator
             Register("str2int", new ExpressionFactoryHelper<Str2IntExp>());
             Register("str2float", new ExpressionFactoryHelper<Str2FloatExp>());
             Register("hex2int", new ExpressionFactoryHelper<Hex2IntExp>());
+            Register("datetimestr", new ExpressionFactoryHelper<DatetimeStrExp>());
+            Register("longdatestr", new ExpressionFactoryHelper<LongDateStrExp>());
+            Register("longtimestr", new ExpressionFactoryHelper<LongTimeStrExp>());
+            Register("shortdatestr", new ExpressionFactoryHelper<ShortDateStrExp>());
+            Register("shorttimestr", new ExpressionFactoryHelper<ShortTimeStrExp>());
             Register("isnullorempty", new ExpressionFactoryHelper<IsNullOrEmptyExp>());
             Register("array", new ExpressionFactoryHelper<ArrayExp>());
             Register("toarray", new ExpressionFactoryHelper<ToArrayExp>());
@@ -3667,7 +3718,8 @@ namespace Calculator
             if (!m_Procs.TryGetValue(id, out list)) {
                 list = new List<IExpression>();
                 m_Procs.Add(id, list);
-            } else {
+            }
+            else {
                 list.Clear();
             }
             foreach (Dsl.ISyntaxComponent comp in func.Statements) {
@@ -3698,7 +3750,8 @@ namespace Calculator
             if (!m_Procs.TryGetValue(proc, out list)) {
                 list = new List<IExpression>();
                 m_Procs.Add(proc, list);
-            } else {
+            }
+            else {
                 list.Clear();
             }
             foreach (Dsl.ISyntaxComponent comp in func.Statements) {
