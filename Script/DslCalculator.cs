@@ -2371,6 +2371,63 @@ namespace Calculator
             return new String(chars.ToArray());
         }
     }
+    internal class StringContainsExp : SimpleExpressionBase
+    {
+        protected override object OnCalc(IList<object> operands)
+        {
+            bool r = false;
+            if (operands.Count >= 2) {
+                string str = operands[0] as string;
+                r = true;
+                for(int i = 1; i < operands.Count; ++i) {
+                    var list = operands[i] as IList;
+                    if (null != list) {
+                        foreach (var o in list) {
+                            var key = o as string;
+                            if (!string.IsNullOrEmpty(key) && !str.Contains(key)) {
+                                return false;
+                            }
+                        }
+                    } else {
+                        var key = operands[i] as string;
+                        if (!string.IsNullOrEmpty(key) && !str.Contains(key)) {
+                            return false;
+                        }
+                    }
+                }
+            }
+            return r;
+        }
+    }
+    internal class StringNotContainsExp : SimpleExpressionBase
+    {
+        protected override object OnCalc(IList<object> operands)
+        {
+            bool r = false;
+            if (operands.Count >= 2) {
+                string str = operands[0] as string;
+                r = true;
+                for (int i = 1; i < operands.Count; ++i) {
+                    var list = operands[i] as IList;
+                    if (null != list) {
+                        foreach (var o in list) {
+                            var key = o as string;
+                            if (!string.IsNullOrEmpty(key) && str.Contains(key)) {
+                                return false;
+                            }
+                        }
+                    }
+                    else {
+                        var key = operands[i] as string;
+                        if (!string.IsNullOrEmpty(key) && str.Contains(key)) {
+                            return false;
+                        }
+                    }
+                }
+            }
+            return r;
+        }
+    }
     internal class Str2IntExp : SimpleExpressionBase
     {
         protected override object OnCalc(IList<object> operands)
@@ -3558,6 +3615,8 @@ namespace Calculator
             Register("stringreplace", new ExpressionFactoryHelper<StringReplaceExp>());
             Register("stringreplacechar", new ExpressionFactoryHelper<StringReplaceCharExp>());
             Register("makestring", new ExpressionFactoryHelper<MakeStringExp>());
+            Register("stringcontains", new ExpressionFactoryHelper<StringContainsExp>());
+            Register("stringnotcontains", new ExpressionFactoryHelper<StringNotContainsExp>());
             Register("str2int", new ExpressionFactoryHelper<Str2IntExp>());
             Register("str2float", new ExpressionFactoryHelper<Str2FloatExp>());
             Register("hex2int", new ExpressionFactoryHelper<Hex2IntExp>());
