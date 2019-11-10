@@ -2137,6 +2137,39 @@ namespace Calculator
 
         private List<IExpression> m_Expressions = new List<IExpression>();
     }
+    internal class DotnetLoadExp : SimpleExpressionBase
+    {
+        protected override object OnCalc(IList<object> operands)
+        {
+            object r = null;
+            if (operands.Count >= 1) {
+                string path = operands[0] as string;
+                if (!string.IsNullOrEmpty(path) && File.Exists(path)) {
+                    r = Assembly.LoadFile(path);
+                }
+            }
+            return r;
+        }
+    }
+    internal class DotnetNewExp : SimpleExpressionBase
+    {
+        protected override object OnCalc(IList<object> operands)
+        {
+            object r = null;
+            if (operands.Count >= 2) {
+                var assem = operands[0] as Assembly;
+                string typeName = operands[1] as string;
+                if (null!=assem && !string.IsNullOrEmpty(typeName)) {
+                    var al = new ArrayList();
+                    for(int i = 2; i < operands.Count; ++i) {
+                        al.Add(operands[i]);
+                    }
+                    r = assem.CreateInstance(typeName, false, BindingFlags.CreateInstance, null, al.ToArray(), System.Globalization.CultureInfo.CurrentCulture, null);
+                }
+            }
+            return r;
+        }
+    }
     internal class NewStringBuilderExp : SimpleExpressionBase
     {
         protected override object OnCalc(IList<object> operands)
@@ -3601,6 +3634,8 @@ namespace Calculator
             Register("dotnetget", new ExpressionFactoryHelper<DotnetGetExp>());
             Register("linq", new ExpressionFactoryHelper<LinqExp>());
             Register("isnull", new ExpressionFactoryHelper<IsNullExp>());
+            Register("dotnetload", new ExpressionFactoryHelper<DotnetLoadExp>());
+            Register("dotnetnew", new ExpressionFactoryHelper<DotnetNewExp>());
             Register("newstringbuilder", new ExpressionFactoryHelper<NewStringBuilderExp>());
             Register("appendformat", new ExpressionFactoryHelper<AppendFormatExp>());
             Register("appendlineformat", new ExpressionFactoryHelper<AppendLineFormatExp>());
