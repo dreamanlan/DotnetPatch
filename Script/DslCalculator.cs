@@ -2461,6 +2461,84 @@ namespace Calculator
             return r;
         }
     }
+    internal class StringContainsAnyExp : SimpleExpressionBase
+    {
+        protected override object OnCalc(IList<object> operands)
+        {
+            bool r = false;
+            if (operands.Count >= 2) {
+                r = true;
+                string str = operands[0] as string;
+                for (int i = 1; i < operands.Count; ++i) {
+                    var list = operands[i] as IList;
+                    if (null != list) {
+                        foreach (var o in list) {
+                            var key = o as string;
+                            if (!string.IsNullOrEmpty(key)){
+                                if (str.Contains(key)) {
+                                    return true;
+                                }
+                                else {
+                                    r = false;
+                                }
+                            }
+                        }
+                    }
+                    else {
+                        var key = operands[i] as string;
+                        if (!string.IsNullOrEmpty(key)) {
+                            if (str.Contains(key)) {
+                                return true;
+                            }
+                            else {
+                                r = false;
+                            }
+                        }
+                    }
+                }
+            }
+            return r;
+        }
+    }
+    internal class StringNotContainsAnyExp : SimpleExpressionBase
+    {
+        protected override object OnCalc(IList<object> operands)
+        {
+            bool r = false;
+            if (operands.Count >= 2) {
+                r = true;
+                string str = operands[0] as string;
+                for (int i = 1; i < operands.Count; ++i) {
+                    var list = operands[i] as IList;
+                    if (null != list) {
+                        foreach (var o in list) {
+                            var key = o as string;
+                            if (!string.IsNullOrEmpty(key)) {
+                                if (!str.Contains(key)) {
+                                    return true;
+                                }
+                                else {
+                                    r = false;
+                                }
+                            }
+                        }
+                    }
+                    else {
+                        var key = operands[i] as string;
+                        if (!string.IsNullOrEmpty(key)) {
+                            if (!str.Contains(key)) {
+                                return true;
+                            }
+                            else {
+                                r = false;
+                            }
+                        }
+                    }
+                }
+            }
+            return r;
+        }
+    }
     internal class Str2IntExp : SimpleExpressionBase
     {
         protected override object OnCalc(IList<object> operands)
@@ -3757,6 +3835,8 @@ namespace Calculator
             Register("makestring", new ExpressionFactoryHelper<MakeStringExp>());
             Register("stringcontains", new ExpressionFactoryHelper<StringContainsExp>());
             Register("stringnotcontains", new ExpressionFactoryHelper<StringNotContainsExp>());
+            Register("stringcontainsany", new ExpressionFactoryHelper<StringContainsAnyExp>());
+            Register("stringnotcontainsany", new ExpressionFactoryHelper<StringNotContainsAnyExp>());
             Register("str2int", new ExpressionFactoryHelper<Str2IntExp>());
             Register("str2uint", new ExpressionFactoryHelper<Str2UintExp>());
             Register("str2long", new ExpressionFactoryHelper<Str2LongExp>());
