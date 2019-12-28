@@ -3668,6 +3668,14 @@ namespace Calculator
             return r;
         }
     }
+    internal class CallStackExp : SimpleExpressionBase
+    {
+        protected override object OnCalc(IList<object> operands)
+        {
+            object r = System.Environment.StackTrace;
+            return r;
+        }
+    }
     internal class CallExp : SimpleExpressionBase
     {
         protected override object OnCalc(IList<object> operands)
@@ -3913,6 +3921,7 @@ namespace Calculator
             Register("combinepath", new ExpressionFactoryHelper<CombinePathExp>());
             Register("changeextension", new ExpressionFactoryHelper<ChangeExtensionExp>());
             Register("echo", new ExpressionFactoryHelper<EchoExp>());
+            Register("callstack", new ExpressionFactoryHelper<CallStackExp>());
             Register("call", new ExpressionFactoryHelper<CallExp>());
             Register("return", new ExpressionFactoryHelper<ReturnExp>());
             Register("redirect", new ExpressionFactoryHelper<RedirectExp>());
