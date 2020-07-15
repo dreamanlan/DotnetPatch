@@ -48,30 +48,30 @@ namespace Calculator
                 return Load(valueData);
             }
             else {
-                Dsl.CallData callData = dsl as Dsl.CallData;
-                if (null != callData) {
-                    bool ret = Load(callData);
-                    if (!ret) {
-                        int num = callData.GetParamNum();
-                        List<IExpression> args = new List<IExpression>();
-                        for (int ix = 0; ix < num; ++ix) {
-                            Dsl.ISyntaxComponent param = callData.GetParam(ix);
-                            args.Add(calculator.Load(param));
+                Dsl.FunctionData funcData = dsl as Dsl.FunctionData;
+                if (null != funcData) {
+                    if (funcData.HaveParam()) {
+                        var callData = funcData;
+                        bool ret = Load(callData);
+                        if (!ret) {
+                            int num = callData.GetParamNum();
+                            List<IExpression> args = new List<IExpression>();
+                            for (int ix = 0; ix < num; ++ix) {
+                                Dsl.ISyntaxComponent param = callData.GetParam(ix);
+                                args.Add(calculator.Load(param));
+                            }
+                            return Load(args);
                         }
-                        return Load(args);
-                    }
-                    return ret;
-                }
-                else {
-                    Dsl.FunctionData funcData = dsl as Dsl.FunctionData;
-                    if (null != funcData) {
-                        return Load(funcData);
+                        return ret;
                     }
                     else {
-                        Dsl.StatementData statementData = dsl as Dsl.StatementData;
-                        if (null != statementData) {
-                            return Load(statementData);
-                        }
+                        return Load(funcData);
+                    }
+                }
+                else {
+                    Dsl.StatementData statementData = dsl as Dsl.StatementData;
+                    if (null != statementData) {
+                        return Load(statementData);
                     }
                 }
             }
@@ -82,7 +82,6 @@ namespace Calculator
             return string.Format("{0} line:{1}", base.ToString(), m_Dsl.GetLine());
         }
         protected virtual bool Load(Dsl.ValueData valData) { return false; }
-        protected virtual bool Load(Dsl.CallData callData) { return false; }
         protected virtual bool Load(IList<IExpression> exps) { return false; }
         protected virtual bool Load(Dsl.FunctionData funcData) { return false; }
         protected virtual bool Load(Dsl.StatementData statementData) { return false; }
@@ -248,7 +247,7 @@ namespace Calculator
             object ret = Calculator.Arguments;
             return ret;
         }
-        protected override bool Load(Dsl.CallData callData)
+        protected override bool Load(Dsl.FunctionData callData)
         {
             return true;
         }
@@ -265,7 +264,7 @@ namespace Calculator
             }
             return ret;
         }
-        protected override bool Load(Dsl.CallData callData)
+        protected override bool Load(Dsl.FunctionData callData)
         {
             m_ArgIndex = Calculator.Load(callData.GetParam(0));
             return true;
@@ -280,7 +279,7 @@ namespace Calculator
             object ret = Calculator.Arguments.Count;
             return ret;
         }
-        protected override bool Load(Dsl.CallData callData)
+        protected override bool Load(Dsl.FunctionData callData)
         {
             return true;
         }
@@ -303,9 +302,9 @@ namespace Calculator
             }
             return v;
         }
-        protected override bool Load(Dsl.CallData callData)
+        protected override bool Load(Dsl.FunctionData callData)
         {
-            Dsl.CallData param1 = callData.GetParam(0) as Dsl.CallData;
+            Dsl.FunctionData param1 = callData.GetParam(0) as Dsl.FunctionData;
             Dsl.ISyntaxComponent param2 = callData.GetParam(1);
             m_VarId = Calculator.Load(param1.GetParam(0));
             m_Op = Calculator.Load(param2);
@@ -333,7 +332,7 @@ namespace Calculator
             }
             return v;
         }
-        protected override bool Load(Dsl.CallData callData)
+        protected override bool Load(Dsl.FunctionData callData)
         {
             m_VarId = Calculator.Load(callData.GetParam(0));
             return true;
@@ -354,7 +353,7 @@ namespace Calculator
             }
             return v;
         }
-        protected override bool Load(Dsl.CallData callData)
+        protected override bool Load(Dsl.FunctionData callData)
         {
             Dsl.ISyntaxComponent param1 = callData.GetParam(0);
             Dsl.ISyntaxComponent param2 = callData.GetParam(1);
@@ -1069,10 +1068,10 @@ namespace Calculator
         {
             Dsl.FunctionData funcData1 = statementData.First;
             Dsl.FunctionData funcData2 = statementData.Second;
-            if (funcData2.GetId() == ":") {
-                Dsl.ISyntaxComponent cond = funcData1.Call.GetParam(0);
-                Dsl.ISyntaxComponent op1 = funcData1.GetStatement(0);
-                Dsl.ISyntaxComponent op2 = funcData2.GetStatement(0);
+            if (funcData1.IsHighOrder && funcData1.HaveLowerOrderParam() && funcData2.GetId() == ":" && funcData2.HaveParamOrStatement()) {
+                Dsl.ISyntaxComponent cond = funcData1.LowerOrderFunction.GetParam(0);
+                Dsl.ISyntaxComponent op1 = funcData1.GetParam(0);
+                Dsl.ISyntaxComponent op2 = funcData2.GetParam(0);
                 m_Op1 = Calculator.Load(cond);
                 m_Op2 = Calculator.Load(op1);
                 m_Op3 = Calculator.Load(op2);
@@ -1121,14 +1120,20 @@ namespace Calculator
         }
         protected override bool Load(Dsl.FunctionData funcData)
         {
-            Dsl.ISyntaxComponent cond = funcData.Call.GetParam(0);
-            IfExp.Clause item = new IfExp.Clause();
-            item.Condition = Calculator.Load(cond);
-            for (int ix = 0; ix < funcData.GetStatementNum(); ++ix) {
-                IExpression subExp = Calculator.Load(funcData.GetStatement(ix));
-                item.Expressions.Add(subExp);
+            if (funcData.IsHighOrder) {
+                Dsl.ISyntaxComponent cond = funcData.LowerOrderFunction.GetParam(0);
+                IfExp.Clause item = new IfExp.Clause();
+                item.Condition = Calculator.Load(cond);
+                for (int ix = 0; ix < funcData.GetParamNum(); ++ix) {
+                    IExpression subExp = Calculator.Load(funcData.GetParam(ix));
+                    item.Expressions.Add(subExp);
+                }
+                m_Clauses.Add(item);
             }
-            m_Clauses.Add(item);
+            else {
+                //error
+                Console.WriteLine("DslCalculator error, {0} line {1}", funcData.ToScriptString(false), funcData.GetLine());
+            }
             return true;
         }
         protected override bool Load(Dsl.StatementData statementData)
@@ -1143,8 +1148,8 @@ namespace Calculator
                 if (firstId == "if" && !first.HaveStatement() && !first.HaveExternScript() &&
                         !string.IsNullOrEmpty(secondId) && !second.HaveStatement() && !second.HaveExternScript()) {
                     IfExp.Clause item = new IfExp.Clause();
-                    if (first.Call.GetParamNum() > 0) {
-                        Dsl.ISyntaxComponent cond = first.Call.GetParam(0);
+                    if (first.GetParamNum() > 0) {
+                        Dsl.ISyntaxComponent cond = first.GetParam(0);
                         item.Condition = Calculator.Load(cond);
                     }
                     else {
@@ -1161,16 +1166,16 @@ namespace Calculator
             foreach (var fData in statementData.Functions) {
                 if (fData.GetId() == "if" || fData.GetId() == "elseif") {
                     IfExp.Clause item = new IfExp.Clause();
-                    if (fData.Call.GetParamNum() > 0) {
-                        Dsl.ISyntaxComponent cond = fData.Call.GetParam(0);
+                    if (fData.IsHighOrder && fData.LowerOrderFunction.GetParamNum() > 0) {
+                        Dsl.ISyntaxComponent cond = fData.LowerOrderFunction.GetParam(0);
                         item.Condition = Calculator.Load(cond);
                     }
                     else {
                         //error
                         Console.WriteLine("DslCalculator error, {0} line {1}", fData.ToScriptString(false), fData.GetLine());
                     }
-                    for (int ix = 0; ix < fData.GetStatementNum(); ++ix) {
-                        IExpression subExp = Calculator.Load(fData.GetStatement(ix));
+                    for (int ix = 0; ix < fData.GetParamNum(); ++ix) {
+                        IExpression subExp = Calculator.Load(fData.GetParam(ix));
                         item.Expressions.Add(subExp);
                     }
                     m_Clauses.Add(item);
@@ -1182,8 +1187,8 @@ namespace Calculator
                     }
                     else {
                         IfExp.Clause item = new IfExp.Clause();
-                        for (int ix = 0; ix < fData.GetStatementNum(); ++ix) {
-                            IExpression subExp = Calculator.Load(fData.GetStatement(ix));
+                        for (int ix = 0; ix < fData.GetParamNum(); ++ix) {
+                            IExpression subExp = Calculator.Load(fData.GetParam(ix));
                             item.Expressions.Add(subExp);
                         }
                         m_Clauses.Add(item);
@@ -1234,11 +1239,17 @@ namespace Calculator
         }
         protected override bool Load(Dsl.FunctionData funcData)
         {
-            Dsl.ISyntaxComponent cond = funcData.Call.GetParam(0);
-            m_Condition = Calculator.Load(cond);
-            for (int ix = 0; ix < funcData.GetStatementNum(); ++ix) {
-                IExpression subExp = Calculator.Load(funcData.GetStatement(ix));
-                m_Expressions.Add(subExp);
+            if (funcData.IsHighOrder) {
+                Dsl.ISyntaxComponent cond = funcData.LowerOrderFunction.GetParam(0);
+                m_Condition = Calculator.Load(cond);
+                for (int ix = 0; ix < funcData.GetParamNum(); ++ix) {
+                    IExpression subExp = Calculator.Load(funcData.GetParam(ix));
+                    m_Expressions.Add(subExp);
+                }
+            }
+            else {
+                //error
+                Console.WriteLine("DslCalculator error, {0} line {1}", funcData.ToScriptString(false), funcData.GetLine());
             }
             return true;
         }
@@ -1252,8 +1263,8 @@ namespace Calculator
                 var secondId = second.GetId();
                 if (firstId == "while" && !first.HaveStatement() && !first.HaveExternScript() &&
                         !string.IsNullOrEmpty(secondId) && !second.HaveStatement() && !second.HaveExternScript()) {
-                    if (first.Call.GetParamNum() > 0) {
-                        Dsl.ISyntaxComponent cond = first.Call.GetParam(0);
+                    if (first.GetParamNum() > 0) {
+                        Dsl.ISyntaxComponent cond = first.GetParam(0);
                         m_Condition = Calculator.Load(cond);
                     }
                     else {
@@ -1297,11 +1308,17 @@ namespace Calculator
         }
         protected override bool Load(Dsl.FunctionData funcData)
         {
-            Dsl.ISyntaxComponent count = funcData.Call.GetParam(0);
-            m_Count = Calculator.Load(count);
-            for (int ix = 0; ix < funcData.GetStatementNum(); ++ix) {
-                IExpression subExp = Calculator.Load(funcData.GetStatement(ix));
-                m_Expressions.Add(subExp);
+            if (funcData.IsHighOrder) {
+                Dsl.ISyntaxComponent count = funcData.LowerOrderFunction.GetParam(0);
+                m_Count = Calculator.Load(count);
+                for (int ix = 0; ix < funcData.GetParamNum(); ++ix) {
+                    IExpression subExp = Calculator.Load(funcData.GetParam(ix));
+                    m_Expressions.Add(subExp);
+                }
+            }
+            else {
+                //error
+                Console.WriteLine("DslCalculator error, {0} line {1}", funcData.ToScriptString(false), funcData.GetLine());
             }
             return true;
         }
@@ -1315,8 +1332,8 @@ namespace Calculator
                 var secondId = second.GetId();
                 if (firstId == "loop" && !first.HaveStatement() && !first.HaveExternScript() &&
                         !string.IsNullOrEmpty(secondId) && !second.HaveStatement() && !second.HaveExternScript()) {
-                    if (first.Call.GetParamNum() > 0) {
-                        Dsl.ISyntaxComponent exp = first.Call.GetParam(0);
+                    if (first.GetParamNum() > 0) {
+                        Dsl.ISyntaxComponent exp = first.GetParam(0);
                         m_Count = Calculator.Load(exp);
                     }
                     else {
@@ -1364,11 +1381,17 @@ namespace Calculator
         }
         protected override bool Load(Dsl.FunctionData funcData)
         {
-            Dsl.ISyntaxComponent list = funcData.Call.GetParam(0);
-            m_List = Calculator.Load(list);
-            for (int ix = 0; ix < funcData.GetStatementNum(); ++ix) {
-                IExpression subExp = Calculator.Load(funcData.GetStatement(ix));
-                m_Expressions.Add(subExp);
+            if (funcData.IsHighOrder) {
+                Dsl.ISyntaxComponent list = funcData.LowerOrderFunction.GetParam(0);
+                m_List = Calculator.Load(list);
+                for (int ix = 0; ix < funcData.GetParamNum(); ++ix) {
+                    IExpression subExp = Calculator.Load(funcData.GetParam(ix));
+                    m_Expressions.Add(subExp);
+                }
+            }
+            else {
+                //error
+                Console.WriteLine("DslCalculator error, {0} line {1}", funcData.ToScriptString(false), funcData.GetLine());
             }
             return true;
         }
@@ -1382,8 +1405,8 @@ namespace Calculator
                 var secondId = second.GetId();
                 if (firstId == "looplist" && !first.HaveStatement() && !first.HaveExternScript() &&
                         !string.IsNullOrEmpty(secondId) && !second.HaveStatement() && !second.HaveExternScript()) {
-                    if (first.Call.GetParamNum() > 0) {
-                        Dsl.ISyntaxComponent exp = first.Call.GetParam(0);
+                    if (first.GetParamNum() > 0) {
+                        Dsl.ISyntaxComponent exp = first.GetParam(0);
                         m_List = Calculator.Load(exp);
                     }
                     else {
@@ -1432,16 +1455,20 @@ namespace Calculator
         }
         protected override bool Load(Dsl.FunctionData funcData)
         {
-            Dsl.CallData callData = funcData.Call;
-            int num = callData.GetParamNum();
-            for (int ix = 0; ix < num; ++ix) {
-                Dsl.ISyntaxComponent exp = funcData.Call.GetParam(ix);
-                m_Elements.Add(Calculator.Load(exp));
+            if (funcData.IsHighOrder) {
+                Dsl.FunctionData callData = funcData.LowerOrderFunction;
+                int num = callData.GetParamNum();
+                for (int ix = 0; ix < num; ++ix) {
+                    Dsl.ISyntaxComponent exp = callData.GetParam(ix);
+                    m_Elements.Add(Calculator.Load(exp));
+                }
             }
-            int fnum = funcData.GetStatementNum();
-            for (int ix = 0; ix < fnum; ++ix) {
-                IExpression subExp = Calculator.Load(funcData.GetStatement(ix));
-                m_Expressions.Add(subExp);
+            if (funcData.HaveStatement()) {
+                int fnum = funcData.GetParamNum();
+                for (int ix = 0; ix < fnum; ++ix) {
+                    IExpression subExp = Calculator.Load(funcData.GetParam(ix));
+                    m_Expressions.Add(subExp);
+                }
             }
             return true;
         }
@@ -1455,10 +1482,10 @@ namespace Calculator
                 var secondId = second.GetId();
                 if (firstId == "foreach" && !first.HaveStatement() && !first.HaveExternScript() &&
                         !string.IsNullOrEmpty(secondId) && !second.HaveStatement() && !second.HaveExternScript()) {
-                    int num = first.Call.GetParamNum();
+                    int num = first.GetParamNum();
                     if (num > 0) {
                         for (int ix = 0; ix < num; ++ix) {
-                            Dsl.ISyntaxComponent exp = first.Call.GetParam(ix);
+                            Dsl.ISyntaxComponent exp = first.GetParam(ix);
                             m_Elements.Add(Calculator.Load(exp));
                         }
                     }
@@ -1488,7 +1515,7 @@ namespace Calculator
             }
             return v;
         }
-        protected override bool Load(Dsl.CallData callData)
+        protected override bool Load(Dsl.FunctionData callData)
         {
             for (int i = 0; i < callData.GetParamNum(); ++i) {
                 Dsl.ISyntaxComponent param = callData.GetParam(i);
@@ -1517,7 +1544,7 @@ namespace Calculator
             v = string.Format(fmt, al.ToArray());
             return v;
         }
-        protected override bool Load(Dsl.CallData callData)
+        protected override bool Load(Dsl.FunctionData callData)
         {
             for (int i = 0; i < callData.GetParamNum(); ++i) {
                 Dsl.ISyntaxComponent param = callData.GetParam(i);
@@ -1544,7 +1571,7 @@ namespace Calculator
             }
             return ret;
         }
-        protected override bool Load(Dsl.CallData callData)
+        protected override bool Load(Dsl.FunctionData callData)
         {
             for (int i = 0; i < callData.GetParamNum(); ++i) {
                 Dsl.ISyntaxComponent param = callData.GetParam(i);
@@ -1571,7 +1598,7 @@ namespace Calculator
             }
             return ret;
         }
-        protected override bool Load(Dsl.CallData callData)
+        protected override bool Load(Dsl.FunctionData callData)
         {
             for (int i = 0; i < callData.GetParamNum(); ++i) {
                 Dsl.ISyntaxComponent param = callData.GetParam(i);
@@ -1598,7 +1625,7 @@ namespace Calculator
             }
             return ret;
         }
-        protected override bool Load(Dsl.CallData callData)
+        protected override bool Load(Dsl.FunctionData callData)
         {
             for (int i = 0; i < callData.GetParamNum(); ++i) {
                 Dsl.ISyntaxComponent param = callData.GetParam(i);
@@ -1628,7 +1655,7 @@ namespace Calculator
             }
             return ret;
         }
-        protected override bool Load(Dsl.CallData callData)
+        protected override bool Load(Dsl.FunctionData callData)
         {
             for (int i = 0; i < callData.GetParamNum(); ++i) {
                 Dsl.ISyntaxComponent param = callData.GetParam(i);
@@ -1700,7 +1727,7 @@ namespace Calculator
             }
             return ret;
         }
-        protected override bool Load(Dsl.CallData callData)
+        protected override bool Load(Dsl.FunctionData callData)
         {
             for (int i = 0; i < callData.GetParamNum(); ++i) {
                 Dsl.ISyntaxComponent param = callData.GetParam(i);
@@ -1734,7 +1761,7 @@ namespace Calculator
             }
             return ret;
         }
-        protected override bool Load(Dsl.CallData callData)
+        protected override bool Load(Dsl.FunctionData callData)
         {
             for (int i = 0; i < callData.GetParamNum(); ++i) {
                 Dsl.ISyntaxComponent param = callData.GetParam(i);
@@ -1831,7 +1858,7 @@ namespace Calculator
             }
             return ret;
         }
-        protected override bool Load(Dsl.CallData callData)
+        protected override bool Load(Dsl.FunctionData callData)
         {
             for (int i = 0; i < callData.GetParamNum(); ++i) {
                 Dsl.ISyntaxComponent param = callData.GetParam(i);
@@ -1917,7 +1944,7 @@ namespace Calculator
             }
             return ret;
         }
-        protected override bool Load(Dsl.CallData callData)
+        protected override bool Load(Dsl.FunctionData callData)
         {
             for (int i = 0; i < callData.GetParamNum(); ++i) {
                 Dsl.ISyntaxComponent param = callData.GetParam(i);
@@ -2005,7 +2032,7 @@ namespace Calculator
             }
             return ret;
         }
-        protected override bool Load(Dsl.CallData callData)
+        protected override bool Load(Dsl.FunctionData callData)
         {
             for (int i = 0; i < callData.GetParamNum(); ++i) {
                 Dsl.ISyntaxComponent param = callData.GetParam(i);
@@ -2098,7 +2125,7 @@ namespace Calculator
             }
             return v;
         }
-        protected override bool Load(Dsl.CallData callData)
+        protected override bool Load(Dsl.FunctionData callData)
         {
             Dsl.ISyntaxComponent list = callData.GetParam(0);
             m_List = Calculator.Load(list);
@@ -2126,7 +2153,7 @@ namespace Calculator
             }
             return ret;
         }
-        protected override bool Load(Dsl.CallData callData)
+        protected override bool Load(Dsl.FunctionData callData)
         {
             for (int i = 0; i < callData.GetParamNum(); ++i) {
                 Dsl.ISyntaxComponent param = callData.GetParam(i);
@@ -3001,23 +3028,10 @@ namespace Calculator
             r = dict;
             return r;
         }
-        protected override bool Load(Dsl.CallData callData)
-        {
-            for (int i = 0; i < callData.GetParamNum(); ++i) {
-                Dsl.CallData paramCallData = callData.GetParam(i) as Dsl.CallData;
-                if (null != paramCallData && paramCallData.GetParamNum() == 2) {
-                    var expKey = Calculator.Load(paramCallData.GetParam(0));
-                    m_Expressions.Add(expKey);
-                    var expVal = Calculator.Load(paramCallData.GetParam(1));
-                    m_Expressions.Add(expVal);
-                }
-            }
-            return true;
-        }
         protected override bool Load(Dsl.FunctionData funcData)
         {
-            for (int i = 0; i < funcData.GetStatementNum(); ++i) {
-                Dsl.CallData callData = funcData.GetStatement(i) as Dsl.CallData;
+            for (int i = 0; i < funcData.GetParamNum(); ++i) {
+                Dsl.FunctionData callData = funcData.GetParam(i) as Dsl.FunctionData;
                 if (null != callData && callData.GetParamNum() == 2) {
                     var expKey = Calculator.Load(callData.GetParam(0));
                     m_Expressions.Add(expKey);
@@ -3712,9 +3726,9 @@ namespace Calculator
         {
             Calculator.RunState = RunStateEnum.Redirect;
             if (operands.Count >= 1) {
-                ArrayList args = new ArrayList();
+                List<string> args = new List<string>();
                 for (int i = 0; i < operands.Count; ++i) {
-                    var arg = operands[i];
+                    var arg = operands[i] as string;
                     args.Add(arg);
                 }
                 return args;
@@ -3982,15 +3996,18 @@ namespace Calculator
             var func = info as Dsl.FunctionData;
             string id;
             if (null != func) {
-                id = func.Call.GetParamId(0);
+                if (func.IsHighOrder)
+                    id = func.LowerOrderFunction.GetParamId(0);
+                else
+                    return;
             }
             else {
                 var statement = info as Dsl.StatementData;
                 if (null != statement && statement.GetFunctionNum() == 2) {
-                    id = statement.First.Call.GetParamId(0);
+                    id = statement.First.GetParamId(0);
                     func = statement.Second;
-                    if (func.GetId() == "args") {
-                        if (func.Call.GetParamNum() > 0) {
+                    if (func.GetId() == "args" && func.IsHighOrder) {
+                        if (func.LowerOrderFunction.GetParamNum() > 0) {
                             List<string> names;
                             if (!m_ProcArgNames.TryGetValue(id, out names)) {
                                 names = new List<string>();
@@ -3999,7 +4016,7 @@ namespace Calculator
                             else {
                                 names.Clear();
                             }
-                            foreach (var p in func.Call.Params) {
+                            foreach (var p in func.LowerOrderFunction.Params) {
                                 names.Add(p.GetId());
                             }
                         }
@@ -4020,7 +4037,7 @@ namespace Calculator
             else {
                 list.Clear();
             }
-            foreach (Dsl.ISyntaxComponent comp in func.Statements) {
+            foreach (Dsl.ISyntaxComponent comp in func.Params) {
                 var exp = Load(comp);
                 if (null != exp) {
                     list.Add(exp);
@@ -4052,7 +4069,7 @@ namespace Calculator
             else {
                 list.Clear();
             }
-            foreach (Dsl.ISyntaxComponent comp in func.Statements) {
+            foreach (Dsl.ISyntaxComponent comp in func.Params) {
                 var exp = Load(comp);
                 if (null != exp) {
                     list.Add(exp);
@@ -4227,9 +4244,24 @@ namespace Calculator
             if (null != valueData) {
                 int idType = valueData.GetIdType();
                 if (idType == Dsl.ValueData.ID_TOKEN) {
-                    NamedVarGet varExp = new NamedVarGet();
-                    varExp.Load(comp, this);
-                    return varExp;
+                    string id = valueData.GetId();
+                    var p = Create(id);
+                    if (null != p) {
+                        //将无参数名字转换为无参函数调用
+                        Dsl.FunctionData fd = new Dsl.FunctionData();
+                        fd.Name.CopyFrom(valueData);
+                        fd.SetParamClass((int)Dsl.FunctionData.ParamClassEnum.PARAM_CLASS_PARENTHESIS);
+                        if (!p.Load(fd, this)) {
+                            //error
+                            Console.WriteLine("DslCalculator error, {0} line {1}", comp.ToScriptString(false), comp.GetLine());
+                        }
+                        return p;
+                    }
+                    else {
+                        NamedVarGet varExp = new NamedVarGet();
+                        varExp.Load(comp, this);
+                        return varExp;
+                    }
                 }
                 else {
                     ConstGet constExp = new ConstGet();
@@ -4238,166 +4270,165 @@ namespace Calculator
                 }
             }
             else {
-                Dsl.CallData callData = comp as Dsl.CallData;
-                if (null != callData) {
-                    if (!callData.HaveId() && !callData.IsHighOrder && (callData.GetParamClass() == (int)Dsl.CallData.ParamClassEnum.PARAM_CLASS_PARENTHESIS || callData.GetParamClass() == (int)Dsl.CallData.ParamClassEnum.PARAM_CLASS_BRACKET)) {
-                        switch (callData.GetParamClass()) {
-                            case (int)Dsl.CallData.ParamClassEnum.PARAM_CLASS_PARENTHESIS:
-                                int num = callData.GetParamNum();
-                                if (num == 1) {
-                                    Dsl.ISyntaxComponent param = callData.GetParam(0);
-                                    return Load(param);
-                                }
-                                else {
-                                    ParenthesisExp exp = new ParenthesisExp();
-                                    exp.Load(comp, this);
-                                    return exp;
-                                }
-                            case (int)Dsl.CallData.ParamClassEnum.PARAM_CLASS_BRACKET: {
-                                    ArrayExp exp = new ArrayExp();
-                                    exp.Load(comp, this);
-                                    return exp;
-                                }
-                            default:
-                                return null;
-                        }
-                    }
-                    else if (!callData.HaveParam()) {
-                        //退化
-                        valueData = callData.Name;
-                        return Load(valueData);
-                    }
-                    else {
-                        int paramClass = callData.GetParamClass();
-                        string op = callData.GetId();
-                        if (op == "=") {//赋值
-                            Dsl.CallData innerCall = callData.GetParam(0) as Dsl.CallData;
-                            if (null != innerCall) {
-                                //obj.property = val -> dotnetset(obj, property, val)
-                                int innerParamClass = innerCall.GetParamClass();
-                                if (innerParamClass == (int)Dsl.CallData.ParamClassEnum.PARAM_CLASS_PERIOD ||
-                                  innerParamClass == (int)Dsl.CallData.ParamClassEnum.PARAM_CLASS_BRACKET ||
-                                  innerParamClass == (int)Dsl.CallData.ParamClassEnum.PARAM_CLASS_PERIOD_BRACE ||
-                                  innerParamClass == (int)Dsl.CallData.ParamClassEnum.PARAM_CLASS_PERIOD_BRACKET ||
-                                  innerParamClass == (int)Dsl.CallData.ParamClassEnum.PARAM_CLASS_PERIOD_PARENTHESIS) {
-                                    Dsl.CallData newCall = new Dsl.CallData();
-                                    newCall.Name = new Dsl.ValueData("dotnetset", Dsl.ValueData.ID_TOKEN);
-                                    newCall.SetParamClass((int)Dsl.CallData.ParamClassEnum.PARAM_CLASS_PARENTHESIS);
-                                    if (innerCall.IsHighOrder) {
-                                        newCall.Params.Add(innerCall.Call);
-                                        newCall.Params.Add(ConvertMember(innerCall.GetParam(0), innerCall.GetParamClass()));
-                                        newCall.Params.Add(callData.GetParam(1));
+                Dsl.FunctionData funcData = comp as Dsl.FunctionData;
+                if (null != funcData) {
+                    if (funcData.HaveParam()) {
+                        var callData = funcData;
+                        if (!callData.HaveId() && !callData.IsHighOrder && (callData.GetParamClass() == (int)Dsl.FunctionData.ParamClassEnum.PARAM_CLASS_PARENTHESIS || callData.GetParamClass() == (int)Dsl.FunctionData.ParamClassEnum.PARAM_CLASS_BRACKET)) {
+                            switch (callData.GetParamClass()) {
+                                case (int)Dsl.FunctionData.ParamClassEnum.PARAM_CLASS_PARENTHESIS:
+                                    int num = callData.GetParamNum();
+                                    if (num == 1) {
+                                        Dsl.ISyntaxComponent param = callData.GetParam(0);
+                                        return Load(param);
                                     }
                                     else {
-                                        newCall.Params.Add(innerCall.Name);
-                                        newCall.Params.Add(ConvertMember(innerCall.GetParam(0), innerCall.GetParamClass()));
-                                        newCall.Params.Add(callData.GetParam(1));
+                                        ParenthesisExp exp = new ParenthesisExp();
+                                        exp.Load(comp, this);
+                                        return exp;
                                     }
-
-                                    var setExp = new DotnetSetExp();
-                                    setExp.Load(newCall, this);
-                                    return setExp;
-                                }
+                                case (int)Dsl.FunctionData.ParamClassEnum.PARAM_CLASS_BRACKET: {
+                                        ArrayExp exp = new ArrayExp();
+                                        exp.Load(comp, this);
+                                        return exp;
+                                    }
+                                default:
+                                    return null;
                             }
-                            IExpression exp = null;
-                            string name = callData.GetParamId(0);
-                            if (name == "var") {
-                                exp = new VarSet();
-                            }
-                            else {
-                                exp = new NamedVarSet();
-                            }
-                            if (null != exp) {
-                                exp.Load(comp, this);
-                            }
-                            else {
-                                //error
-                                Console.WriteLine("DslCalculator error, {0} line {1}", callData.ToScriptString(false), callData.GetLine());
-                            }
-                            return exp;
+                        }
+                        else if (!callData.HaveParam()) {
+                            //退化
+                            valueData = callData.Name;
+                            return Load(valueData);
                         }
                         else {
-                            if (callData.IsHighOrder) {
-                                Dsl.CallData innerCall = callData.Call;
-                                int innerParamClass = innerCall.GetParamClass();
-                                if (paramClass == (int)Dsl.CallData.ParamClassEnum.PARAM_CLASS_PARENTHESIS && (
-                                    innerParamClass == (int)Dsl.CallData.ParamClassEnum.PARAM_CLASS_PERIOD ||
-                                    innerParamClass == (int)Dsl.CallData.ParamClassEnum.PARAM_CLASS_BRACKET ||
-                                    innerParamClass == (int)Dsl.CallData.ParamClassEnum.PARAM_CLASS_PERIOD_BRACE ||
-                                    innerParamClass == (int)Dsl.CallData.ParamClassEnum.PARAM_CLASS_PERIOD_BRACKET ||
-                                    innerParamClass == (int)Dsl.CallData.ParamClassEnum.PARAM_CLASS_PERIOD_PARENTHESIS)) {
-                                    //obj.member(a,b,...) or obj[member](a,b,...) or obj.(member)(a,b,...) or obj.[member](a,b,...) or obj.{member}(a,b,...) -> dotnetcall(obj,member,a,b,...)
-                                    string apiName;
-                                    string member = innerCall.GetParamId(0);
-                                    if (member == "orderby" || member == "orderbydesc" || member == "where" || member == "top") {
-                                        apiName = "linq";
-                                    }
-                                    else {
-                                        apiName = "dotnetcall";
-                                    }
-                                    Dsl.CallData newCall = new Dsl.CallData();
-                                    newCall.Name = new Dsl.ValueData(apiName, Dsl.ValueData.ID_TOKEN);
-                                    newCall.SetParamClass((int)Dsl.CallData.ParamClassEnum.PARAM_CLASS_PARENTHESIS);
-                                    if (innerCall.IsHighOrder) {
-                                        newCall.Params.Add(innerCall.Call);
-                                        newCall.Params.Add(ConvertMember(innerCall.GetParam(0), innerCall.GetParamClass()));
-                                        for (int i = 0; i < callData.GetParamNum(); ++i) {
-                                            Dsl.ISyntaxComponent p = callData.Params[i];
-                                            newCall.Params.Add(p);
+                            int paramClass = callData.GetParamClass();
+                            string op = callData.GetId();
+                            if (op == "=") {//赋值
+                                Dsl.FunctionData innerCall = callData.GetParam(0) as Dsl.FunctionData;
+                                if (null != innerCall) {
+                                    //obj.property = val -> dotnetset(obj, property, val)
+                                    int innerParamClass = innerCall.GetParamClass();
+                                    if (innerParamClass == (int)Dsl.FunctionData.ParamClassEnum.PARAM_CLASS_PERIOD ||
+                                      innerParamClass == (int)Dsl.FunctionData.ParamClassEnum.PARAM_CLASS_BRACKET ||
+                                      innerParamClass == (int)Dsl.FunctionData.ParamClassEnum.PARAM_CLASS_PERIOD_BRACE ||
+                                      innerParamClass == (int)Dsl.FunctionData.ParamClassEnum.PARAM_CLASS_PERIOD_BRACKET ||
+                                      innerParamClass == (int)Dsl.FunctionData.ParamClassEnum.PARAM_CLASS_PERIOD_PARENTHESIS) {
+                                        Dsl.FunctionData newCall = new Dsl.FunctionData();
+                                        newCall.Name = new Dsl.ValueData("dotnetset", Dsl.ValueData.ID_TOKEN);
+                                        newCall.SetParamClass((int)Dsl.FunctionData.ParamClassEnum.PARAM_CLASS_PARENTHESIS);
+                                        if (innerCall.IsHighOrder) {
+                                            newCall.Params.Add(innerCall.LowerOrderFunction);
+                                            newCall.Params.Add(ConvertMember(innerCall.GetParam(0), innerCall.GetParamClass()));
+                                            newCall.Params.Add(callData.GetParam(1));
                                         }
-                                    }
-                                    else {
-                                        newCall.Params.Add(innerCall.Name);
-                                        newCall.Params.Add(ConvertMember(innerCall.GetParam(0), innerCall.GetParamClass()));
-                                        for (int i = 0; i < callData.GetParamNum(); ++i) {
-                                            Dsl.ISyntaxComponent p = callData.Params[i];
-                                            newCall.Params.Add(p);
+                                        else {
+                                            newCall.Params.Add(innerCall.Name);
+                                            newCall.Params.Add(ConvertMember(innerCall.GetParam(0), innerCall.GetParamClass()));
+                                            newCall.Params.Add(callData.GetParam(1));
                                         }
-                                    }
 
-                                    if (apiName == "dotnetcall") {
-                                        var callExp = new DotnetCallExp();
-                                        callExp.Load(newCall, this);
-                                        return callExp;
-                                    }
-                                    else {
-                                        var callExp = new LinqExp();
-                                        callExp.Load(newCall, this);
-                                        return callExp;
+                                        var setExp = new DotnetSetExp();
+                                        setExp.Load(newCall, this);
+                                        return setExp;
                                     }
                                 }
-                            }
-                            if (paramClass == (int)Dsl.CallData.ParamClassEnum.PARAM_CLASS_PERIOD ||
-                              paramClass == (int)Dsl.CallData.ParamClassEnum.PARAM_CLASS_BRACKET ||
-                              paramClass == (int)Dsl.CallData.ParamClassEnum.PARAM_CLASS_PERIOD_BRACE ||
-                              paramClass == (int)Dsl.CallData.ParamClassEnum.PARAM_CLASS_PERIOD_BRACKET ||
-                              paramClass == (int)Dsl.CallData.ParamClassEnum.PARAM_CLASS_PERIOD_PARENTHESIS) {
-                                //obj.property or obj[property] or obj.(property) or obj.[property] or obj.{property} -> dotnetget(obj,property)
-                                Dsl.CallData newCall = new Dsl.CallData();
-                                newCall.Name = new Dsl.ValueData("dotnetget", Dsl.ValueData.ID_TOKEN);
-                                newCall.SetParamClass((int)Dsl.CallData.ParamClassEnum.PARAM_CLASS_PARENTHESIS);
-                                if (callData.IsHighOrder) {
-                                    newCall.Params.Add(callData.Call);
-                                    newCall.Params.Add(ConvertMember(callData.GetParam(0), callData.GetParamClass()));
+                                IExpression exp = null;
+                                string name = callData.GetParamId(0);
+                                if (name == "var") {
+                                    exp = new VarSet();
                                 }
                                 else {
-                                    newCall.Params.Add(callData.Name);
-                                    newCall.Params.Add(ConvertMember(callData.GetParam(0), callData.GetParamClass()));
+                                    exp = new NamedVarSet();
                                 }
+                                if (null != exp) {
+                                    exp.Load(comp, this);
+                                }
+                                else {
+                                    //error
+                                    Console.WriteLine("DslCalculator error, {0} line {1}", callData.ToScriptString(false), callData.GetLine());
+                                }
+                                return exp;
+                            }
+                            else {
+                                if (callData.IsHighOrder) {
+                                    Dsl.FunctionData innerCall = callData.LowerOrderFunction;
+                                    int innerParamClass = innerCall.GetParamClass();
+                                    if (paramClass == (int)Dsl.FunctionData.ParamClassEnum.PARAM_CLASS_PARENTHESIS && (
+                                        innerParamClass == (int)Dsl.FunctionData.ParamClassEnum.PARAM_CLASS_PERIOD ||
+                                        innerParamClass == (int)Dsl.FunctionData.ParamClassEnum.PARAM_CLASS_BRACKET ||
+                                        innerParamClass == (int)Dsl.FunctionData.ParamClassEnum.PARAM_CLASS_PERIOD_BRACE ||
+                                        innerParamClass == (int)Dsl.FunctionData.ParamClassEnum.PARAM_CLASS_PERIOD_BRACKET ||
+                                        innerParamClass == (int)Dsl.FunctionData.ParamClassEnum.PARAM_CLASS_PERIOD_PARENTHESIS)) {
+                                        //obj.member(a,b,...) or obj[member](a,b,...) or obj.(member)(a,b,...) or obj.[member](a,b,...) or obj.{member}(a,b,...) -> dotnetcall(obj,member,a,b,...)
+                                        string apiName;
+                                        string member = innerCall.GetParamId(0);
+                                        if (member == "orderby" || member == "orderbydesc" || member == "where" || member == "top") {
+                                            apiName = "linq";
+                                        }
+                                        else {
+                                            apiName = "dotnetcall";
+                                        }
+                                        Dsl.FunctionData newCall = new Dsl.FunctionData();
+                                        newCall.Name = new Dsl.ValueData(apiName, Dsl.ValueData.ID_TOKEN);
+                                        newCall.SetParamClass((int)Dsl.FunctionData.ParamClassEnum.PARAM_CLASS_PARENTHESIS);
+                                        if (innerCall.IsHighOrder) {
+                                            newCall.Params.Add(innerCall.LowerOrderFunction);
+                                            newCall.Params.Add(ConvertMember(innerCall.GetParam(0), innerCall.GetParamClass()));
+                                            for (int i = 0; i < callData.GetParamNum(); ++i) {
+                                                Dsl.ISyntaxComponent p = callData.Params[i];
+                                                newCall.Params.Add(p);
+                                            }
+                                        }
+                                        else {
+                                            newCall.Params.Add(innerCall.Name);
+                                            newCall.Params.Add(ConvertMember(innerCall.GetParam(0), innerCall.GetParamClass()));
+                                            for (int i = 0; i < callData.GetParamNum(); ++i) {
+                                                Dsl.ISyntaxComponent p = callData.Params[i];
+                                                newCall.Params.Add(p);
+                                            }
+                                        }
 
-                                var getExp = new DotnetGetExp();
-                                getExp.Load(newCall, this);
-                                return getExp;
+                                        if (apiName == "dotnetcall") {
+                                            var callExp = new DotnetCallExp();
+                                            callExp.Load(newCall, this);
+                                            return callExp;
+                                        }
+                                        else {
+                                            var callExp = new LinqExp();
+                                            callExp.Load(newCall, this);
+                                            return callExp;
+                                        }
+                                    }
+                                }
+                                if (paramClass == (int)Dsl.FunctionData.ParamClassEnum.PARAM_CLASS_PERIOD ||
+                                  paramClass == (int)Dsl.FunctionData.ParamClassEnum.PARAM_CLASS_BRACKET ||
+                                  paramClass == (int)Dsl.FunctionData.ParamClassEnum.PARAM_CLASS_PERIOD_BRACE ||
+                                  paramClass == (int)Dsl.FunctionData.ParamClassEnum.PARAM_CLASS_PERIOD_BRACKET ||
+                                  paramClass == (int)Dsl.FunctionData.ParamClassEnum.PARAM_CLASS_PERIOD_PARENTHESIS) {
+                                    //obj.property or obj[property] or obj.(property) or obj.[property] or obj.{property} -> dotnetget(obj,property)
+                                    Dsl.FunctionData newCall = new Dsl.FunctionData();
+                                    newCall.Name = new Dsl.ValueData("dotnetget", Dsl.ValueData.ID_TOKEN);
+                                    newCall.SetParamClass((int)Dsl.FunctionData.ParamClassEnum.PARAM_CLASS_PARENTHESIS);
+                                    if (callData.IsHighOrder) {
+                                        newCall.Params.Add(callData.LowerOrderFunction);
+                                        newCall.Params.Add(ConvertMember(callData.GetParam(0), callData.GetParamClass()));
+                                    }
+                                    else {
+                                        newCall.Params.Add(callData.Name);
+                                        newCall.Params.Add(ConvertMember(callData.GetParam(0), callData.GetParamClass()));
+                                    }
+
+                                    var getExp = new DotnetGetExp();
+                                    getExp.Load(newCall, this);
+                                    return getExp;
+                                }
                             }
                         }
                     }
-                }
-                else {
-                    Dsl.FunctionData funcData = comp as Dsl.FunctionData;
-                    if (null != funcData) {
+                    else {
                         if (funcData.HaveStatement()) {
-                            callData = funcData.Call;
-                            if (null == callData || !callData.HaveId() && !callData.HaveParam()) {
+                            if (!funcData.HaveId() && !funcData.IsHighOrder) {
                                 HashtableExp exp = new HashtableExp();
                                 exp.Load(comp, this);
                                 return exp;
@@ -4405,20 +4436,37 @@ namespace Calculator
                         }
                         else if (!funcData.HaveExternScript()) {
                             //退化
-                            callData = funcData.Call;
-                            if (callData.HaveParam()) {
-                                return Load(callData);
-                            }
-                            else {
-                                valueData = callData.Name;
-                                return Load(valueData);
-                            }
+                            valueData = funcData.Name;
+                            return Load(valueData);
                         }
                     }
                 }
             }
             IExpression ret = Create(comp.GetId());
             if (null != ret) {
+                Dsl.StatementData stData = comp as Dsl.StatementData;
+                if (null != stData) {
+                    Dsl.FunctionData first = stData.First;
+                    if(first.HaveId() && !first.HaveParamOrStatement()) {
+                        //将命令行语法转换为函数调用语法
+                        Dsl.FunctionData fd = new Dsl.FunctionData();
+                        fd.CopyFrom(first);
+                        for(int argi = 1; argi < stData.GetFunctionNum(); ++argi) {
+                            var pfd = stData.GetFunction(argi);
+                            if (pfd.HaveId() && !pfd.HaveParamOrStatement()) {
+                                fd.AddParam(pfd.Name);
+                            }
+                            else {
+                                fd.AddParam(pfd);
+                            }
+                        }
+                        if (!ret.Load(fd, this)) {
+                            //error
+                            Console.WriteLine("DslCalculator error, {0} line {1}", comp.ToScriptString(false), comp.GetLine());
+                        }
+                        return ret;
+                    }
+                }
                 if (!ret.Load(comp, this)) {
                     //error
                     Console.WriteLine("DslCalculator error, {0} line {1}", comp.ToScriptString(false), comp.GetLine());
@@ -4433,9 +4481,9 @@ namespace Calculator
         private Dsl.ISyntaxComponent ConvertMember(Dsl.ISyntaxComponent p, int paramClass)
         {
             var pvd = p as Dsl.ValueData;
-            if (null != pvd && pvd.IsId() && (paramClass == (int)Dsl.CallData.ParamClassEnum.PARAM_CLASS_PERIOD
-                || paramClass == (int)Dsl.CallData.ParamClassEnum.PARAM_CLASS_POINTER
-                || paramClass == (int)Dsl.CallData.ParamClassEnum.PARAM_CLASS_QUESTION_PERIOD)) {
+            if (null != pvd && pvd.IsId() && (paramClass == (int)Dsl.FunctionData.ParamClassEnum.PARAM_CLASS_PERIOD
+                || paramClass == (int)Dsl.FunctionData.ParamClassEnum.PARAM_CLASS_POINTER
+                || paramClass == (int)Dsl.FunctionData.ParamClassEnum.PARAM_CLASS_QUESTION_PERIOD)) {
                 pvd.SetType(Dsl.ValueData.STRING_TOKEN);
                 return pvd;
             }
