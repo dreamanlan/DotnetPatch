@@ -432,11 +432,13 @@ namespace Calculator
                     }
                 }
             }
-            else if (idType == Dsl.ValueData.BOOL_TOKEN) {
-                m_Val = id == "true";
-            }
             else {
-                m_Val = id;
+                if (id == "true")
+                    m_Val = true;
+                else if (id == "false")
+                    m_Val = false;
+                else
+                    m_Val = id;
             }
             return true;
         }
@@ -4256,6 +4258,11 @@ namespace Calculator
                             Console.WriteLine("DslCalculator error, {0} line {1}", comp.ToScriptString(false), comp.GetLine());
                         }
                         return p;
+                    }
+                    else if(id == "true" || id == "false") {
+                        ConstGet constExp = new ConstGet();
+                        constExp.Load(comp, this);
+                        return constExp;
                     }
                     else {
                         NamedVarGet varExp = new NamedVarGet();
