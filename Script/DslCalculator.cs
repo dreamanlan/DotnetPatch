@@ -5,13 +5,1694 @@ using System.Reflection;
 using System.Text;
 using System.IO;
 using System.Security.Cryptography;
+using System.Runtime.InteropServices;
 using System.Linq;
 
 namespace Calculator
 {
+    public struct Float2
+    {
+        public float x;
+        public float y;
+
+        public override string ToString()
+        {
+            return string.Format("{{{0},{1}}}", x, y);
+        }
+        public static Float2 zero = new Float2();
+    }
+    public struct Float3
+    {
+        public float x;
+        public float y;
+        public float z;
+
+        public override string ToString()
+        {
+            return string.Format("{{{0},{1},{2}}}", x, y, z);
+        }
+        public static Float3 zero = new Float3();
+    }
+    public struct Float4
+    {
+        public float x;
+        public float y;
+        public float z;
+        public float w;
+
+        public override string ToString()
+        {
+            return string.Format("{{{0},{1},{2},{3}}}}", x, y, z, w);
+        }
+        public static Float4 zero = new Float4();
+    }
+    public struct Integer2
+    {
+        public int x;
+        public int y;
+
+        public override string ToString()
+        {
+            return string.Format("{{{0},{1}}}", x, y);
+        }
+        public static Integer2 zero = new Integer2();
+    }
+    public struct Integer3
+    {
+        public int x;
+        public int y;
+        public int z;
+
+        public override string ToString()
+        {
+            return string.Format("{{{0},{1},{2}}}", x, y, z);
+        }
+        public static Integer3 zero = new Integer3();
+    }
+    public struct Integer4
+    {
+        public int x;
+        public int y;
+        public int z;
+        public int w;
+
+        public override string ToString()
+        {
+            return string.Format("{{{0},{1},{2},{3}}}", x, y, z, w);
+        }
+        public static Integer4 zero = new Integer4();
+    }
+    public static class CalculatorValueConverter
+    {
+        public static CalculatorValue ToCalculatorValue<T>(T v)
+        {
+            var from = s_FromBoxedValue as FromGenericDelegation<CalculatorValue, T>;
+            if (null != from)
+                return from(v);
+            return CalculatorValue.NullObject;
+        }
+        public static object ToObject<T>(T v)
+        {
+            var from = s_FromObject as FromGenericDelegation<object, T>;
+            if (null != from)
+                return from(v);
+            return null;
+        }
+        public static string ToString<T>(T v)
+        {
+            var from = s_FromString as FromGenericDelegation<string, T>;
+            if (null != from)
+                return from(v);
+            return null;
+        }
+        public static bool ToBool<T>(T v)
+        {
+            var from = s_FromBool as FromGenericDelegation<bool, T>;
+            if (null != from)
+                return from(v);
+            return false;
+        }
+        public static char ToChar<T>(T v)
+        {
+            var from = s_FromChar as FromGenericDelegation<char, T>;
+            if (null != from)
+                return from(v);
+            return (char)0;
+        }
+        public static sbyte ToSByte<T>(T v)
+        {
+            var from = s_FromSByte as FromGenericDelegation<sbyte, T>;
+            if (null != from)
+                return from(v);
+            return 0;
+        }
+        public static short ToShort<T>(T v)
+        {
+            var from = s_FromShort as FromGenericDelegation<short, T>;
+            if (null != from)
+                return from(v);
+            return 0;
+        }
+        public static int ToInt<T>(T v)
+        {
+            var from = s_FromInt as FromGenericDelegation<int, T>;
+            if (null != from)
+                return from(v);
+            return 0;
+        }
+        public static long ToLong<T>(T v)
+        {
+            var from = s_FromLong as FromGenericDelegation<long, T>;
+            if (null != from)
+                return from(v);
+            return 0;
+        }
+        public static byte ToByte<T>(T v)
+        {
+            var from = s_FromByte as FromGenericDelegation<byte, T>;
+            if (null != from)
+                return from(v);
+            return 0;
+        }
+        public static ushort ToUShort<T>(T v)
+        {
+            var from = s_FromUShort as FromGenericDelegation<ushort, T>;
+            if (null != from)
+                return from(v);
+            return 0;
+        }
+        public static uint ToUInt<T>(T v)
+        {
+            var from = s_FromUInt as FromGenericDelegation<uint, T>;
+            if (null != from)
+                return from(v);
+            return 0;
+        }
+        public static ulong ToULong<T>(T v)
+        {
+            var from = s_FromULong as FromGenericDelegation<ulong, T>;
+            if (null != from)
+                return from(v);
+            return 0;
+        }
+        public static float ToFloat<T>(T v)
+        {
+            var from = s_FromFloat as FromGenericDelegation<float, T>;
+            if (null != from)
+                return from(v);
+            return 0;
+        }
+        public static double ToDouble<T>(T v)
+        {
+            var from = s_FromDouble as FromGenericDelegation<double, T>;
+            if (null != from)
+                return from(v);
+            return 0;
+        }
+        public static decimal ToDecimal<T>(T v)
+        {
+            var from = s_FromDecimal as FromGenericDelegation<decimal, T>;
+            if (null != from)
+                return from(v);
+            return 0;
+        }
+        public static Float2 ToFloat2<T>(T v)
+        {
+            var from = s_FromFloat2 as FromGenericDelegation<Float2, T>;
+            if (null != from)
+                return from(v);
+            return Float2.zero;
+        }
+        public static Float3 ToFloat3<T>(T v)
+        {
+            var from = s_FromFloat3 as FromGenericDelegation<Float3, T>;
+            if (null != from)
+                return from(v);
+            return Float3.zero;
+        }
+        public static Float4 ToFloat4<T>(T v)
+        {
+            var from = s_FromFloat4 as FromGenericDelegation<Float4, T>;
+            if (null != from)
+                return from(v);
+            return Float4.zero;
+        }
+        public static Integer2 ToInteger2<T>(T v)
+        {
+            var from = s_FromInteger2 as FromGenericDelegation<Integer2, T>;
+            if (null != from)
+                return from(v);
+            return Integer2.zero;
+        }
+        public static Integer3 ToInteger3<T>(T v)
+        {
+            var from = s_FromInteger3 as FromGenericDelegation<Integer3, T>;
+            if (null != from)
+                return from(v);
+            return Integer3.zero;
+        }
+        public static Integer4 ToInteger4<T>(T v)
+        {
+            var from = s_FromInteger4 as FromGenericDelegation<Integer4, T>;
+            if (null != from)
+                return from(v);
+            return Integer4.zero;
+        }
+
+        public static T From<T>(CalculatorValue v)
+        {
+            var from = s_FromBoxedValue as FromGenericDelegation<T, CalculatorValue>;
+            if (null != from)
+                return from(v);
+            return default(T);
+        }
+        public static T From<T>(object v)
+        {
+            var from = s_FromObject as FromGenericDelegation<T, object>;
+            if (null != from)
+                return from(v);
+            return default(T);
+        }
+        public static T From<T>(string v)
+        {
+            var from = s_FromString as FromGenericDelegation<T, string>;
+            if (null != from)
+                return from(v);
+            return default(T);
+        }
+        public static T From<T>(bool v)
+        {
+            var from = s_FromBool as FromGenericDelegation<T, bool>;
+            if (null != from)
+                return from(v);
+            return default(T);
+        }
+        public static T From<T>(char v)
+        {
+            var from = s_FromChar as FromGenericDelegation<T, char>;
+            if (null != from)
+                return from(v);
+            return default(T);
+        }
+        public static T From<T>(sbyte v)
+        {
+            var from = s_FromSByte as FromGenericDelegation<T, sbyte>;
+            if (null != from)
+                return from(v);
+            return default(T);
+        }
+        public static T From<T>(short v)
+        {
+            var from = s_FromShort as FromGenericDelegation<T, short>;
+            if (null != from)
+                return from(v);
+            return default(T);
+        }
+        public static T From<T>(int v)
+        {
+            var from = s_FromInt as FromGenericDelegation<T, int>;
+            if (null != from)
+                return from(v);
+            return default(T);
+        }
+        public static T From<T>(long v)
+        {
+            var from = s_FromLong as FromGenericDelegation<T, long>;
+            if (null != from)
+                return from(v);
+            return default(T);
+        }
+        public static T From<T>(byte v)
+        {
+            var from = s_FromByte as FromGenericDelegation<T, byte>;
+            if (null != from)
+                return from(v);
+            return default(T);
+        }
+        public static T From<T>(ushort v)
+        {
+            var from = s_FromUShort as FromGenericDelegation<T, ushort>;
+            if (null != from)
+                return from(v);
+            return default(T);
+        }
+        public static T From<T>(uint v)
+        {
+            var from = s_FromUInt as FromGenericDelegation<T, uint>;
+            if (null != from)
+                return from(v);
+            return default(T);
+        }
+        public static T From<T>(ulong v)
+        {
+            var from = s_FromULong as FromGenericDelegation<T, ulong>;
+            if (null != from)
+                return from(v);
+            return default(T);
+        }
+        public static T From<T>(float v)
+        {
+            var from = s_FromFloat as FromGenericDelegation<T, float>;
+            if (null != from)
+                return from(v);
+            return default(T);
+        }
+        public static T From<T>(double v)
+        {
+            var from = s_FromDouble as FromGenericDelegation<T, double>;
+            if (null != from)
+                return from(v);
+            return default(T);
+        }
+        public static T From<T>(decimal v)
+        {
+            var from = s_FromDecimal as FromGenericDelegation<T, decimal>;
+            if (null != from)
+                return from(v);
+            return default(T);
+        }
+        public static T From<T>(Float2 v)
+        {
+            var from = s_FromFloat2 as FromGenericDelegation<T, Float2>;
+            if (null != from)
+                return from(v);
+            return default(T);
+        }
+        public static T From<T>(Float3 v)
+        {
+            var from = s_FromFloat3 as FromGenericDelegation<T, Float3>;
+            if (null != from)
+                return from(v);
+            return default(T);
+        }
+        public static T From<T>(Float4 v)
+        {
+            var from = s_FromFloat4 as FromGenericDelegation<T, Float4>;
+            if (null != from)
+                return from(v);
+            return default(T);
+        }
+        public static T From<T>(Integer2 v)
+        {
+            var from = s_FromInteger2 as FromGenericDelegation<T, Integer2>;
+            if (null != from)
+                return from(v);
+            return default(T);
+        }
+        public static T From<T>(Integer3 v)
+        {
+            var from = s_FromInteger3 as FromGenericDelegation<T, Integer3>;
+            if (null != from)
+                return from(v);
+            return default(T);
+        }
+        public static T From<T>(Integer4 v)
+        {
+            var from = s_FromInteger4 as FromGenericDelegation<T, Integer4>;
+            if (null != from)
+                return from(v);
+            return default(T);
+        }
+
+        public static CalculatorValue ToBoxedValue(Type t, object o)
+        {
+            return CastTo<CalculatorValue>(o);
+        }
+        public static bool ToBool(Type t, object o)
+        {
+            return CastTo<bool>(o);
+        }
+        public static char ToChar(Type t, object o)
+        {
+            return CastTo<char>(o);
+        }
+        public static sbyte ToSByte(Type t, object o)
+        {
+            return CastTo<sbyte>(o);
+        }
+        public static short ToShort(Type t, object o)
+        {
+            return CastTo<short>(o);
+        }
+        public static int ToInt(Type t, object o)
+        {
+            return CastTo<int>(o);
+        }
+        public static long ToLong(Type t, object o)
+        {
+            return CastTo<long>(o);
+        }
+        public static byte ToByte(Type t, object o)
+        {
+            return CastTo<byte>(o);
+        }
+        public static ushort ToUShort(Type t, object o)
+        {
+            return CastTo<ushort>(o);
+        }
+        public static uint ToUInt(Type t, object o)
+        {
+            return CastTo<uint>(o);
+        }
+        public static ulong ToULong(Type t, object o)
+        {
+            return CastTo<ulong>(o);
+        }
+        public static float ToFloat(Type t, object o)
+        {
+            return CastTo<float>(o);
+        }
+        public static double ToDouble(Type t, object o)
+        {
+            return CastTo<double>(o);
+        }
+        public static decimal ToDecimal(Type t, object o)
+        {
+            return CastTo<decimal>(o);
+        }
+        public static string ToString(Type t, object o)
+        {
+            return CastTo<string>(o);
+        }
+        public static object ToObject(Type t, object o)
+        {
+            return o;
+        }
+        public static Float2 ToVector2(Type t, object o)
+        {
+            return CastTo<Float2>(o);
+        }
+        public static Float3 ToVector3(Type t, object o)
+        {
+            return CastTo<Float3>(o);
+        }
+        public static Float4 ToVector4(Type t, object o)
+        {
+            return CastTo<Float4>(o);
+        }
+        public static Integer2 ToQuaternion(Type t, object o)
+        {
+            return CastTo<Integer2>(o);
+        }
+        public static Integer3 ToColor(Type t, object o)
+        {
+            return CastTo<Integer3>(o);
+        }
+        public static Integer4 ToColor32(Type t, object o)
+        {
+            return CastTo<Integer4>(o);
+        }
+        public static object From(Type t, object o)
+        {
+            return o;
+        }
+
+        internal static T CastTo<T>(object obj)
+        {
+            if (obj is T) {
+                return (T)obj;
+            }
+            else {
+                try {
+                    return (T)Convert.ChangeType(obj, typeof(T));
+                }
+                catch {
+                    return default(T);
+                }
+            }
+        }
+
+        private delegate R FromGenericDelegation<R, T>(T v);
+        private static FromGenericDelegation<CalculatorValue, CalculatorValue> s_FromBoxedValue = FromHelper<CalculatorValue>;
+        private static FromGenericDelegation<bool, bool> s_FromBool = FromHelper<bool>;
+        private static FromGenericDelegation<char, char> s_FromChar = FromHelper<char>;
+        private static FromGenericDelegation<sbyte, sbyte> s_FromSByte = FromHelper<sbyte>;
+        private static FromGenericDelegation<short, short> s_FromShort = FromHelper<short>;
+        private static FromGenericDelegation<int, int> s_FromInt = FromHelper<int>;
+        private static FromGenericDelegation<long, long> s_FromLong = FromHelper<long>;
+        private static FromGenericDelegation<byte, byte> s_FromByte = FromHelper<byte>;
+        private static FromGenericDelegation<ushort, ushort> s_FromUShort = FromHelper<ushort>;
+        private static FromGenericDelegation<uint, uint> s_FromUInt = FromHelper<uint>;
+        private static FromGenericDelegation<ulong, ulong> s_FromULong = FromHelper<ulong>;
+        private static FromGenericDelegation<float, float> s_FromFloat = FromHelper<float>;
+        private static FromGenericDelegation<double, double> s_FromDouble = FromHelper<double>;
+        private static FromGenericDelegation<decimal, decimal> s_FromDecimal = FromHelper<decimal>;
+        private static FromGenericDelegation<string, string> s_FromString = FromHelper<string>;
+        private static FromGenericDelegation<object, object> s_FromObject = FromHelper<object>;
+        private static FromGenericDelegation<Float2, Float2> s_FromFloat2 = FromHelper<Float2>;
+        private static FromGenericDelegation<Float3, Float3> s_FromFloat3 = FromHelper<Float3>;
+        private static FromGenericDelegation<Float4, Float4> s_FromFloat4 = FromHelper<Float4>;
+        private static FromGenericDelegation<Integer2, Integer2> s_FromInteger2 = FromHelper<Integer2>;
+        private static FromGenericDelegation<Integer3, Integer3> s_FromInteger3 = FromHelper<Integer3>;
+        private static FromGenericDelegation<Integer4, Integer4> s_FromInteger4 = FromHelper<Integer4>;
+        private static T FromHelper<T>(T v)
+        {
+            return v;
+        }
+    }
+    public struct CalculatorValue
+    {
+        public const int c_ObjectType = 0;
+        public const int c_StringType = 1;
+        public const int c_BoolType = 2;
+        public const int c_CharType = 3;
+        public const int c_SByteType = 4;
+        public const int c_ShortType = 5;
+        public const int c_IntType = 6;
+        public const int c_LongType = 7;
+        public const int c_ByteType = 8;
+        public const int c_UShortType = 9;
+        public const int c_UIntType = 10;
+        public const int c_ULongType = 11;
+        public const int c_FloatType = 12;
+        public const int c_DoubleType = 13;
+        public const int c_DecimalType = 14;
+        public const int c_Float2Type = 15;
+        public const int c_Float3Type = 16;
+        public const int c_Float4Type = 17;
+        public const int c_Integer2Type = 18;
+        public const int c_Integer3Type = 19;
+        public const int c_Integer4Type = 20;
+
+        [StructLayout(LayoutKind.Explicit)]
+        internal struct UnionValue
+        {
+            [FieldOffset(0)]
+            public bool BoolVal;
+            [FieldOffset(0)]
+            public char CharVal;
+            [FieldOffset(0)]
+            public sbyte SByteVal;
+            [FieldOffset(0)]
+            public short ShortVal;
+            [FieldOffset(0)]
+            public int IntVal;
+            [FieldOffset(0)]
+            public long LongVal;
+            [FieldOffset(0)]
+            public byte ByteVal;
+            [FieldOffset(0)]
+            public ushort UShortVal;
+            [FieldOffset(0)]
+            public uint UIntVal;
+            [FieldOffset(0)]
+            public ulong ULongVal;
+            [FieldOffset(0)]
+            public float FloatVal;
+            [FieldOffset(0)]
+            public double DoubleVal;
+            [FieldOffset(0)]
+            public decimal DecimalVal;
+            [FieldOffset(0)]
+            public Float2 Float2Val;
+            [FieldOffset(0)]
+            public Float3 Float3Val;
+            [FieldOffset(0)]
+            public Float4 Float4Val;
+            [FieldOffset(0)]
+            public Integer2 Integer2Val;
+            [FieldOffset(0)]
+            public Integer3 Integer3Val;
+            [FieldOffset(0)]
+            public Integer4 Integer4Val;
+        }
+
+        public string StringVal
+        {
+            get { return ObjectVal as string; }
+            set { ObjectVal = value; }
+        }
+        public int Type;
+        public object ObjectVal;
+        private UnionValue Union;
+
+        public static implicit operator CalculatorValue(string v)
+        {
+            return CalculatorValue.From(v);
+        }
+        public static implicit operator string(CalculatorValue v)
+        {
+            return v.Get<string>();
+        }
+        public static implicit operator CalculatorValue(bool v)
+        {
+            return CalculatorValue.From(v);
+        }
+        public static implicit operator bool(CalculatorValue v)
+        {
+            return v.Get<bool>();
+        }
+        public static implicit operator CalculatorValue(char v)
+        {
+            return CalculatorValue.From(v);
+        }
+        public static implicit operator char(CalculatorValue v)
+        {
+            return v.Get<char>();
+        }
+        public static implicit operator CalculatorValue(sbyte v)
+        {
+            return CalculatorValue.From(v);
+        }
+        public static implicit operator sbyte(CalculatorValue v)
+        {
+            return v.Get<sbyte>();
+        }
+        public static implicit operator CalculatorValue(short v)
+        {
+            return CalculatorValue.From(v);
+        }
+        public static implicit operator short(CalculatorValue v)
+        {
+            return v.Get<short>();
+        }
+        public static implicit operator CalculatorValue(int v)
+        {
+            return CalculatorValue.From(v);
+        }
+        public static implicit operator int(CalculatorValue v)
+        {
+            return v.Get<int>();
+        }
+        public static implicit operator CalculatorValue(long v)
+        {
+            return CalculatorValue.From(v);
+        }
+        public static implicit operator long(CalculatorValue v)
+        {
+            return v.Get<long>();
+        }
+        public static implicit operator CalculatorValue(byte v)
+        {
+            return CalculatorValue.From(v);
+        }
+        public static implicit operator byte(CalculatorValue v)
+        {
+            return v.Get<byte>();
+        }
+        public static implicit operator CalculatorValue(ushort v)
+        {
+            return CalculatorValue.From(v);
+        }
+        public static implicit operator ushort(CalculatorValue v)
+        {
+            return v.Get<ushort>();
+        }
+        public static implicit operator CalculatorValue(uint v)
+        {
+            return CalculatorValue.From(v);
+        }
+        public static implicit operator uint(CalculatorValue v)
+        {
+            return v.Get<uint>();
+        }
+        public static implicit operator CalculatorValue(ulong v)
+        {
+            return CalculatorValue.From(v);
+        }
+        public static implicit operator ulong(CalculatorValue v)
+        {
+            return v.Get<ulong>();
+        }
+        public static implicit operator CalculatorValue(float v)
+        {
+            return CalculatorValue.From(v);
+        }
+        public static implicit operator float(CalculatorValue v)
+        {
+            return v.Get<float>();
+        }
+        public static implicit operator CalculatorValue(double v)
+        {
+            return CalculatorValue.From(v);
+        }
+        public static implicit operator double(CalculatorValue v)
+        {
+            return v.Get<double>();
+        }
+        public static implicit operator CalculatorValue(decimal v)
+        {
+            return CalculatorValue.From(v);
+        }
+        public static implicit operator decimal(CalculatorValue v)
+        {
+            return v.Get<decimal>();
+        }
+        public static implicit operator CalculatorValue(Float2 v)
+        {
+            return CalculatorValue.From(v);
+        }
+        public static implicit operator Float2(CalculatorValue v)
+        {
+            return v.Get<Float2>();
+        }
+        public static implicit operator CalculatorValue(Float3 v)
+        {
+            return CalculatorValue.From(v);
+        }
+        public static implicit operator Float3(CalculatorValue v)
+        {
+            return v.Get<Float3>();
+        }
+        public static implicit operator CalculatorValue(Float4 v)
+        {
+            return CalculatorValue.From(v);
+        }
+        public static implicit operator Float4(CalculatorValue v)
+        {
+            return v.Get<Float4>();
+        }
+        public static implicit operator CalculatorValue(Integer2 v)
+        {
+            return CalculatorValue.From(v);
+        }
+        public static implicit operator Integer2(CalculatorValue v)
+        {
+            return v.Get<Integer2>();
+        }
+        public static implicit operator CalculatorValue(Integer3 v)
+        {
+            return CalculatorValue.From(v);
+        }
+        public static implicit operator Integer3(CalculatorValue v)
+        {
+            return v.Get<Integer3>();
+        }
+        public static implicit operator CalculatorValue(Integer4 v)
+        {
+            return CalculatorValue.From(v);
+        }
+        public static implicit operator Integer4(CalculatorValue v)
+        {
+            return v.Get<Integer4>();
+        }
+
+        public static implicit operator CalculatorValue(Type v)
+        {
+            return CalculatorValue.From(v);
+        }
+        public static implicit operator Type(CalculatorValue v)
+        {
+            return v.ObjectVal as Type;
+        }
+        public static implicit operator CalculatorValue(ArrayList v)
+        {
+            return CalculatorValue.From(v);
+        }
+        public static implicit operator ArrayList(CalculatorValue v)
+        {
+            return v.ObjectVal as ArrayList;
+        }
+
+        public string GetTypeName()
+        {
+            switch (Type) {
+                case c_ObjectType:
+                    return "object";
+                case c_StringType:
+                    return "string";
+                case c_BoolType:
+                    return "bool";
+                case c_CharType:
+                    return "char";
+                case c_SByteType:
+                    return "sbyte";
+                case c_ShortType:
+                    return "short";
+                case c_IntType:
+                    return "int";
+                case c_LongType:
+                    return "long";
+                case c_ByteType:
+                    return "byte";
+                case c_UShortType:
+                    return "ushort";
+                case c_UIntType:
+                    return "uint";
+                case c_ULongType:
+                    return "ulong";
+                case c_FloatType:
+                    return "float";
+                case c_DoubleType:
+                    return "double";
+                case c_DecimalType:
+                    return "decimal";
+                case c_Float2Type:
+                    return "Float2";
+                case c_Float3Type:
+                    return "Float3";
+                case c_Float4Type:
+                    return "Float4";
+                case c_Integer2Type:
+                    return "Integer2";
+                case c_Integer3Type:
+                    return "Integer3";
+                case c_Integer4Type:
+                    return "Integer4";
+                default:
+                    return "Unknown";
+            }
+        }
+
+        public bool IsNullObject
+        {
+            get { return Type == c_ObjectType && ObjectVal == null; }
+        }
+        public bool IsNullOrEmptyString
+        {
+            get { return Type == c_StringType && string.IsNullOrEmpty(StringVal); }
+        }
+        public bool IsObject
+        {
+            get {
+                return Type == c_ObjectType;
+            }
+        }
+        public bool IsString
+        {
+            get {
+                return Type == c_StringType;
+            }
+        }
+        public bool IsBoolean
+        {
+            get {
+                return Type == c_BoolType;
+            }
+        }
+        public bool IsChar
+        {
+            get {
+                return Type == c_CharType;
+            }
+        }
+        public bool IsInteger
+        {
+            get {
+                switch (Type) {
+                    case c_SByteType:
+                    case c_ShortType:
+                    case c_IntType:
+                    case c_LongType:
+                    case c_ByteType:
+                    case c_UShortType:
+                    case c_UIntType:
+                    case c_ULongType:
+                        return true;
+                    default:
+                        return false;
+                }
+            }
+        }
+        public bool IsFloat
+        {
+            get {
+                return Type == c_FloatType || Type == c_DoubleType || Type == c_DecimalType;
+            }
+        }
+        public string AsString
+        {
+            get {
+                return IsString ? StringVal : (IsObject ? ObjectVal as string : null);
+            }
+        }
+        public T As<T>() where T : class
+        {
+            return IsObject || IsString ? ObjectVal as T : null;
+        }
+        public object As(Type t)
+        {
+            if (null == ObjectVal) {
+                return null;
+            }
+            else if (IsObject || IsString) {
+                Type st = ObjectVal.GetType();
+                if (t.IsAssignableFrom(st) || st.IsSubclassOf(t))
+                    return ObjectVal;
+                else
+                    return null;
+            }
+            else {
+                return null;
+            }
+        }
+
+        public void SetNullObject()
+        {
+            Type = c_ObjectType;
+            ObjectVal = null;
+        }
+        public void SetNullString()
+        {
+            Type = c_StringType;
+            StringVal = null;
+        }
+        public void SetEmptyString()
+        {
+            Type = c_StringType;
+            StringVal = string.Empty;
+        }
+        public void Set<T>(T v)
+        {
+            var t = v != null ? v.GetType() : typeof(T);
+            Set<T>(t, v);
+        }
+        public void Set(Type t, object v)
+        {
+            Set<object>(t, v);
+        }
+        public T Get<T>()
+        {
+            var t = typeof(T);
+            return Get<T>(t);
+        }
+        public object Get(Type t)
+        {
+            return Get<object>(t);
+        }
+        //供lua或防止隐式转换出问题时使用
+        public void SetBool(bool v)
+        {
+            Set(v);
+        }
+        public void SetNumber(double v)
+        {
+            Set(v);
+        }
+        public void SetString(string v)
+        {
+            Set(v);
+        }
+        public void SetObject(object v)
+        {
+            Set(v);
+        }
+        public bool GetBool()
+        {
+            return Get<bool>();
+        }
+        public double GetNumber()
+        {
+            return Get<double>();
+        }
+        public string GetString()
+        {
+            return Get<string>();
+        }
+        public object GetObject()
+        {
+            return Get<object>();
+        }
+
+        public void CopyFrom(CalculatorValue other)
+        {
+            Type = other.Type;
+            switch (Type) {
+                case c_ObjectType:
+                    ObjectVal = other.ObjectVal;
+                    break;
+                case c_StringType:
+                    StringVal = other.StringVal;
+                    break;
+                case c_BoolType:
+                    Union.BoolVal = other.Union.BoolVal;
+                    break;
+                case c_CharType:
+                    Union.CharVal = other.Union.CharVal;
+                    break;
+                case c_SByteType:
+                    Union.SByteVal = other.Union.SByteVal;
+                    break;
+                case c_ShortType:
+                    Union.ShortVal = other.Union.ShortVal;
+                    break;
+                case c_IntType:
+                    Union.IntVal = other.Union.IntVal;
+                    break;
+                case c_LongType:
+                    Union.LongVal = other.Union.LongVal;
+                    break;
+                case c_ByteType:
+                    Union.ByteVal = other.Union.ByteVal;
+                    break;
+                case c_UShortType:
+                    Union.UShortVal = other.Union.UShortVal;
+                    break;
+                case c_UIntType:
+                    Union.UIntVal = other.Union.UIntVal;
+                    break;
+                case c_ULongType:
+                    Union.ULongVal = other.Union.ULongVal;
+                    break;
+                case c_FloatType:
+                    Union.FloatVal = other.Union.FloatVal;
+                    break;
+                case c_DoubleType:
+                    Union.DoubleVal = other.Union.DoubleVal;
+                    break;
+                case c_DecimalType:
+                    Union.DecimalVal = other.Union.DecimalVal;
+                    break;
+                case c_Float2Type:
+                    Union.Float2Val = other.Union.Float2Val;
+                    break;
+                case c_Float3Type:
+                    Union.Float3Val = other.Union.Float3Val;
+                    break;
+                case c_Float4Type:
+                    Union.Float4Val = other.Union.Float4Val;
+                    break;
+                case c_Integer2Type:
+                    Union.Integer2Val = other.Union.Integer2Val;
+                    break;
+                case c_Integer3Type:
+                    Union.Integer3Val = other.Union.Integer3Val;
+                    break;
+                case c_Integer4Type:
+                    Union.Integer4Val = other.Union.Integer4Val;
+                    break;
+            }
+        }
+        public override string ToString()
+        {
+            switch (Type) {
+                case c_ObjectType:
+                    return null != ObjectVal ? ObjectVal.ToString() : string.Empty;
+                case c_StringType:
+                    return null != StringVal ? StringVal : string.Empty;
+                case c_BoolType:
+                    return Union.BoolVal.ToString();
+                case c_CharType:
+                    return Union.CharVal.ToString();
+                case c_SByteType:
+                    return Union.SByteVal.ToString();
+                case c_ShortType:
+                    return Union.ShortVal.ToString();
+                case c_IntType:
+                    return Union.IntVal.ToString();
+                case c_LongType:
+                    return Union.LongVal.ToString();
+                case c_ByteType:
+                    return Union.ByteVal.ToString();
+                case c_UShortType:
+                    return Union.UShortVal.ToString();
+                case c_UIntType:
+                    return Union.UIntVal.ToString();
+                case c_ULongType:
+                    return Union.ULongVal.ToString();
+                case c_FloatType:
+                    return Union.FloatVal.ToString();
+                case c_DoubleType:
+                    return Union.DoubleVal.ToString();
+                case c_DecimalType:
+                    return Union.DecimalVal.ToString();
+                case c_Float2Type:
+                    return Union.Float2Val.ToString();
+                case c_Float3Type:
+                    return Union.Float3Val.ToString();
+                case c_Float4Type:
+                    return Union.Float4Val.ToString();
+                case c_Integer2Type:
+                    return Union.Integer2Val.ToString();
+                case c_Integer3Type:
+                    return Union.Integer3Val.ToString();
+                case c_Integer4Type:
+                    return Union.Integer4Val.ToString();
+            }
+            return string.Empty;
+        }
+
+        private void Set<T>(Type t, T v)
+        {
+            if (typeof(T) == typeof(object)) {
+
+                if (t == typeof(CalculatorValue)) {
+                    var cv = (CalculatorValue)(object)v;
+                    CopyFrom(cv);
+                }
+                else if (t == typeof(bool)) {
+                    var cv = (bool)(object)v;
+                    Type = c_BoolType;
+                    Union.BoolVal = cv;
+                }
+                else if (t == typeof(char)) {
+                    var cv = (char)(object)v;
+                    Type = c_CharType;
+                    Union.CharVal = cv;
+                }
+                else if (t == typeof(sbyte)) {
+                    var cv = (sbyte)(object)v;
+                    Type = c_SByteType;
+                    Union.SByteVal = cv;
+                }
+                else if (t == typeof(short)) {
+                    var cv = (short)(object)v;
+                    Type = c_ShortType;
+                    Union.ShortVal = cv;
+                }
+                else if (t == typeof(int)) {
+                    var cv = (int)(object)v;
+                    Type = c_IntType;
+                    Union.IntVal = cv;
+                }
+                else if (t == typeof(long)) {
+                    var cv = (long)(object)v;
+                    Type = c_LongType;
+                    Union.LongVal = cv;
+                }
+                else if (t == typeof(byte)) {
+                    var cv = (byte)(object)v;
+                    Type = c_ByteType;
+                    Union.ByteVal = cv;
+                }
+                else if (t == typeof(ushort)) {
+                    var cv = (ushort)(object)v;
+                    Type = c_UShortType;
+                    Union.UShortVal = cv;
+                }
+                else if (t == typeof(uint)) {
+                    var cv = (uint)(object)v;
+                    Type = c_UIntType;
+                    Union.UIntVal = cv;
+                }
+                else if (t == typeof(ulong)) {
+                    var cv = (ulong)(object)v;
+                    Type = c_ULongType;
+                    Union.ULongVal = cv;
+                }
+                else if (t == typeof(float)) {
+                    var cv = (float)(object)v;
+                    Type = c_FloatType;
+                    Union.FloatVal = cv;
+                }
+                else if (t == typeof(double)) {
+                    var cv = (double)(object)v;
+                    Type = c_DoubleType;
+                    Union.DoubleVal = cv;
+                }
+                else if (t == typeof(decimal)) {
+                    var cv = (decimal)(object)v;
+                    Type = c_DecimalType;
+                    Union.DecimalVal = cv;
+                }
+                else if (t == typeof(Float2)) {
+                    var cv = (Float2)(object)v;
+                    Type = c_Float2Type;
+                    Union.Float2Val = cv;
+                }
+                else if (t == typeof(Float3)) {
+                    var cv = (Float3)(object)v;
+                    Type = c_Float3Type;
+                    Union.Float3Val = cv;
+                }
+                else if (t == typeof(Float4)) {
+                    var cv = (Float4)(object)v;
+                    Type = c_Float4Type;
+                    Union.Float4Val = cv;
+                }
+                else if (t == typeof(Integer2)) {
+                    var cv = (Integer2)(object)v;
+                    Type = c_Integer2Type;
+                    Union.Integer2Val = cv;
+                }
+                else if (t == typeof(Integer3)) {
+                    var cv = (Integer3)(object)v;
+                    Type = c_Integer3Type;
+                    Union.Integer3Val = cv;
+                }
+                else if (t == typeof(Integer4)) {
+                    var cv = (Integer4)(object)v;
+                    Type = c_Integer4Type;
+                    Union.Integer4Val = cv;
+                }
+                else if (t == typeof(string)) {
+                    var cv = (string)(object)v;
+                    Type = c_StringType;
+                    ObjectVal = cv;
+                }
+                else {
+                    object vObj = v;
+                    Type = c_ObjectType;
+                    ObjectVal = vObj;
+                }
+            }
+            else {
+                if (t == typeof(CalculatorValue)) {
+                    var cv = CalculatorValueConverter.ToCalculatorValue(v);
+                    CopyFrom(cv);
+                }
+                else if (t == typeof(bool)) {
+                    var cv = CalculatorValueConverter.ToBool(v);
+                    Type = c_BoolType;
+                    Union.BoolVal = cv;
+                }
+                else if (t == typeof(char)) {
+                    var cv = CalculatorValueConverter.ToChar(v);
+                    Type = c_CharType;
+                    Union.CharVal = cv;
+                }
+                else if (t == typeof(sbyte)) {
+                    var cv = CalculatorValueConverter.ToSByte(v);
+                    Type = c_SByteType;
+                    Union.SByteVal = cv;
+                }
+                else if (t == typeof(short)) {
+                    var cv = CalculatorValueConverter.ToShort(v);
+                    Type = c_ShortType;
+                    Union.ShortVal = cv;
+                }
+                else if (t == typeof(int)) {
+                    var cv = CalculatorValueConverter.ToInt(v);
+                    Type = c_IntType;
+                    Union.IntVal = cv;
+                }
+                else if (t == typeof(long)) {
+                    var cv = CalculatorValueConverter.ToLong(v);
+                    Type = c_LongType;
+                    Union.LongVal = cv;
+                }
+                else if (t == typeof(byte)) {
+                    var cv = CalculatorValueConverter.ToByte(v);
+                    Type = c_ByteType;
+                    Union.ByteVal = cv;
+                }
+                else if (t == typeof(ushort)) {
+                    var cv = CalculatorValueConverter.ToUShort(v);
+                    Type = c_UShortType;
+                    Union.UShortVal = cv;
+                }
+                else if (t == typeof(uint)) {
+                    var cv = CalculatorValueConverter.ToUInt(v);
+                    Type = c_UIntType;
+                    Union.UIntVal = cv;
+                }
+                else if (t == typeof(ulong)) {
+                    var cv = CalculatorValueConverter.ToULong(v);
+                    Type = c_ULongType;
+                    Union.ULongVal = cv;
+                }
+                else if (t == typeof(float)) {
+                    var cv = CalculatorValueConverter.ToFloat(v);
+                    Type = c_FloatType;
+                    Union.FloatVal = cv;
+                }
+                else if (t == typeof(double)) {
+                    var cv = CalculatorValueConverter.ToDouble(v);
+                    Type = c_DoubleType;
+                    Union.DoubleVal = cv;
+                }
+                else if (t == typeof(decimal)) {
+                    var cv = CalculatorValueConverter.ToDecimal(v);
+                    Type = c_DecimalType;
+                    Union.DecimalVal = cv;
+                }
+                else if (t == typeof(Float2)) {
+                    var cv = CalculatorValueConverter.ToFloat2(v);
+                    Type = c_Float2Type;
+                    Union.Float2Val = cv;
+                }
+                else if (t == typeof(Float3)) {
+                    var cv = CalculatorValueConverter.ToFloat3(v);
+                    Type = c_Float3Type;
+                    Union.Float3Val = cv;
+                }
+                else if (t == typeof(Float4)) {
+                    var cv = CalculatorValueConverter.ToFloat4(v);
+                    Type = c_Float4Type;
+                    Union.Float4Val = cv;
+                }
+                else if (t == typeof(Integer2)) {
+                    var cv = CalculatorValueConverter.ToInteger2(v);
+                    Type = c_Integer2Type;
+                    Union.Integer2Val = cv;
+                }
+                else if (t == typeof(Integer3)) {
+                    var cv = CalculatorValueConverter.ToInteger3(v);
+                    Type = c_Integer3Type;
+                    Union.Integer3Val = cv;
+                }
+                else if (t == typeof(Integer4)) {
+                    var cv = CalculatorValueConverter.ToInteger4(v);
+                    Type = c_Integer4Type;
+                    Union.Integer4Val = cv;
+                }
+                else if (t == typeof(string)) {
+                    var cv = CalculatorValueConverter.ToString(v);
+                    Type = c_StringType;
+                    ObjectVal = cv;
+                }
+                else {
+                    object vObj = v;
+                    Type = c_ObjectType;
+                    ObjectVal = vObj;
+                }
+            }
+        }
+        private T Get<T>(Type t)
+        {
+            if (typeof(T) == typeof(object)) {
+                var obj = ToObject();
+                return CalculatorValueConverter.CastTo<T>(obj);
+            }
+            else {
+                if (t == typeof(CalculatorValue)) {
+                    return CalculatorValueConverter.From<T>(this);
+                }
+                else if (t == typeof(bool) && Type == c_BoolType) {
+                    return CalculatorValueConverter.From<T>(Union.BoolVal);
+                }
+                else if (t == typeof(char) && Type == c_CharType) {
+                    return CalculatorValueConverter.From<T>(Union.CharVal);
+                }
+                else if (t == typeof(sbyte) && Type == c_SByteType) {
+                    return CalculatorValueConverter.From<T>(Union.SByteVal);
+                }
+                else if (t == typeof(short) && Type == c_ShortType) {
+                    return CalculatorValueConverter.From<T>(Union.ShortVal);
+                }
+                else if (t == typeof(int) && Type == c_IntType) {
+                    return CalculatorValueConverter.From<T>(Union.IntVal);
+                }
+                else if (t == typeof(long) && Type == c_LongType) {
+                    return CalculatorValueConverter.From<T>(Union.LongVal);
+                }
+                else if (t == typeof(byte) && Type == c_ByteType) {
+                    return CalculatorValueConverter.From<T>(Union.ByteVal);
+                }
+                else if (t == typeof(ushort) && Type == c_UShortType) {
+                    return CalculatorValueConverter.From<T>(Union.UShortVal);
+                }
+                else if (t == typeof(uint) && Type == c_UIntType) {
+                    return CalculatorValueConverter.From<T>(Union.UIntVal);
+                }
+                else if (t == typeof(ulong) && Type == c_ULongType) {
+                    return CalculatorValueConverter.From<T>(Union.ULongVal);
+                }
+                else if (t == typeof(float) && Type == c_FloatType) {
+                    return CalculatorValueConverter.From<T>(Union.FloatVal);
+                }
+                else if (t == typeof(double) && Type == c_DoubleType) {
+                    return CalculatorValueConverter.From<T>(Union.DoubleVal);
+                }
+                else if (t == typeof(decimal) && Type == c_DecimalType) {
+                    return CalculatorValueConverter.From<T>(Union.DecimalVal);
+                }
+                else if (t == typeof(Float2) && Type == c_Float2Type) {
+                    return CalculatorValueConverter.From<T>(Union.Float2Val);
+                }
+                else if (t == typeof(Float3) && Type == c_Float3Type) {
+                    return CalculatorValueConverter.From<T>(Union.Float3Val);
+                }
+                else if (t == typeof(Float4) && Type == c_Float4Type) {
+                    return CalculatorValueConverter.From<T>(Union.Float4Val);
+                }
+                else if (t == typeof(Integer2) && Type == c_Integer2Type) {
+                    return CalculatorValueConverter.From<T>(Union.Integer2Val);
+                }
+                else if (t == typeof(Integer3) && Type == c_Integer3Type) {
+                    return CalculatorValueConverter.From<T>(Union.Integer3Val);
+                }
+                else if (t == typeof(Integer4) && Type == c_Integer4Type) {
+                    return CalculatorValueConverter.From<T>(Union.Integer4Val);
+                }
+                else if (t == typeof(bool)) {
+                    long v = ToLong();
+                    return CalculatorValueConverter.From<T>(v != 0);
+                }
+                else if (t == typeof(char)) {
+                    long v = ToLong();
+                    return CalculatorValueConverter.From<T>((char)v);
+                }
+                else if (t == typeof(sbyte)) {
+                    long v = ToLong();
+                    return CalculatorValueConverter.From<T>((sbyte)v);
+                }
+                else if (t == typeof(short)) {
+                    long v = ToLong();
+                    return CalculatorValueConverter.From<T>((short)v);
+                }
+                else if (t == typeof(int)) {
+                    long v = ToLong();
+                    return CalculatorValueConverter.From<T>((int)v);
+                }
+                else if (t == typeof(long)) {
+                    long v = ToLong();
+                    return CalculatorValueConverter.From<T>(v);
+                }
+                else if (t == typeof(byte)) {
+                    long v = ToLong();
+                    return CalculatorValueConverter.From<T>((byte)v);
+                }
+                else if (t == typeof(ushort)) {
+                    long v = ToLong();
+                    return CalculatorValueConverter.From<T>((ushort)v);
+                }
+                else if (t == typeof(uint)) {
+                    long v = ToLong();
+                    return CalculatorValueConverter.From<T>((uint)v);
+                }
+                else if (t == typeof(ulong)) {
+                    long v = ToLong();
+                    return CalculatorValueConverter.From<T>((ulong)v);
+                }
+                else if (t == typeof(float)) {
+                    double v = ToDouble();
+                    return CalculatorValueConverter.From<T>((float)v);
+                }
+                else if (t == typeof(double)) {
+                    double v = ToDouble();
+                    return CalculatorValueConverter.From<T>(v);
+                }
+                else if (t == typeof(decimal)) {
+                    double v = ToDouble();
+                    return CalculatorValueConverter.From<T>((decimal)v);
+                }
+                else if (t == typeof(string) && Type == c_StringType) {
+                    return CalculatorValueConverter.From<T>(StringVal);
+                }
+                else if (t == typeof(object) && Type == c_ObjectType) {
+                    return CalculatorValueConverter.From<T>(ObjectVal);
+                }
+                else if (t == typeof(string)) {
+                    var str = ToString();
+                    return CalculatorValueConverter.From<T>(str);
+                }
+                else if (t == typeof(object)) {
+                    var obj = ToObject();
+                    return CalculatorValueConverter.From<T>(obj);
+                }
+                else {
+                    var obj = ToObject();
+                    return CalculatorValueConverter.CastTo<T>(obj);
+                }
+            }
+        }
+        private object ToObject()
+        {
+            switch (Type) {
+                case c_ObjectType:
+                case c_StringType:
+                    return ObjectVal;
+                case c_BoolType:
+                    return Union.BoolVal;
+                case c_CharType:
+                    return Union.CharVal;
+                case c_SByteType:
+                    return Union.SByteVal;
+                case c_ShortType:
+                    return Union.ShortVal;
+                case c_IntType:
+                    return Union.IntVal;
+                case c_LongType:
+                    return Union.LongVal;
+                case c_ByteType:
+                    return Union.ByteVal;
+                case c_UShortType:
+                    return Union.UShortVal;
+                case c_UIntType:
+                    return Union.UIntVal;
+                case c_ULongType:
+                    return Union.ULongVal;
+                case c_FloatType:
+                    return Union.FloatVal;
+                case c_DoubleType:
+                    return Union.DoubleVal;
+                case c_DecimalType:
+                    return Union.DecimalVal;
+                case c_Float2Type:
+                    return Union.Float2Val;
+                case c_Float3Type:
+                    return Union.Float3Val;
+                case c_Float4Type:
+                    return Union.Float4Val;
+                case c_Integer2Type:
+                    return Union.Integer2Val;
+                case c_Integer3Type:
+                    return Union.Integer3Val;
+                case c_Integer4Type:
+                    return Union.Integer4Val;
+            }
+            return null;
+        }
+        private bool ToBool()
+        {
+            if (Type == c_BoolType)
+                return Union.BoolVal;
+            else
+                return ToLong() != 0;
+        }
+        private char ToChar()
+        {
+            if (Type == c_CharType)
+                return Union.CharVal;
+            else
+                return (char)(ulong)ToLong();
+        }
+        private long ToLong()
+        {
+            long v = 0;
+            switch (Type) {
+                case c_BoolType:
+                    return Union.BoolVal ? 1 : 0;
+                case c_CharType:
+                    return Union.CharVal;
+                case c_SByteType:
+                    return Union.SByteVal;
+                case c_ShortType:
+                    return Union.ShortVal;
+                case c_IntType:
+                    return Union.IntVal;
+                case c_LongType:
+                    return Union.LongVal;
+                case c_ByteType:
+                    return Union.ByteVal;
+                case c_UShortType:
+                    return Union.UShortVal;
+                case c_UIntType:
+                    return Union.UIntVal;
+                case c_ULongType:
+                    return (long)Union.ULongVal;
+                case c_FloatType:
+                    return (long)Union.FloatVal;
+                case c_DoubleType:
+                    return (long)Union.DoubleVal;
+                case c_DecimalType:
+                    return (long)Union.DecimalVal;
+                case c_StringType:
+                    if (null != StringVal) {
+                        long.TryParse(StringVal, out v);
+                    }
+                    return v;
+                case c_ObjectType:
+                    if (null != ObjectVal) {
+                        v = CalculatorValueConverter.CastTo<long>(ObjectVal);
+                    }
+                    return v;
+            }
+            return v;
+        }
+        private double ToDouble()
+        {
+            double v = 0;
+            switch (Type) {
+                case c_BoolType:
+                    return Union.BoolVal ? 1 : 0;
+                case c_CharType:
+                    return Union.CharVal;
+                case c_SByteType:
+                    return Union.SByteVal;
+                case c_ShortType:
+                    return Union.ShortVal;
+                case c_IntType:
+                    return Union.IntVal;
+                case c_LongType:
+                    return Union.LongVal;
+                case c_ByteType:
+                    return Union.ByteVal;
+                case c_UShortType:
+                    return Union.UShortVal;
+                case c_UIntType:
+                    return Union.UIntVal;
+                case c_ULongType:
+                    return Union.ULongVal;
+                case c_FloatType:
+                    return Union.FloatVal;
+                case c_DoubleType:
+                    return Union.DoubleVal;
+                case c_DecimalType:
+                    return (double)Union.DecimalVal;
+                case c_StringType:
+                    if (null != StringVal) {
+                        double.TryParse(StringVal, out v);
+                    }
+                    return v;
+                case c_ObjectType:
+                    if (null != ObjectVal) {
+                        v = CalculatorValueConverter.CastTo<double>(ObjectVal);
+                    }
+                    return v;
+            }
+            return v;
+        }
+
+        public static CalculatorValue From<T>(T v)
+        {
+            CalculatorValue bv = new CalculatorValue();
+            bv.Set(v);
+            return bv;
+        }
+        public static CalculatorValue From(Type t, object o)
+        {
+            CalculatorValue bv = new CalculatorValue();
+            bv.Set(o);
+            return bv;
+        }
+        //供lua或防止隐式转换出问题时使用
+        public static CalculatorValue FromBool(bool v)
+        {
+            CalculatorValue bv = new CalculatorValue();
+            bv.Set(v);
+            return bv;
+        }
+        public static CalculatorValue FromNumber(double v)
+        {
+            CalculatorValue bv = new CalculatorValue();
+            bv.Set(v);
+            return bv;
+        }
+        public static CalculatorValue FromString(string v)
+        {
+            CalculatorValue bv = new CalculatorValue();
+            bv.Set(v);
+            return bv;
+        }
+        public static CalculatorValue FromObject(object v)
+        {
+            CalculatorValue bv = new CalculatorValue();
+            bv.Set(v);
+            return bv;
+        }
+
+        public static CalculatorValue NullObject
+        {
+            get { return s_NullObject; }
+        }
+        public static CalculatorValue EmptyString
+        {
+            get { return s_EmptyString; }
+        }
+        private static CalculatorValue s_NullObject = CalculatorValue.FromObject(null);
+        private static CalculatorValue s_EmptyString = CalculatorValue.FromString(string.Empty);
+    }
+    public class CalculatorValueListPool
+    {
+        public List<CalculatorValue> Alloc()
+        {
+            if (m_Pool.Count > 0)
+                return m_Pool.Dequeue();
+            else
+                return new List<CalculatorValue>();
+        }
+        public void Recycle(List<CalculatorValue> list)
+        {
+            if (null != list) {
+                m_Pool.Enqueue(list);
+            }
+        }
+        public void Clear()
+        {
+            m_Pool.Clear();
+        }
+        public CalculatorValueListPool(int initCapacity)
+        {
+            m_Pool = new Queue<List<CalculatorValue>>(initCapacity);
+        }
+
+        private Queue<List<CalculatorValue>> m_Pool = null;
+    }
     public interface IExpression
     {
-        object Calc();
+        CalculatorValue Calc();
         bool Load(Dsl.ISyntaxComponent dsl, DslCalculator calculator);
     }
     public interface IExpressionFactory
@@ -27,9 +1708,9 @@ namespace Calculator
     }
     public abstract class AbstractExpression : IExpression
     {
-        public object Calc()
+        public CalculatorValue Calc()
         {
-            object ret = null;
+            CalculatorValue ret = CalculatorValue.NullObject;
             try {
                 ret = DoCalc();
             }
@@ -85,7 +1766,7 @@ namespace Calculator
         protected virtual bool Load(IList<IExpression> exps) { return false; }
         protected virtual bool Load(Dsl.FunctionData funcData) { return false; }
         protected virtual bool Load(Dsl.StatementData statementData) { return false; }
-        protected abstract object DoCalc();
+        protected abstract CalculatorValue DoCalc();
 
         protected DslCalculator Calculator
         {
@@ -95,36 +1776,6 @@ namespace Calculator
         private DslCalculator m_Calculator = null;
         private Dsl.ISyntaxComponent m_Dsl = null;
 
-        protected static double ToDouble(object v)
-        {
-            if (null == v)
-                return 0;
-            return (double)Convert.ChangeType(v, typeof(double));
-        }
-        protected static long ToLong(object v)
-        {
-            if (null == v)
-                return 0;
-            return (long)Convert.ChangeType(v, typeof(long));
-        }
-        protected static float ToFloat(object v)
-        {
-            if (null == v)
-                return 0;
-            return (float)Convert.ChangeType(v, typeof(float));
-        }
-        protected static int ToInt(object v)
-        {
-            if (null == v)
-                return 0;
-            return (int)Convert.ChangeType(v, typeof(int));
-        }
-        protected static string ToString(object v)
-        {
-            if (null == v)
-                return string.Empty;
-            return v.ToString();
-        }
         protected static void CastArgsForCall(Type t, string method, BindingFlags flags, params object[] args)
         {
             var mis = t.GetMember(method, flags);
@@ -190,7 +1841,10 @@ namespace Calculator
         }
         protected static T CastTo<T>(object obj)
         {
-            if (obj is T) {
+            if (obj is CalculatorValue) {
+                return ((CalculatorValue)obj).Get<T>();
+            }
+            else if (obj is T) {
                 return (T)obj;
             }
             else {
@@ -207,7 +1861,10 @@ namespace Calculator
             if (null == obj)
                 return null;
             Type st = obj.GetType();
-            if (t.IsAssignableFrom(st) || st.IsSubclassOf(t)) {
+            if (obj is CalculatorValue) {
+                return ((CalculatorValue)obj).Get(t);
+            }
+            else if (t.IsAssignableFrom(st) || st.IsSubclassOf(t)) {
                 return obj;
             }
             else {
@@ -222,29 +1879,31 @@ namespace Calculator
     }
     public abstract class SimpleExpressionBase : AbstractExpression
     {
-        protected override object DoCalc()
+        protected override CalculatorValue DoCalc()
         {
-            List<object> operands = new List<object>();
+            var operands = Calculator.NewCalculatorValueList();
             for (int i = 0; i < m_Exps.Count; ++i) {
-                object v = m_Exps[i].Calc();
+                var v = m_Exps[i].Calc();
                 operands.Add(v);
             }
-            return OnCalc(operands);
+            var r = OnCalc(operands);
+            Calculator.RecycleCalculatorValueList(operands);
+            return r;
         }
         protected override bool Load(IList<IExpression> exps)
         {
             m_Exps = exps;
             return true;
         }
-        protected abstract object OnCalc(IList<object> operands);
+        protected abstract CalculatorValue OnCalc(IList<CalculatorValue> operands);
 
         private IList<IExpression> m_Exps = null;
     }
     internal sealed class ArgsGet : AbstractExpression
     {
-        protected override object DoCalc()
+        protected override CalculatorValue DoCalc()
         {
-            object ret = Calculator.Arguments;
+            CalculatorValue ret = CalculatorValue.FromObject(Calculator.Arguments);
             return ret;
         }
         protected override bool Load(Dsl.FunctionData callData)
@@ -254,10 +1913,10 @@ namespace Calculator
     }
     internal sealed class ArgGet : AbstractExpression
     {
-        protected override object DoCalc()
+        protected override CalculatorValue DoCalc()
         {
-            object ret = null;
-            var ix = (int)Convert.ChangeType(m_ArgIndex.Calc(), typeof(int));
+            var ret = CalculatorValue.NullObject;
+            var ix = m_ArgIndex.Calc().Get<int>();
             var args = Calculator.Arguments;
             if (ix >= 0 && ix < args.Count) {
                 ret = args[ix];
@@ -274,10 +1933,10 @@ namespace Calculator
     }
     internal sealed class ArgNumGet : AbstractExpression
     {
-        protected override object DoCalc()
+        protected override CalculatorValue DoCalc()
         {
-            object ret = Calculator.Arguments.Count;
-            return ret;
+            var ret = Calculator.Arguments.Count;
+            return CalculatorValue.From(ret);
         }
         protected override bool Load(Dsl.FunctionData callData)
         {
@@ -286,16 +1945,16 @@ namespace Calculator
     }
     internal sealed class VarSet : AbstractExpression
     {
-        protected override object DoCalc()
+        protected override CalculatorValue DoCalc()
         {
             var varId = m_VarId.Calc();
-            object v = m_Op.Calc();
-            if (varId is int) {
-                int id = (int)Convert.ChangeType(varId, typeof(int));
+            CalculatorValue v = m_Op.Calc();
+            if (varId.IsInteger) {
+                int id = varId.Get<int>();
                 Calculator.SetVariable(id, v);
             }
             else {
-                var str = varId as string;
+                var str = varId.AsString;
                 if (null != str) {
                     Calculator.SetVariable(str, v);
                 }
@@ -316,16 +1975,16 @@ namespace Calculator
     }
     internal sealed class VarGet : AbstractExpression
     {
-        protected override object DoCalc()
+        protected override CalculatorValue DoCalc()
         {
             var varId = m_VarId.Calc();
-            object v = null;
-            if (varId is int) {
-                int id = (int)Convert.ChangeType(varId, typeof(int));
+            CalculatorValue v = CalculatorValue.NullObject;
+            if (varId.IsInteger) {
+                int id = varId.Get<int>();
                 v = Calculator.GetVariable(id);
             }
             else {
-                var str = varId as string;
+                var str = varId.AsString;
                 if (null != str) {
                     v = Calculator.GetVariable(str);
                 }
@@ -342,12 +2001,12 @@ namespace Calculator
     }
     internal sealed class NamedVarSet : AbstractExpression
     {
-        protected override object DoCalc()
+        protected override CalculatorValue DoCalc()
         {
-            object v = m_Op.Calc();
+            CalculatorValue v = m_Op.Calc();
             if (m_VarId.Length > 0) {
                 Calculator.SetVariable(m_VarId, v);
-                if (null != v && m_VarId[0] != '@' && m_VarId[0] != '$') {
+                if (!v.IsNullObject && m_VarId[0] != '@' && m_VarId[0] != '$') {
                     Environment.SetEnvironmentVariable(m_VarId, v.ToString());
                 }
             }
@@ -367,9 +2026,9 @@ namespace Calculator
     }
     internal sealed class NamedVarGet : AbstractExpression
     {
-        protected override object DoCalc()
+        protected override CalculatorValue DoCalc()
         {
-            object ret = 0;
+            var ret = CalculatorValue.NullObject;
             if (m_VarId == "break") {
                 Calculator.RunState = RunStateEnum.Break;
             }
@@ -378,8 +2037,8 @@ namespace Calculator
             }
             else if (m_VarId.Length > 0) {
                 ret = Calculator.GetVariable(m_VarId);
-                if (null == ret && m_VarId[0] != '@' && m_VarId[0] != '$') {
-                    ret = Environment.GetEnvironmentVariable(m_VarId);
+                if (ret.IsNullObject && m_VarId[0] != '@' && m_VarId[0] != '$') {
+                    ret = CalculatorValue.FromObject(Environment.GetEnvironmentVariable(m_VarId));
                 }
             }
             return ret;
@@ -394,9 +2053,9 @@ namespace Calculator
     }
     internal sealed class ConstGet : AbstractExpression
     {
-        protected override object DoCalc()
+        protected override CalculatorValue DoCalc()
         {
-            object v = m_Val;
+            CalculatorValue v = m_Val;
             return v;
         }
         protected override bool Load(Dsl.ValueData valData)
@@ -448,20 +2107,20 @@ namespace Calculator
             return true;
         }
 
-        private object m_Val;
+        private CalculatorValue m_Val;
     }
     internal sealed class AddExp : AbstractExpression
     {
-        protected override object DoCalc()
+        protected override CalculatorValue DoCalc()
         {
-            object v1 = m_Op1.Calc();
-            object v2 = m_Op2.Calc();
-            object v;
-            if (v1 is string || v2 is string) {
-                v = ToString(v1) + ToString(v2);
+            var v1 = m_Op1.Calc();
+            var v2 = m_Op2.Calc();
+            CalculatorValue v;
+            if (v1.IsString || v2.IsString) {
+                v = v1.ToString() + v2.ToString();
             }
             else {
-                v = ToDouble(v1) + ToDouble(v2);
+                v = v1.Get<double>() + v2.Get<double>();
             }
             return v;
         }
@@ -477,11 +2136,11 @@ namespace Calculator
     }
     internal sealed class SubExp : AbstractExpression
     {
-        protected override object DoCalc()
+        protected override CalculatorValue DoCalc()
         {
-            object v1 = m_Op1.Calc();
-            object v2 = m_Op2.Calc();
-            object v = ToDouble(v1) - ToDouble(v2);
+            var v1 = m_Op1.Calc();
+            var v2 = m_Op2.Calc();
+            CalculatorValue v = v1.Get<double>() - v2.Get<double>();
             return v;
         }
         protected override bool Load(IList<IExpression> exps)
@@ -496,11 +2155,11 @@ namespace Calculator
     }
     internal sealed class MulExp : AbstractExpression
     {
-        protected override object DoCalc()
+        protected override CalculatorValue DoCalc()
         {
-            object v1 = m_Op1.Calc();
-            object v2 = m_Op2.Calc();
-            object v = ToDouble(v1) * ToDouble(v2);
+            var v1 = m_Op1.Calc();
+            var v2 = m_Op2.Calc();
+            CalculatorValue v = v1.Get<double>() * v2.Get<double>();
             return v;
         }
         protected override bool Load(IList<IExpression> exps)
@@ -515,11 +2174,11 @@ namespace Calculator
     }
     internal sealed class DivExp : AbstractExpression
     {
-        protected override object DoCalc()
+        protected override CalculatorValue DoCalc()
         {
-            object v1 = m_Op1.Calc();
-            object v2 = m_Op2.Calc();
-            object v = ToDouble(v1) / ToDouble(v2);
+            var v1 = m_Op1.Calc();
+            var v2 = m_Op2.Calc();
+            CalculatorValue v = v1.Get<double>() / v2.Get<double>();
             return v;
         }
         protected override bool Load(IList<IExpression> exps)
@@ -534,11 +2193,11 @@ namespace Calculator
     }
     internal sealed class ModExp : AbstractExpression
     {
-        protected override object DoCalc()
+        protected override CalculatorValue DoCalc()
         {
-            object v1 = m_Op1.Calc();
-            object v2 = m_Op2.Calc();
-            object v = ToDouble(v1) % ToDouble(v2);
+            var v1 = m_Op1.Calc();
+            var v2 = m_Op2.Calc();
+            CalculatorValue v = v1.Get<double>() % v2.Get<double>();
             return v;
         }
         protected override bool Load(IList<IExpression> exps)
@@ -553,11 +2212,11 @@ namespace Calculator
     }
     internal sealed class BitAndExp : AbstractExpression
     {
-        protected override object DoCalc()
+        protected override CalculatorValue DoCalc()
         {
-            object v1 = m_Op1.Calc();
-            object v2 = m_Op2.Calc();
-            object v = ToLong(v1) & ToLong(v2);
+            var v1 = m_Op1.Calc();
+            var v2 = m_Op2.Calc();
+            CalculatorValue v = v1.Get<long>() & v2.Get<long>();
             return v;
         }
         protected override bool Load(IList<IExpression> exps)
@@ -572,11 +2231,11 @@ namespace Calculator
     }
     internal sealed class BitOrExp : AbstractExpression
     {
-        protected override object DoCalc()
+        protected override CalculatorValue DoCalc()
         {
-            object v1 = m_Op1.Calc();
-            object v2 = m_Op2.Calc();
-            object v = ToLong(v1) | ToLong(v2);
+            var v1 = m_Op1.Calc();
+            var v2 = m_Op2.Calc();
+            CalculatorValue v = v1.Get<long>() | v2.Get<long>();
             return v;
         }
         protected override bool Load(IList<IExpression> exps)
@@ -591,11 +2250,11 @@ namespace Calculator
     }
     internal sealed class BitXorExp : AbstractExpression
     {
-        protected override object DoCalc()
+        protected override CalculatorValue DoCalc()
         {
-            object v1 = m_Op1.Calc();
-            object v2 = m_Op2.Calc();
-            object v = ToLong(v1) ^ ToLong(v2);
+            var v1 = m_Op1.Calc();
+            var v2 = m_Op2.Calc();
+            CalculatorValue v = v1.Get<long>() ^ v2.Get<long>();
             return v;
         }
         protected override bool Load(IList<IExpression> exps)
@@ -610,10 +2269,10 @@ namespace Calculator
     }
     internal sealed class BitNotExp : AbstractExpression
     {
-        protected override object DoCalc()
+        protected override CalculatorValue DoCalc()
         {
-            object v1 = m_Op1.Calc();
-            object v = ~ToLong(v1);
+            var v1 = m_Op1.Calc();
+            CalculatorValue v = ~v1.Get<long>();
             return v;
         }
         protected override bool Load(IList<IExpression> exps)
@@ -626,11 +2285,11 @@ namespace Calculator
     }
     internal sealed class LShiftExp : AbstractExpression
     {
-        protected override object DoCalc()
+        protected override CalculatorValue DoCalc()
         {
-            object v1 = m_Op1.Calc();
-            object v2 = m_Op2.Calc();
-            object v = ToLong(v1) << ToInt(v2);
+            var v1 = m_Op1.Calc();
+            var v2 = m_Op2.Calc();
+            CalculatorValue v = v1.Get<long>() << v2.Get<int>();
             return v;
         }
         protected override bool Load(IList<IExpression> exps)
@@ -645,11 +2304,11 @@ namespace Calculator
     }
     internal sealed class RShiftExp : AbstractExpression
     {
-        protected override object DoCalc()
+        protected override CalculatorValue DoCalc()
         {
-            object v1 = m_Op1.Calc();
-            object v2 = m_Op2.Calc();
-            object v = ToLong(v1) >> ToInt(v2);
+            var v1 = m_Op1.Calc();
+            var v2 = m_Op2.Calc();
+            CalculatorValue v = v1.Get<long>() >> v2.Get<int>();
             return v;
         }
         protected override bool Load(IList<IExpression> exps)
@@ -664,11 +2323,11 @@ namespace Calculator
     }
     internal sealed class MaxExp : AbstractExpression
     {
-        protected override object DoCalc()
+        protected override CalculatorValue DoCalc()
         {
-            double v1 = ToDouble(m_Op1.Calc());
-            double v2 = ToDouble(m_Op2.Calc());
-            object v = v1 >= v2 ? v1 : v2;
+            double v1 = m_Op1.Calc().Get<double>();
+            double v2 = m_Op2.Calc().Get<double>();
+            CalculatorValue v = v1 >= v2 ? v1 : v2;
             return v;
         }
         protected override bool Load(IList<IExpression> exps)
@@ -683,11 +2342,11 @@ namespace Calculator
     }
     internal sealed class MinExp : AbstractExpression
     {
-        protected override object DoCalc()
+        protected override CalculatorValue DoCalc()
         {
-            double v1 = ToDouble(m_Op1.Calc());
-            double v2 = ToDouble(m_Op2.Calc());
-            object v = v1 <= v2 ? v1 : v2;
+            double v1 = m_Op1.Calc().Get<double>();
+            double v2 = m_Op2.Calc().Get<double>();
+            CalculatorValue v = v1 <= v2 ? v1 : v2;
             return v;
         }
         protected override bool Load(IList<IExpression> exps)
@@ -702,10 +2361,10 @@ namespace Calculator
     }
     internal sealed class AbsExp : AbstractExpression
     {
-        protected override object DoCalc()
+        protected override CalculatorValue DoCalc()
         {
-            double v1 = ToDouble(m_Op.Calc());
-            object v = v1 >= 0 ? v1 : -v1;
+            double v1 = m_Op.Calc().Get<double>();
+            CalculatorValue v = v1 >= 0 ? v1 : -v1;
             return v;
         }
         protected override bool Load(IList<IExpression> exps)
@@ -718,11 +2377,11 @@ namespace Calculator
     }
     internal sealed class PowExp : AbstractExpression
     {
-        protected override object DoCalc()
+        protected override CalculatorValue DoCalc()
         {
-            double v1 = ToDouble(m_Op1.Calc());
-            double v2 = ToDouble(m_Op2.Calc());
-            object v = (double)Math.Pow((float)v1, (float)v2);
+            double v1 = m_Op1.Calc().Get<double>();
+            double v2 = m_Op2.Calc().Get<double>();
+            CalculatorValue v = (double)Math.Pow((float)v1, (float)v2);
             return v;
         }
         protected override bool Load(IList<IExpression> exps)
@@ -737,10 +2396,10 @@ namespace Calculator
     }
     internal sealed class SqrtExp : AbstractExpression
     {
-        protected override object DoCalc()
+        protected override CalculatorValue DoCalc()
         {
-            double v1 = ToDouble(m_Op1.Calc());
-            object v = (double)Math.Sqrt((float)v1);
+            double v1 = m_Op1.Calc().Get<double>();
+            CalculatorValue v = (double)Math.Sqrt((float)v1);
             return v;
         }
         protected override bool Load(IList<IExpression> exps)
@@ -753,10 +2412,10 @@ namespace Calculator
     }
     internal sealed class LogExp : AbstractExpression
     {
-        protected override object DoCalc()
+        protected override CalculatorValue DoCalc()
         {
-            double v1 = ToDouble(m_Op1.Calc());
-            object v = (double)Math.Log((float)v1);
+            double v1 = m_Op1.Calc().Get<double>();
+            CalculatorValue v = (double)Math.Log((float)v1);
             return v;
         }
         protected override bool Load(IList<IExpression> exps)
@@ -769,10 +2428,10 @@ namespace Calculator
     }
     internal sealed class Log10Exp : AbstractExpression
     {
-        protected override object DoCalc()
+        protected override CalculatorValue DoCalc()
         {
-            double v1 = ToDouble(m_Op1.Calc());
-            object v = (double)Math.Log10((float)v1);
+            double v1 = m_Op1.Calc().Get<double>();
+            CalculatorValue v = (double)Math.Log10((float)v1);
             return v;
         }
         protected override bool Load(IList<IExpression> exps)
@@ -785,10 +2444,10 @@ namespace Calculator
     }
     internal sealed class FloorExp : AbstractExpression
     {
-        protected override object DoCalc()
+        protected override CalculatorValue DoCalc()
         {
-            double v1 = ToDouble(m_Op1.Calc());
-            object v = Math.Floor(v1);
+            double v1 = m_Op1.Calc().Get<double>();
+            CalculatorValue v = Math.Floor(v1);
             return v;
         }
         protected override bool Load(IList<IExpression> exps)
@@ -801,10 +2460,10 @@ namespace Calculator
     }
     internal sealed class CeilExp : AbstractExpression
     {
-        protected override object DoCalc()
+        protected override CalculatorValue DoCalc()
         {
-            double v1 = ToDouble(m_Op1.Calc());
-            object v = Math.Ceiling(v1);
+            double v1 = m_Op1.Calc().Get<double>();
+            CalculatorValue v = Math.Ceiling(v1);
             return v;
         }
         protected override bool Load(IList<IExpression> exps)
@@ -817,12 +2476,12 @@ namespace Calculator
     }
     internal sealed class ClampExp : AbstractExpression
     {
-        protected override object DoCalc()
+        protected override CalculatorValue DoCalc()
         {
-            double v1 = ToDouble(m_Op1.Calc());
-            double v2 = ToDouble(m_Op2.Calc());
-            double v3 = ToDouble(m_Op3.Calc());
-            object v;
+            double v1 = m_Op1.Calc().Get<double>();
+            double v2 = m_Op2.Calc().Get<double>();
+            double v3 = m_Op3.Calc().Get<double>();
+            CalculatorValue v;
             if (v3 < v1)
                 v = v1;
             else if (v3 > v2)
@@ -845,13 +2504,13 @@ namespace Calculator
     }
     internal sealed class DistExp : AbstractExpression
     {
-        protected override object DoCalc()
+        protected override CalculatorValue DoCalc()
         {
-            float x1 = (float)ToDouble(m_Op1.Calc());
-            float y1 = (float)ToDouble(m_Op2.Calc());
-            float x2 = (float)ToDouble(m_Op3.Calc());
-            float y2 = (float)ToDouble(m_Op4.Calc());
-            object v = Math.Sqrt((x2 - x1) * (x2 - x1) + (y2 - y1) * (y2 - y1));
+            float x1 = (float)m_Op1.Calc().Get<double>();
+            float y1 = (float)m_Op2.Calc().Get<double>();
+            float x2 = (float)m_Op3.Calc().Get<double>();
+            float y2 = (float)m_Op4.Calc().Get<double>();
+            CalculatorValue v = Math.Sqrt((x2 - x1) * (x2 - x1) + (y2 - y1) * (y2 - y1));
             return v;
         }
         protected override bool Load(IList<IExpression> exps)
@@ -870,13 +2529,13 @@ namespace Calculator
     }
     internal sealed class DistSqrExp : AbstractExpression
     {
-        protected override object DoCalc()
+        protected override CalculatorValue DoCalc()
         {
-            float x1 = (float)ToDouble(m_Op1.Calc());
-            float y1 = (float)ToDouble(m_Op2.Calc());
-            float x2 = (float)ToDouble(m_Op3.Calc());
-            float y2 = (float)ToDouble(m_Op4.Calc());
-            object v = (x2 - x1) * (x2 - x1) + (y2 - y1) * (y2 - y1);
+            float x1 = (float)m_Op1.Calc().Get<double>();
+            float y1 = (float)m_Op2.Calc().Get<double>();
+            float x2 = (float)m_Op3.Calc().Get<double>();
+            float y2 = (float)m_Op4.Calc().Get<double>();
+            CalculatorValue v = (x2 - x1) * (x2 - x1) + (y2 - y1) * (y2 - y1);
             return v;
         }
         protected override bool Load(IList<IExpression> exps)
@@ -895,11 +2554,11 @@ namespace Calculator
     }
     internal sealed class GreatExp : AbstractExpression
     {
-        protected override object DoCalc()
+        protected override CalculatorValue DoCalc()
         {
-            double v1 = ToDouble(m_Op1.Calc());
-            double v2 = ToDouble(m_Op2.Calc());
-            object v = v1 > v2 ? 1 : 0;
+            double v1 = m_Op1.Calc().Get<double>();
+            double v2 = m_Op2.Calc().Get<double>();
+            CalculatorValue v = v1 > v2 ? 1 : 0;
             return v;
         }
         protected override bool Load(IList<IExpression> exps)
@@ -914,11 +2573,11 @@ namespace Calculator
     }
     internal sealed class GreatEqualExp : AbstractExpression
     {
-        protected override object DoCalc()
+        protected override CalculatorValue DoCalc()
         {
-            double v1 = ToDouble(m_Op1.Calc());
-            double v2 = ToDouble(m_Op2.Calc());
-            object v = v1 >= v2 ? 1 : 0;
+            double v1 = m_Op1.Calc().Get<double>();
+            double v2 = m_Op2.Calc().Get<double>();
+            CalculatorValue v = v1 >= v2 ? 1 : 0;
             return v;
         }
         protected override bool Load(IList<IExpression> exps)
@@ -933,11 +2592,11 @@ namespace Calculator
     }
     internal sealed class LessExp : AbstractExpression
     {
-        protected override object DoCalc()
+        protected override CalculatorValue DoCalc()
         {
-            double v1 = ToDouble(m_Op1.Calc());
-            double v2 = ToDouble(m_Op2.Calc());
-            object v = v1 < v2 ? 1 : 0;
+            double v1 = m_Op1.Calc().Get<double>();
+            double v2 = m_Op2.Calc().Get<double>();
+            CalculatorValue v = v1 < v2 ? 1 : 0;
             return v;
         }
         protected override bool Load(IList<IExpression> exps)
@@ -952,11 +2611,11 @@ namespace Calculator
     }
     internal sealed class LessEqualExp : AbstractExpression
     {
-        protected override object DoCalc()
+        protected override CalculatorValue DoCalc()
         {
-            double v1 = ToDouble(m_Op1.Calc());
-            double v2 = ToDouble(m_Op2.Calc());
-            object v = v1 <= v2 ? 1 : 0;
+            double v1 = m_Op1.Calc().Get<double>();
+            double v2 = m_Op2.Calc().Get<double>();
+            CalculatorValue v = v1 <= v2 ? 1 : 0;
             return v;
         }
         protected override bool Load(IList<IExpression> exps)
@@ -971,11 +2630,11 @@ namespace Calculator
     }
     internal sealed class EqualExp : AbstractExpression
     {
-        protected override object DoCalc()
+        protected override CalculatorValue DoCalc()
         {
-            object v1 = m_Op1.Calc();
-            object v2 = m_Op2.Calc();
-            object v = ToString(v1) == ToString(v2) ? 1 : 0;
+            var v1 = m_Op1.Calc();
+            var v2 = m_Op2.Calc();
+            CalculatorValue v = v1.ToString() == v2.ToString() ? 1 : 0;
             return v;
         }
         protected override bool Load(IList<IExpression> exps)
@@ -990,11 +2649,11 @@ namespace Calculator
     }
     internal sealed class NotEqualExp : AbstractExpression
     {
-        protected override object DoCalc()
+        protected override CalculatorValue DoCalc()
         {
-            object v1 = m_Op1.Calc();
-            object v2 = m_Op2.Calc();
-            object v = ToString(v1) != ToString(v2) ? 1 : 0;
+            var v1 = m_Op1.Calc();
+            var v2 = m_Op2.Calc();
+            CalculatorValue v = v1.ToString() != v2.ToString() ? 1 : 0;
             return v;
         }
         protected override bool Load(IList<IExpression> exps)
@@ -1009,11 +2668,11 @@ namespace Calculator
     }
     internal sealed class AndExp : AbstractExpression
     {
-        protected override object DoCalc()
+        protected override CalculatorValue DoCalc()
         {
-            long v1 = ToLong(m_Op1.Calc());
+            long v1 = m_Op1.Calc().Get<long>();
             long v2 = 0;
-            object v = v1 != 0 && (v2 = ToLong(m_Op2.Calc())) != 0 ? 1 : 0;
+            CalculatorValue v = v1 != 0 && (v2 = m_Op2.Calc().Get<long>()) != 0 ? 1 : 0;
             return v;
         }
         protected override bool Load(IList<IExpression> exps)
@@ -1028,11 +2687,11 @@ namespace Calculator
     }
     internal sealed class OrExp : AbstractExpression
     {
-        protected override object DoCalc()
+        protected override CalculatorValue DoCalc()
         {
-            long v1 = ToLong(m_Op1.Calc());
+            long v1 = m_Op1.Calc().Get<long>();
             long v2 = 0;
-            object v = v1 != 0 || (v2 = ToLong(m_Op2.Calc())) != 0 ? 1 : 0;
+            CalculatorValue v = v1 != 0 || (v2 = m_Op2.Calc().Get<long>()) != 0 ? 1 : 0;
             return v;
         }
         protected override bool Load(IList<IExpression> exps)
@@ -1047,10 +2706,10 @@ namespace Calculator
     }
     internal sealed class NotExp : AbstractExpression
     {
-        protected override object DoCalc()
+        protected override CalculatorValue DoCalc()
         {
-            long val = ToLong(m_Op.Calc());
-            object v = val == 0 ? 1 : 0;
+            long val = m_Op.Calc().Get<long>();
+            CalculatorValue v = val == 0 ? 1 : 0;
             return v;
         }
         protected override bool Load(IList<IExpression> exps)
@@ -1063,12 +2722,12 @@ namespace Calculator
     }
     internal sealed class CondExp : AbstractExpression
     {
-        protected override object DoCalc()
+        protected override CalculatorValue DoCalc()
         {
-            object v1 = m_Op1.Calc();
-            object v2 = null;
-            object v3 = null;
-            object v = ToLong(v1) != 0 ? v2 = m_Op2.Calc() : v3 = m_Op3.Calc();
+            var v1 = m_Op1.Calc();
+            var v2 = CalculatorValue.NullObject;
+            CalculatorValue v3 = CalculatorValue.NullObject;
+            CalculatorValue v = v1.Get<long>() != 0 ? v2 = m_Op2.Calc() : v3 = m_Op3.Calc();
             return v;
         }
         protected override bool Load(Dsl.StatementData statementData)
@@ -1096,14 +2755,14 @@ namespace Calculator
     }
     internal sealed class IfExp : AbstractExpression
     {
-        protected override object DoCalc()
+        protected override CalculatorValue DoCalc()
         {
-            object v = 0;
+            CalculatorValue v = 0;
             for (int ix = 0; ix < m_Clauses.Count; ++ix) {
                 var clause = m_Clauses[ix];
                 if (null != clause.Condition) {
-                    object condVal = clause.Condition.Calc();
-                    if (ToLong(condVal) != 0) {
+                    var condVal = clause.Condition.Calc();
+                    if (condVal.Get<long>() != 0) {
                         for (int index = 0; index < clause.Expressions.Count; ++index) {
                             v = clause.Expressions[index].Calc();
                             if (Calculator.RunState != RunStateEnum.Normal) {
@@ -1219,12 +2878,12 @@ namespace Calculator
     }
     internal sealed class WhileExp : AbstractExpression
     {
-        protected override object DoCalc()
+        protected override CalculatorValue DoCalc()
         {
-            object v = 0;
+            CalculatorValue v = 0;
             for (; ; ) {
-                object condVal = m_Condition.Calc();
-                if (ToLong(condVal) != 0) {
+                var condVal = m_Condition.Calc();
+                if (condVal.Get<long>() != 0) {
                     for (int index = 0; index < m_Expressions.Count; ++index) {
                         v = m_Expressions[index].Calc();
                         if (Calculator.RunState == RunStateEnum.Continue) {
@@ -1291,11 +2950,11 @@ namespace Calculator
     }
     internal sealed class LoopExp : AbstractExpression
     {
-        protected override object DoCalc()
+        protected override CalculatorValue DoCalc()
         {
-            object v = 0;
-            object count = m_Count.Calc();
-            long ct = ToLong(count);
+            CalculatorValue v = 0;
+            var count = m_Count.Calc();
+            long ct = count.Get<long>();
             for (int i = 0; i < ct; ++i) {
                 Calculator.SetVariable("$$", i);
                 for (int index = 0; index < m_Expressions.Count; ++index) {
@@ -1360,15 +3019,15 @@ namespace Calculator
     }
     internal sealed class LoopListExp : AbstractExpression
     {
-        protected override object DoCalc()
+        protected override CalculatorValue DoCalc()
         {
-            object v = 0;
-            object list = m_List.Calc();
-            IEnumerable obj = list as IEnumerable;
+            CalculatorValue v = 0;
+            var list = m_List.Calc();
+            IEnumerable obj = list.As<IEnumerable>();
             if (null != obj) {
                 IEnumerator enumer = obj.GetEnumerator();
                 while (enumer.MoveNext()) {
-                    object val = enumer.Current;
+                    var val = CalculatorValue.FromObject(enumer.Current);
                     Calculator.SetVariable("$$", val);
                     for (int index = 0; index < m_Expressions.Count; ++index) {
                         v = m_Expressions[index].Calc();
@@ -1433,17 +3092,17 @@ namespace Calculator
     }
     internal sealed class ForeachExp : AbstractExpression
     {
-        protected override object DoCalc()
+        protected override CalculatorValue DoCalc()
         {
-            object v = 0;
+            CalculatorValue v = 0;
             List<object> list = new List<object>();
             for (int ix = 0; ix < m_Elements.Count; ++ix) {
-                object val = m_Elements[ix].Calc();
+                object val = m_Elements[ix].Calc().Get<object>();
                 list.Add(val);
             }
             IEnumerator enumer = list.GetEnumerator();
             while (enumer.MoveNext()) {
-                object val = enumer.Current;
+                var val = CalculatorValue.FromObject(enumer.Current);
                 Calculator.SetVariable("$$", val);
                 for (int index = 0; index < m_Expressions.Count; ++index) {
                     v = m_Expressions[index].Calc();
@@ -1513,9 +3172,9 @@ namespace Calculator
     }
     internal sealed class ParenthesisExp : AbstractExpression
     {
-        protected override object DoCalc()
+        protected override CalculatorValue DoCalc()
         {
-            object v = 0;
+            CalculatorValue v = 0;
             for (int ix = 0; ix < m_Expressions.Count; ++ix) {
                 var exp = m_Expressions[ix];
                 v = exp.Calc();
@@ -1535,16 +3194,16 @@ namespace Calculator
     }
     internal sealed class FormatExp : AbstractExpression
     {
-        protected override object DoCalc()
+        protected override CalculatorValue DoCalc()
         {
-            object v = 0;
+            CalculatorValue v = 0;
             string fmt = string.Empty;
             ArrayList al = new ArrayList();
             for (int ix = 0; ix < m_Expressions.Count; ++ix) {
                 var exp = m_Expressions[ix];
                 v = exp.Calc();
                 if (ix == 0)
-                    fmt = v as string;
+                    fmt = v.AsString;
                 else
                     al.Add(v);
             }
@@ -1564,9 +3223,9 @@ namespace Calculator
     }
     internal sealed class GetTypeAssemblyNameExp : AbstractExpression
     {
-        protected override object DoCalc()
+        protected override CalculatorValue DoCalc()
         {
-            object ret = null;
+            var ret = CalculatorValue.NullObject;
             if (m_Expressions.Count >= 1) {
                 var obj = m_Expressions[0].Calc();
                 try {
@@ -1591,9 +3250,9 @@ namespace Calculator
     }
     internal sealed class GetTypeFullNameExp : AbstractExpression
     {
-        protected override object DoCalc()
+        protected override CalculatorValue DoCalc()
         {
-            object ret = null;
+            var ret = CalculatorValue.NullObject;
             if (m_Expressions.Count >= 1) {
                 var obj = m_Expressions[0].Calc();
                 try {
@@ -1618,9 +3277,9 @@ namespace Calculator
     }
     internal sealed class GetTypeNameExp : AbstractExpression
     {
-        protected override object DoCalc()
+        protected override CalculatorValue DoCalc()
         {
-            object ret = null;
+            var ret = CalculatorValue.NullObject;
             if (m_Expressions.Count >= 1) {
                 var obj = m_Expressions[0].Calc();
                 try {
@@ -1645,15 +3304,18 @@ namespace Calculator
     }
     internal sealed class GetTypeExp : AbstractExpression
     {
-        protected override object DoCalc()
+        protected override CalculatorValue DoCalc()
         {
-            object ret = null;
+            var ret = CalculatorValue.NullObject;
             if (m_Expressions.Count >= 1) {
-                string type = m_Expressions[0].Calc() as string;
+                string type = m_Expressions[0].Calc().AsString;
                 try {
-                    ret = Type.GetType(type);
-                    if (null == ret) {
+                    var r = Type.GetType(type);
+                    if (null == r) {
                         Console.WriteLine("null == Type.GetType({0})", type);
+                    }
+                    else {
+                        ret = CalculatorValue.FromObject(r);
                     }
                 }
                 catch (Exception ex) {
@@ -1675,53 +3337,53 @@ namespace Calculator
     }
     internal sealed class ChangeTypeExp : AbstractExpression
     {
-        protected override object DoCalc()
+        protected override CalculatorValue DoCalc()
         {
-            object ret = null;
+            var ret = CalculatorValue.NullObject;
             if (m_Expressions.Count >= 2) {
-                object obj = m_Expressions[0].Calc();
-                string type = m_Expressions[1].Calc() as string;
+                var obj = m_Expressions[0].Calc();
+                string type = m_Expressions[1].Calc().AsString;
                 try {
                     if (0 == type.CompareTo("sbyte")) {
-                        ret = CastTo<sbyte>(obj);
+                        ret = obj.Get<sbyte>();
                     }
                     else if (0 == type.CompareTo("byte")) {
-                        ret = CastTo<byte>(obj);
+                        ret = obj.Get<byte>();
                     }
                     else if (0 == type.CompareTo("short")) {
-                        ret = CastTo<short>(obj);
+                        ret = obj.Get<short>();
                     }
                     else if (0 == type.CompareTo("ushort")) {
-                        ret = CastTo<ushort>(obj);
+                        ret = obj.Get<ushort>();
                     }
                     else if (0 == type.CompareTo("int")) {
-                        ret = CastTo<int>(obj);
+                        ret = obj.Get<int>();
                     }
                     else if (0 == type.CompareTo("uint")) {
-                        ret = CastTo<uint>(obj);
+                        ret = obj.Get<uint>();
                     }
                     else if (0 == type.CompareTo("long")) {
-                        ret = CastTo<long>(obj);
+                        ret = obj.Get<long>();
                     }
                     else if (0 == type.CompareTo("ulong")) {
-                        ret = CastTo<ulong>(obj);
+                        ret = obj.Get<ulong>();
                     }
                     else if (0 == type.CompareTo("float")) {
-                        ret = CastTo<float>(obj);
+                        ret = obj.Get<float>();
                     }
                     else if (0 == type.CompareTo("double")) {
-                        ret = CastTo<double>(obj);
+                        ret = obj.Get<double>();
                     }
                     else if (0 == type.CompareTo("string")) {
-                        ret = CastTo<string>(obj);
+                        ret = obj.Get<string>();
                     }
                     else if (0 == type.CompareTo("bool")) {
-                        ret = CastTo<bool>(obj);
+                        ret = obj.Get<bool>();
                     }
                     else {
                         Type t = Type.GetType(type);
                         if (null != t) {
-                            ret = Convert.ChangeType(obj, t);
+                            ret = CalculatorValue.FromObject(obj.Get(t));
                         }
                         else {
                             Console.WriteLine("null == Type.GetType({0})", type);
@@ -1747,16 +3409,16 @@ namespace Calculator
     }
     internal sealed class ParseEnumExp : AbstractExpression
     {
-        protected override object DoCalc()
+        protected override CalculatorValue DoCalc()
         {
-            object ret = null;
+            var ret = CalculatorValue.NullObject;
             if (m_Expressions.Count >= 2) {
-                string type = m_Expressions[0].Calc() as string;
-                string val = m_Expressions[1].Calc() as string;
+                string type = m_Expressions[0].Calc().AsString;
+                string val = m_Expressions[1].Calc().AsString;
                 try {
                     Type t = Type.GetType(type);
                     if (null != t) {
-                        ret = Enum.Parse(t, val, true);
+                        ret = CalculatorValue.FromObject(Enum.Parse(t, val, true));
                     }
                     else {
                         Console.WriteLine("null == Type.GetType({0})", type);
@@ -1781,9 +3443,9 @@ namespace Calculator
     }
     internal sealed class DotnetCallExp : AbstractExpression
     {
-        protected override object DoCalc()
+        protected override CalculatorValue DoCalc()
         {
-            object ret = null;
+            var ret = CalculatorValue.NullObject;
             object obj = null;
             object methodObj = null;
             string method = null;
@@ -1792,14 +3454,14 @@ namespace Calculator
                 var exp = m_Expressions[ix];
                 var v = exp.Calc();
                 if (ix == 0) {
-                    obj = v;
+                    obj = v.Get<object>();
                 }
                 else if (ix == 1) {
-                    methodObj = v;
-                    method = v as string;
+                    methodObj = v.Get<object>();
+                    method = v.AsString;
                 }
                 else {
-                    arglist.Add(v);
+                    arglist.Add(v.Get<object>());
                 }
             }
             object[] _args = arglist.ToArray();
@@ -1809,7 +3471,7 @@ namespace Calculator
                     if (null != dict && dict.Contains(method) && dict[method] is Delegate) {
                         var d = dict[method] as Delegate;
                         if (null != d) {
-                            ret = d.DynamicInvoke();
+                            ret = CalculatorValue.FromObject(d.DynamicInvoke());
                         }
                     }
                     else {
@@ -1818,7 +3480,7 @@ namespace Calculator
                             try {
                                 BindingFlags flags = BindingFlags.Static | BindingFlags.InvokeMethod | BindingFlags.Public | BindingFlags.NonPublic;
                                 CastArgsForCall(t, method, flags, _args);
-                                ret = t.InvokeMember(method, flags, null, null, _args);
+                                ret = CalculatorValue.FromObject(t.InvokeMember(method, flags, null, null, _args));
                             }
                             catch (Exception ex) {
                                 Console.WriteLine("Exception:{0}\n{1}", ex.Message, ex.StackTrace);
@@ -1830,7 +3492,7 @@ namespace Calculator
                                 try {
                                     BindingFlags flags = BindingFlags.Instance | BindingFlags.Static | BindingFlags.InvokeMethod | BindingFlags.Public | BindingFlags.NonPublic;
                                     CastArgsForCall(t, method, flags, _args);
-                                    ret = t.InvokeMember(method, flags, null, obj, _args);
+                                    ret = CalculatorValue.FromObject(t.InvokeMember(method, flags, null, obj, _args));
                                 }
                                 catch (Exception ex) {
                                     Console.WriteLine("Exception:{0}\n{1}", ex.Message, ex.StackTrace);
@@ -1839,12 +3501,12 @@ namespace Calculator
                         }
                     }
                 }
-                else {
+                else if (null != methodObj) {
                     IDictionary dict = obj as IDictionary;
                     if (null != dict && dict.Contains(methodObj)) {
                         var d = dict[methodObj] as Delegate;
                         if (null != d) {
-                            ret = d.DynamicInvoke();
+                            ret = CalculatorValue.FromObject(d.DynamicInvoke());
                         }
                     }
                     else {
@@ -1857,7 +3519,7 @@ namespace Calculator
                             }
                             var d = e.Current as Delegate;
                             if (null != d) {
-                                ret = d.DynamicInvoke();
+                                ret = CalculatorValue.FromObject(d.DynamicInvoke());
                             }
                         }
                     }
@@ -1878,9 +3540,9 @@ namespace Calculator
     }
     internal sealed class DotnetSetExp : AbstractExpression
     {
-        protected override object DoCalc()
+        protected override CalculatorValue DoCalc()
         {
-            object ret = null;
+            var ret = CalculatorValue.NullObject;
             object obj = null;
             object methodObj = null;
             string method = null;
@@ -1889,14 +3551,14 @@ namespace Calculator
                 var exp = m_Expressions[ix];
                 var v = exp.Calc();
                 if (ix == 0) {
-                    obj = v;
+                    obj = v.Get<object>();
                 }
                 else if (ix == 1) {
-                    methodObj = v;
-                    method = v as string;
+                    methodObj = v.Get<object>();
+                    method = v.AsString;
                 }
                 else {
-                    arglist.Add(v);
+                    arglist.Add(v.Get<object>());
                 }
             }
             object[] _args = arglist.ToArray();
@@ -1912,7 +3574,7 @@ namespace Calculator
                             try {
                                 BindingFlags flags = BindingFlags.Static | BindingFlags.SetField | BindingFlags.SetProperty | BindingFlags.Public | BindingFlags.NonPublic;
                                 CastArgsForSet(t, method, flags, _args);
-                                ret = t.InvokeMember(method, flags, null, null, _args);
+                                ret = CalculatorValue.FromObject(t.InvokeMember(method, flags, null, null, _args));
                             }
                             catch (Exception ex) {
                                 Console.WriteLine("Exception:{0}\n{1}", ex.Message, ex.StackTrace);
@@ -1924,7 +3586,7 @@ namespace Calculator
                                 try {
                                     BindingFlags flags = BindingFlags.Instance | BindingFlags.Static | BindingFlags.SetField | BindingFlags.SetProperty | BindingFlags.Public | BindingFlags.NonPublic;
                                     CastArgsForSet(t, method, flags, _args);
-                                    ret = t.InvokeMember(method, flags, null, obj, _args);
+                                    ret = CalculatorValue.FromObject(t.InvokeMember(method, flags, null, obj, _args));
                                 }
                                 catch (Exception ex) {
                                     Console.WriteLine("Exception:{0}\n{1}", ex.Message, ex.StackTrace);
@@ -1933,7 +3595,7 @@ namespace Calculator
                         }
                     }
                 }
-                else {
+                else if (null != methodObj) {
                     IDictionary dict = obj as IDictionary;
                     if (null != dict && dict.Contains(methodObj)) {
                         dict[methodObj] = _args[0];
@@ -1964,9 +3626,9 @@ namespace Calculator
     }
     internal sealed class DotnetGetExp : AbstractExpression
     {
-        protected override object DoCalc()
+        protected override CalculatorValue DoCalc()
         {
-            object ret = null;
+            var ret = CalculatorValue.NullObject;
             object obj = null;
             object methodObj = null;
             string method = null;
@@ -1975,14 +3637,14 @@ namespace Calculator
                 var exp = m_Expressions[ix];
                 var v = exp.Calc();
                 if (ix == 0) {
-                    obj = v;
+                    obj = v.Get<object>();
                 }
                 else if (ix == 1) {
-                    methodObj = v;
-                    method = v as string;
+                    methodObj = v.Get<object>();
+                    method = v.AsString;
                 }
                 else {
-                    arglist.Add(v);
+                    arglist.Add(v.Get<object>());
                 }
             }
             object[] _args = arglist.ToArray();
@@ -1990,7 +3652,7 @@ namespace Calculator
                 if (null != method) {
                     IDictionary dict = obj as IDictionary;
                     if (null != dict && dict.Contains(method)) {
-                        ret = dict[method];
+                        ret = CalculatorValue.FromObject(dict[method]);
                     }
                     else {
                         Type t = obj as Type;
@@ -1998,7 +3660,7 @@ namespace Calculator
                             try {
                                 BindingFlags flags = BindingFlags.Static | BindingFlags.GetField | BindingFlags.GetProperty | BindingFlags.Public | BindingFlags.NonPublic;
                                 CastArgsForGet(t, method, flags, _args);
-                                ret = t.InvokeMember(method, flags, null, null, _args);
+                                ret = CalculatorValue.FromObject(t.InvokeMember(method, flags, null, null, _args));
                             }
                             catch (Exception ex) {
                                 Console.WriteLine("Exception:{0}\n{1}", ex.Message, ex.StackTrace);
@@ -2010,7 +3672,7 @@ namespace Calculator
                                 try {
                                     BindingFlags flags = BindingFlags.Instance | BindingFlags.Static | BindingFlags.GetField | BindingFlags.GetProperty | BindingFlags.Public | BindingFlags.NonPublic;
                                     CastArgsForGet(t, method, flags, _args);
-                                    ret = t.InvokeMember(method, flags, null, obj, _args);
+                                    ret = CalculatorValue.FromObject(t.InvokeMember(method, flags, null, obj, _args));
                                 }
                                 catch (Exception ex) {
                                     Console.WriteLine("Exception:{0}\n{1}", ex.Message, ex.StackTrace);
@@ -2019,10 +3681,10 @@ namespace Calculator
                         }
                     }
                 }
-                else {
+                else if (null != methodObj) {
                     IDictionary dict = obj as IDictionary;
                     if (null != dict && dict.Contains(methodObj)) {
-                        ret = dict[methodObj];
+                        ret = CalculatorValue.FromObject(dict[methodObj]);
                     }
                     else {
                         IEnumerable enumer = obj as IEnumerable;
@@ -2032,7 +3694,7 @@ namespace Calculator
                             for (int i = 0; i <= index; ++i) {
                                 e.MoveNext();
                             }
-                            ret = e.Current;
+                            ret = CalculatorValue.FromObject(e.Current);
                         }
                     }
                 }
@@ -2052,11 +3714,11 @@ namespace Calculator
     }
     internal sealed class LinqExp : AbstractExpression
     {
-        protected override object DoCalc()
+        protected override CalculatorValue DoCalc()
         {
-            object v = 0;
-            object list = m_List.Calc();
-            string method = m_Method.Calc() as string;
+            CalculatorValue v = 0;
+            var list = m_List.Calc().Get<object>();
+            var method = m_Method.Calc().Get<string>();
             IEnumerable obj = list as IEnumerable;
             if (null != obj && !string.IsNullOrEmpty(method)) {
                 if (method == "orderby" || method == "orderbydesc") {
@@ -2064,70 +3726,68 @@ namespace Calculator
                     List<object> results = new List<object>();
                     IEnumerator enumer = obj.GetEnumerator();
                     while (enumer.MoveNext()) {
-                        object val = enumer.Current;
+                        var val = CalculatorValue.FromObject(enumer.Current);
                         results.Add(val);
                     }
                     results.Sort((object o1, object o2) => {
-                        Calculator.SetVariable("$$", o1);
-                        object r1 = null;
+                        Calculator.SetVariable("$$", CalculatorValue.FromObject(o1));
+                        var r1 = CalculatorValue.NullObject;
                         for (int index = 0; index < m_Expressions.Count; ++index) {
                             r1 = m_Expressions[index].Calc();
                         }
-                        Calculator.SetVariable("$$", o2);
-                        object r2 = null;
+                        Calculator.SetVariable("$$", CalculatorValue.FromObject(o2));
+                        var r2 = CalculatorValue.NullObject;
                         for (int index = 0; index < m_Expressions.Count; ++index) {
                             r2 = m_Expressions[index].Calc();
                         }
-                        string rs1 = r1 as string;
-                        string rs2 = r2 as string;
                         int r = 0;
-                        if (null != rs1 && null != rs2) {
-                            r = rs1.CompareTo(rs2);
+                        if (r1.IsString && r2.IsString) {
+                            r = r1.Get<string>().CompareTo(r2.Get<string>());
                         }
                         else {
-                            double rd1 = ToDouble(r1);
-                            double rd2 = ToDouble(r2);
+                            double rd1 = r1.Get<double>();
+                            double rd2 = r2.Get<double>();
                             r = rd1.CompareTo(rd2);
                         }
                         if (desc)
                             r = -r;
                         return r;
                     });
-                    v = results;
+                    v = CalculatorValue.FromObject(results);
                 }
                 else if (method == "where") {
                     List<object> results = new List<object>();
                     IEnumerator enumer = obj.GetEnumerator();
                     while (enumer.MoveNext()) {
-                        object val = enumer.Current;
+                        var val = CalculatorValue.FromObject(enumer.Current);
 
                         Calculator.SetVariable("$$", val);
-                        object r = null;
+                        CalculatorValue r = CalculatorValue.NullObject;
                         for (int index = 0; index < m_Expressions.Count; ++index) {
                             r = m_Expressions[index].Calc();
                         }
-                        if (ToLong(r) != 0) {
+                        if (r.Get<long>() != 0) {
                             results.Add(val);
                         }
                     }
-                    v = results;
+                    v = CalculatorValue.FromObject(results);
                 }
                 else if (method == "top") {
-                    object r = null;
+                    CalculatorValue r = CalculatorValue.NullObject;
                     for (int index = 0; index < m_Expressions.Count; ++index) {
                         r = m_Expressions[index].Calc();
                     }
-                    long ct = ToLong(r);
+                    long ct = r.Get<long>();
                     List<object> results = new List<object>();
                     IEnumerator enumer = obj.GetEnumerator();
                     while (enumer.MoveNext()) {
-                        object val = enumer.Current;
+                        var val = CalculatorValue.FromObject(enumer.Current);
                         if (ct > 0) {
                             results.Add(val);
                             --ct;
                         }
                     }
-                    v = results;
+                    v = CalculatorValue.FromObject(results);
                 }
             }
             return v;
@@ -2151,12 +3811,12 @@ namespace Calculator
     }
     internal sealed class IsNullExp : AbstractExpression
     {
-        protected override object DoCalc()
+        protected override CalculatorValue DoCalc()
         {
-            object ret = null;
+            var ret = CalculatorValue.NullObject;
             if (m_Expressions.Count >= 1) {
                 var obj = m_Expressions[0].Calc();
-                ret = null == obj;
+                ret = obj.IsNullObject;
             }
             return ret;
         }
@@ -2173,13 +3833,13 @@ namespace Calculator
     }
     internal class DotnetLoadExp : SimpleExpressionBase
     {
-        protected override object OnCalc(IList<object> operands)
+        protected override CalculatorValue OnCalc(IList<CalculatorValue> operands)
         {
-            object r = null;
+            CalculatorValue r = CalculatorValue.NullObject;
             if (operands.Count >= 1) {
-                string path = operands[0] as string;
+                string path = operands[0].AsString;
                 if (!string.IsNullOrEmpty(path) && File.Exists(path)) {
-                    r = Assembly.LoadFile(path);
+                    r = CalculatorValue.FromObject(Assembly.LoadFile(path));
                 }
             }
             return r;
@@ -2187,18 +3847,18 @@ namespace Calculator
     }
     internal class DotnetNewExp : SimpleExpressionBase
     {
-        protected override object OnCalc(IList<object> operands)
+        protected override CalculatorValue OnCalc(IList<CalculatorValue> operands)
         {
-            object r = null;
+            CalculatorValue r = CalculatorValue.NullObject;
             if (operands.Count >= 2) {
-                var assem = operands[0] as Assembly;
-                string typeName = operands[1] as string;
+                var assem = operands[0].As<Assembly>();
+                string typeName = operands[1].AsString;
                 if (null!=assem && !string.IsNullOrEmpty(typeName)) {
                     var al = new ArrayList();
                     for(int i = 2; i < operands.Count; ++i) {
-                        al.Add(operands[i]);
+                        al.Add(operands[i].Get<object>());
                     }
-                    r = assem.CreateInstance(typeName, false, BindingFlags.CreateInstance, null, al.ToArray(), System.Globalization.CultureInfo.CurrentCulture, null);
+                    r = CalculatorValue.FromObject(assem.CreateInstance(typeName, false, BindingFlags.CreateInstance, null, al.ToArray(), System.Globalization.CultureInfo.CurrentCulture, null));
                 }
             }
             return r;
@@ -2206,33 +3866,33 @@ namespace Calculator
     }
     internal class NewStringBuilderExp : SimpleExpressionBase
     {
-        protected override object OnCalc(IList<object> operands)
+        protected override CalculatorValue OnCalc(IList<CalculatorValue> operands)
         {
-            object r = null;
+            CalculatorValue r = CalculatorValue.NullObject;
             if (operands.Count >= 0) {
-                r = new StringBuilder();
+                r = CalculatorValue.FromObject(new StringBuilder());
             }
             return r;
         }
     }
     internal class AppendFormatExp : SimpleExpressionBase
     {
-        protected override object OnCalc(IList<object> operands)
+        protected override CalculatorValue OnCalc(IList<CalculatorValue> operands)
         {
-            object r = null;
+            CalculatorValue r = CalculatorValue.NullObject;
             if (operands.Count >= 2) {
-                var sb = operands[0] as StringBuilder;
+                var sb = operands[0].As<StringBuilder>();
                 string fmt = string.Empty;
                 var al = new ArrayList();
                 for (int i = 1; i < operands.Count; ++i) {
                     if (i == 1)
-                        fmt = operands[i] as string;
+                        fmt = operands[i].AsString;
                     else
-                        al.Add(operands[i]);
+                        al.Add(operands[i].Get<object>());
                 }
                 if (null != sb && !string.IsNullOrEmpty(fmt)) {
                     sb.AppendFormat(fmt, al.ToArray());
-                    r = sb;
+                    r = CalculatorValue.FromObject(sb);
                 }
             }
             return r;
@@ -2240,18 +3900,18 @@ namespace Calculator
     }
     internal class AppendLineFormatExp : SimpleExpressionBase
     {
-        protected override object OnCalc(IList<object> operands)
+        protected override CalculatorValue OnCalc(IList<CalculatorValue> operands)
         {
-            object r = null;
+            CalculatorValue r = CalculatorValue.NullObject;
             if (operands.Count >= 1) {
-                var sb = operands[0] as StringBuilder;
+                var sb = operands[0].As<StringBuilder>();
                 string fmt = string.Empty;
                 var al = new ArrayList();
                 for (int i = 1; i < operands.Count; ++i) {
                     if (i == 1)
-                        fmt = operands[i] as string;
+                        fmt = operands[i].AsString;
                     else
-                        al.Add(operands[i]);
+                        al.Add(operands[i].Get<object>());
                 }
                 if (null != sb) {
                     if (string.IsNullOrEmpty(fmt)) {
@@ -2261,7 +3921,7 @@ namespace Calculator
                         sb.AppendFormat(fmt, al.ToArray());
                         sb.AppendLine();
                     }
-                    r = sb;
+                    r = CalculatorValue.FromObject(sb);
                 }
             }
             return r;
@@ -2269,11 +3929,11 @@ namespace Calculator
     }
     internal class StringBuilderToStringExp : SimpleExpressionBase
     {
-        protected override object OnCalc(IList<object> operands)
+        protected override CalculatorValue OnCalc(IList<CalculatorValue> operands)
         {
-            object r = null;
+            CalculatorValue r = CalculatorValue.NullObject;
             if (operands.Count >= 1) {
-                var sb = operands[0] as StringBuilder;
+                var sb = operands[0].As<StringBuilder>();
                 if (null != sb) {
                     r = sb.ToString();
                 }
@@ -2283,12 +3943,12 @@ namespace Calculator
     }
     internal class StringJoinExp : SimpleExpressionBase
     {
-        protected override object OnCalc(IList<object> operands)
+        protected override CalculatorValue OnCalc(IList<CalculatorValue> operands)
         {
-            object r = null;
+            CalculatorValue r = CalculatorValue.NullObject;
             if (operands.Count >= 2) {
-                var sep = operands[0] as string;
-                var list = operands[1] as IList;
+                var sep = operands[0].AsString;
+                var list = operands[1].As<IList>();
                 if (null != sep && null != list) {
                     string[] strs = new string[list.Count];
                     for (int i = 0; i < list.Count; ++i) {
@@ -2302,12 +3962,12 @@ namespace Calculator
     }
     internal class StringSplitExp : SimpleExpressionBase
     {
-        protected override object OnCalc(IList<object> operands)
+        protected override CalculatorValue OnCalc(IList<CalculatorValue> operands)
         {
-            object r = null;
+            CalculatorValue r = CalculatorValue.NullObject;
             if (operands.Count >= 2) {
-                var str = operands[0] as string;
-                var seps = operands[1] as IList;
+                var str = operands[0].AsString;
+                var seps = operands[1].As<IList>();
                 if (!string.IsNullOrEmpty(str) && null != seps) {
                     char[] cs = new char[seps.Count];
                     for (int i = 0; i < seps.Count; ++i) {
@@ -2319,7 +3979,7 @@ namespace Calculator
                             cs[i] = '\0';
                         }
                     }
-                    r = str.Split(cs);
+                    r = CalculatorValue.FromObject(str.Split(cs));
                 }
             }
             return r;
@@ -2327,11 +3987,11 @@ namespace Calculator
     }
     internal class StringTrimExp : SimpleExpressionBase
     {
-        protected override object OnCalc(IList<object> operands)
+        protected override CalculatorValue OnCalc(IList<CalculatorValue> operands)
         {
-            object r = null;
+            CalculatorValue r = CalculatorValue.NullObject;
             if (operands.Count >= 1) {
-                var str = operands[0] as string;
+                var str = operands[0].AsString;
                 r = str.Trim();
             }
             return r;
@@ -2339,11 +3999,11 @@ namespace Calculator
     }
     internal class StringTrimStartExp : SimpleExpressionBase
     {
-        protected override object OnCalc(IList<object> operands)
+        protected override CalculatorValue OnCalc(IList<CalculatorValue> operands)
         {
-            object r = null;
+            CalculatorValue r = CalculatorValue.NullObject;
             if (operands.Count >= 1) {
-                var str = operands[0] as string;
+                var str = operands[0].AsString;
                 r = str.TrimStart();
             }
             return r;
@@ -2351,11 +4011,11 @@ namespace Calculator
     }
     internal class StringTrimEndExp : SimpleExpressionBase
     {
-        protected override object OnCalc(IList<object> operands)
+        protected override CalculatorValue OnCalc(IList<CalculatorValue> operands)
         {
-            object r = null;
+            CalculatorValue r = CalculatorValue.NullObject;
             if (operands.Count >= 1) {
-                var str = operands[0] as string;
+                var str = operands[0].AsString;
                 r = str.TrimEnd();
             }
             return r;
@@ -2363,11 +4023,11 @@ namespace Calculator
     }
     internal class StringToLowerExp : SimpleExpressionBase
     {
-        protected override object OnCalc(IList<object> operands)
+        protected override CalculatorValue OnCalc(IList<CalculatorValue> operands)
         {
-            object r = null;
+            CalculatorValue r = CalculatorValue.NullObject;
             if (operands.Count >= 1) {
-                var str = operands[0] as string;
+                var str = operands[0].AsString;
                 r = str.ToLower();
             }
             return r;
@@ -2375,11 +4035,11 @@ namespace Calculator
     }
     internal class StringToUpperExp : SimpleExpressionBase
     {
-        protected override object OnCalc(IList<object> operands)
+        protected override CalculatorValue OnCalc(IList<CalculatorValue> operands)
         {
-            object r = null;
+            CalculatorValue r = CalculatorValue.NullObject;
             if (operands.Count >= 1) {
-                var str = operands[0] as string;
+                var str = operands[0].AsString;
                 r = str.ToUpper();
             }
             return r;
@@ -2387,13 +4047,13 @@ namespace Calculator
     }
     internal class StringReplaceExp : SimpleExpressionBase
     {
-        protected override object OnCalc(IList<object> operands)
+        protected override CalculatorValue OnCalc(IList<CalculatorValue> operands)
         {
-            object r = null;
+            CalculatorValue r = CalculatorValue.NullObject;
             if (operands.Count >= 3) {
-                var str = operands[0] as string;
-                var key = operands[1] as string;
-                var val = operands[2] as string;
+                var str = operands[0].AsString;
+                var key = operands[1].AsString;
+                var val = operands[2].AsString;
                 r = str.Replace(key, val);
             }
             return r;
@@ -2401,13 +4061,13 @@ namespace Calculator
     }
     internal class StringReplaceCharExp : SimpleExpressionBase
     {
-        protected override object OnCalc(IList<object> operands)
+        protected override CalculatorValue OnCalc(IList<CalculatorValue> operands)
         {
-            object r = null;
+            CalculatorValue r = CalculatorValue.NullObject;
             if (operands.Count >= 3) {
-                var str = operands[0] as string;
-                var key = operands[1] as string;
-                var val = operands[2] as string;
+                var str = operands[0].AsString;
+                var key = operands[1].AsString;
+                var val = operands[2].AsString;
                 if (null != str && !string.IsNullOrEmpty(key) && !string.IsNullOrEmpty(val)) {
                     r = str.Replace(key[0], val[0]);
                 }
@@ -2417,12 +4077,12 @@ namespace Calculator
     }
     internal class MakeStringExp : SimpleExpressionBase
     {
-        protected override object OnCalc(IList<object> operands)
+        protected override CalculatorValue OnCalc(IList<CalculatorValue> operands)
         {
             List<char> chars = new List<char>();
             for (int i = 0; i < operands.Count; ++i) {
                 var v = operands[i];
-                var str = v as string;
+                var str = v.AsString;
                 if (null != str) {
                     char c = '\0';
                     if (str.Length > 0) {
@@ -2431,7 +4091,7 @@ namespace Calculator
                     chars.Add(c);
                 }
                 else {
-                    char c = (char)Convert.ChangeType(operands[i], typeof(char));
+                    char c = operands[i].Get<char>();
                     chars.Add(c);
                 }
             }
@@ -2440,14 +4100,14 @@ namespace Calculator
     }
     internal class StringContainsExp : SimpleExpressionBase
     {
-        protected override object OnCalc(IList<object> operands)
+        protected override CalculatorValue OnCalc(IList<CalculatorValue> operands)
         {
             bool r = false;
             if (operands.Count >= 2) {
-                string str = operands[0] as string;
+                string str = operands[0].AsString;
                 r = true;
                 for(int i = 1; i < operands.Count; ++i) {
-                    var list = operands[i] as IList;
+                    var list = operands[i].As<IList>();
                     if (null != list) {
                         foreach (var o in list) {
                             var key = o as string;
@@ -2456,7 +4116,7 @@ namespace Calculator
                             }
                         }
                     } else {
-                        var key = operands[i] as string;
+                        var key = operands[i].AsString;
                         if (!string.IsNullOrEmpty(key) && !str.Contains(key)) {
                             return false;
                         }
@@ -2468,14 +4128,14 @@ namespace Calculator
     }
     internal class StringNotContainsExp : SimpleExpressionBase
     {
-        protected override object OnCalc(IList<object> operands)
+        protected override CalculatorValue OnCalc(IList<CalculatorValue> operands)
         {
             bool r = false;
             if (operands.Count >= 2) {
-                string str = operands[0] as string;
+                string str = operands[0].AsString;
                 r = true;
                 for (int i = 1; i < operands.Count; ++i) {
-                    var list = operands[i] as IList;
+                    var list = operands[i].As<IList>();
                     if (null != list) {
                         foreach (var o in list) {
                             var key = o as string;
@@ -2485,7 +4145,7 @@ namespace Calculator
                         }
                     }
                     else {
-                        var key = operands[i] as string;
+                        var key = operands[i].AsString;
                         if (!string.IsNullOrEmpty(key) && str.Contains(key)) {
                             return false;
                         }
@@ -2497,14 +4157,14 @@ namespace Calculator
     }
     internal class StringContainsAnyExp : SimpleExpressionBase
     {
-        protected override object OnCalc(IList<object> operands)
+        protected override CalculatorValue OnCalc(IList<CalculatorValue> operands)
         {
             bool r = false;
             if (operands.Count >= 2) {
                 r = true;
-                string str = operands[0] as string;
+                string str = operands[0].AsString;
                 for (int i = 1; i < operands.Count; ++i) {
-                    var list = operands[i] as IList;
+                    var list = operands[i].As<IList>();
                     if (null != list) {
                         foreach (var o in list) {
                             var key = o as string;
@@ -2519,7 +4179,7 @@ namespace Calculator
                         }
                     }
                     else {
-                        var key = operands[i] as string;
+                        var key = operands[i].AsString;
                         if (!string.IsNullOrEmpty(key)) {
                             if (str.Contains(key)) {
                                 return true;
@@ -2536,14 +4196,14 @@ namespace Calculator
     }
     internal class StringNotContainsAnyExp : SimpleExpressionBase
     {
-        protected override object OnCalc(IList<object> operands)
+        protected override CalculatorValue OnCalc(IList<CalculatorValue> operands)
         {
             bool r = false;
             if (operands.Count >= 2) {
                 r = true;
-                string str = operands[0] as string;
+                string str = operands[0].AsString;
                 for (int i = 1; i < operands.Count; ++i) {
-                    var list = operands[i] as IList;
+                    var list = operands[i].As<IList>();
                     if (null != list) {
                         foreach (var o in list) {
                             var key = o as string;
@@ -2558,7 +4218,7 @@ namespace Calculator
                         }
                     }
                     else {
-                        var key = operands[i] as string;
+                        var key = operands[i].AsString;
                         if (!string.IsNullOrEmpty(key)) {
                             if (!str.Contains(key)) {
                                 return true;
@@ -2575,11 +4235,11 @@ namespace Calculator
     }
     internal class Str2IntExp : SimpleExpressionBase
     {
-        protected override object OnCalc(IList<object> operands)
+        protected override CalculatorValue OnCalc(IList<CalculatorValue> operands)
         {
-            object r = null;
+            CalculatorValue r = CalculatorValue.NullObject;
             if (operands.Count >= 1) {
-                var str = operands[0] as string;
+                var str = operands[0].AsString;
                 int v;
                 if (int.TryParse(str, out v)) {
                     r = v;
@@ -2590,11 +4250,11 @@ namespace Calculator
     }
     internal class Str2UintExp : SimpleExpressionBase
     {
-        protected override object OnCalc(IList<object> operands)
+        protected override CalculatorValue OnCalc(IList<CalculatorValue> operands)
         {
-            object r = null;
+            CalculatorValue r = CalculatorValue.NullObject;
             if (operands.Count >= 1) {
-                var str = operands[0] as string;
+                var str = operands[0].AsString;
                 uint v;
                 if (uint.TryParse(str, out v)) {
                     r = v;
@@ -2605,11 +4265,11 @@ namespace Calculator
     }
     internal class Str2LongExp : SimpleExpressionBase
     {
-        protected override object OnCalc(IList<object> operands)
+        protected override CalculatorValue OnCalc(IList<CalculatorValue> operands)
         {
-            object r = null;
+            CalculatorValue r = CalculatorValue.NullObject;
             if (operands.Count >= 1) {
-                var str = operands[0] as string;
+                var str = operands[0].AsString;
                 long v;
                 if (long.TryParse(str, out v)) {
                     r = v;
@@ -2620,11 +4280,11 @@ namespace Calculator
     }
     internal class Str2UlongExp : SimpleExpressionBase
     {
-        protected override object OnCalc(IList<object> operands)
+        protected override CalculatorValue OnCalc(IList<CalculatorValue> operands)
         {
-            object r = null;
+            CalculatorValue r = CalculatorValue.NullObject;
             if (operands.Count >= 1) {
-                var str = operands[0] as string;
+                var str = operands[0].AsString;
                 ulong v;
                 if (ulong.TryParse(str, out v)) {
                     r = v;
@@ -2635,11 +4295,11 @@ namespace Calculator
     }
     internal class Str2FloatExp : SimpleExpressionBase
     {
-        protected override object OnCalc(IList<object> operands)
+        protected override CalculatorValue OnCalc(IList<CalculatorValue> operands)
         {
-            object r = null;
+            CalculatorValue r = CalculatorValue.NullObject;
             if (operands.Count >= 1) {
-                var str = operands[0] as string;
+                var str = operands[0].AsString;
                 float v;
                 if (float.TryParse(str, out v)) {
                     r = v;
@@ -2650,11 +4310,11 @@ namespace Calculator
     }
     internal class Str2DoubleExp : SimpleExpressionBase
     {
-        protected override object OnCalc(IList<object> operands)
+        protected override CalculatorValue OnCalc(IList<CalculatorValue> operands)
         {
-            object r = null;
+            CalculatorValue r = CalculatorValue.NullObject;
             if (operands.Count >= 1) {
-                var str = operands[0] as string;
+                var str = operands[0].AsString;
                 double v;
                 if (double.TryParse(str, out v)) {
                     r = v;
@@ -2665,11 +4325,11 @@ namespace Calculator
     }
     internal class Hex2IntExp : SimpleExpressionBase
     {
-        protected override object OnCalc(IList<object> operands)
+        protected override CalculatorValue OnCalc(IList<CalculatorValue> operands)
         {
-            object r = null;
+            CalculatorValue r = CalculatorValue.NullObject;
             if (operands.Count >= 1) {
-                var str = operands[0] as string;
+                var str = operands[0].AsString;
                 int v;
                 if (int.TryParse(str, System.Globalization.NumberStyles.AllowHexSpecifier, null, out v)) {
                     r = v;
@@ -2680,11 +4340,11 @@ namespace Calculator
     }
     internal class Hex2UintExp : SimpleExpressionBase
     {
-        protected override object OnCalc(IList<object> operands)
+        protected override CalculatorValue OnCalc(IList<CalculatorValue> operands)
         {
-            object r = null;
+            CalculatorValue r = CalculatorValue.NullObject;
             if (operands.Count >= 1) {
-                var str = operands[0] as string;
+                var str = operands[0].AsString;
                 uint v;
                 if (uint.TryParse(str, System.Globalization.NumberStyles.AllowHexSpecifier, null, out v)) {
                     r = v;
@@ -2695,11 +4355,11 @@ namespace Calculator
     }
     internal class Hex2LongExp : SimpleExpressionBase
     {
-        protected override object OnCalc(IList<object> operands)
+        protected override CalculatorValue OnCalc(IList<CalculatorValue> operands)
         {
-            object r = null;
+            CalculatorValue r = CalculatorValue.NullObject;
             if (operands.Count >= 1) {
-                var str = operands[0] as string;
+                var str = operands[0].AsString;
                 long v;
                 if (long.TryParse(str, System.Globalization.NumberStyles.AllowHexSpecifier, null, out v)) {
                     r = v;
@@ -2710,11 +4370,11 @@ namespace Calculator
     }
     internal class Hex2UlongExp : SimpleExpressionBase
     {
-        protected override object OnCalc(IList<object> operands)
+        protected override CalculatorValue OnCalc(IList<CalculatorValue> operands)
         {
-            object r = null;
+            CalculatorValue r = CalculatorValue.NullObject;
             if (operands.Count >= 1) {
-                var str = operands[0] as string;
+                var str = operands[0].AsString;
                 ulong v;
                 if (ulong.TryParse(str, System.Globalization.NumberStyles.AllowHexSpecifier, null, out v)) {
                     r = v;
@@ -2725,11 +4385,11 @@ namespace Calculator
     }
     internal class DatetimeStrExp : SimpleExpressionBase
     {
-        protected override object OnCalc(IList<object> operands)
+        protected override CalculatorValue OnCalc(IList<CalculatorValue> operands)
         {
-            object r = null;
+            CalculatorValue r = CalculatorValue.NullObject;
             if (operands.Count >= 1) {
-                var fmt = operands[0] as string;
+                var fmt = operands[0].AsString;
                 r = DateTime.Now.ToString(fmt);
             } else {
                 r = DateTime.Now.ToString();
@@ -2739,43 +4399,43 @@ namespace Calculator
     }
     internal class LongDateStrExp : SimpleExpressionBase
     {
-        protected override object OnCalc(IList<object> operands)
+        protected override CalculatorValue OnCalc(IList<CalculatorValue> operands)
         {
-            object r = DateTime.Now.ToLongDateString();
+            var r = CalculatorValue.FromObject(DateTime.Now.ToLongDateString());
             return r;
         }
     }
     internal class LongTimeStrExp : SimpleExpressionBase
     {
-        protected override object OnCalc(IList<object> operands)
+        protected override CalculatorValue OnCalc(IList<CalculatorValue> operands)
         {
-            object r = DateTime.Now.ToShortDateString();
+            var r = CalculatorValue.FromObject(DateTime.Now.ToShortDateString());
             return r;
         }
     }
     internal class ShortDateStrExp : SimpleExpressionBase
     {
-        protected override object OnCalc(IList<object> operands)
+        protected override CalculatorValue OnCalc(IList<CalculatorValue> operands)
         {
-            object r = DateTime.Now.ToShortDateString();
+            var r = CalculatorValue.FromObject(DateTime.Now.ToShortDateString());
             return r;
         }
     }
     internal class ShortTimeStrExp : SimpleExpressionBase
     {
-        protected override object OnCalc(IList<object> operands)
+        protected override CalculatorValue OnCalc(IList<CalculatorValue> operands)
         {
-            object r = DateTime.Now.ToShortTimeString();
+            var r = CalculatorValue.FromObject(DateTime.Now.ToShortTimeString());
             return r;
         }
     }
     internal class IsNullOrEmptyExp : SimpleExpressionBase
     {
-        protected override object OnCalc(IList<object> operands)
+        protected override CalculatorValue OnCalc(IList<CalculatorValue> operands)
         {
-            object r = null;
+            CalculatorValue r = CalculatorValue.NullObject;
             if (operands.Count >= 1) {
-                var str = operands[0] as string;
+                var str = operands[0].AsString;
                 r = string.IsNullOrEmpty(str);
             }
             return r;
@@ -2783,31 +4443,31 @@ namespace Calculator
     }
     internal class ArrayExp : SimpleExpressionBase
     {
-        protected override object OnCalc(IList<object> operands)
+        protected override CalculatorValue OnCalc(IList<CalculatorValue> operands)
         {
             object[] r = new object[operands.Count];
             for (int i = 0; i < operands.Count; ++i) {
-                r[i] = operands[i];
+                r[i] = operands[i].Get<object>();
             }
-            return r;
+            return CalculatorValue.FromObject(r);
         }
     }
     internal class ToArrayExp : SimpleExpressionBase
     {
-        protected override object OnCalc(IList<object> operands)
+        protected override CalculatorValue OnCalc(IList<CalculatorValue> operands)
         {
-            object r = null;
+            CalculatorValue r = CalculatorValue.NullObject;
             if (operands.Count >= 1) {
                 var list = operands[0];
-                IEnumerable obj = list as IEnumerable;
+                IEnumerable obj = list.As<IEnumerable>();
                 if (null != obj) {
                     ArrayList al = new ArrayList();
                     IEnumerator enumer = obj.GetEnumerator();
                     while (enumer.MoveNext()) {
-                        object val = enumer.Current;
+                        var val = CalculatorValue.FromObject(enumer.Current);
                         al.Add(val);
                     }
-                    r = al.ToArray();
+                    r = CalculatorValue.FromObject(al.ToArray());
                 }
             }
             return r;
@@ -2815,11 +4475,11 @@ namespace Calculator
     }
     internal class ListSizeExp : SimpleExpressionBase
     {
-        protected override object OnCalc(IList<object> operands)
+        protected override CalculatorValue OnCalc(IList<CalculatorValue> operands)
         {
-            object r = null;
+            CalculatorValue r = CalculatorValue.NullObject;
             if (operands.Count >= 1) {
-                var list = operands[0] as IList;
+                var list = operands[0].As<IList>();
                 if (null != list) {
                     r = list.Count;
                 }
@@ -2829,12 +4489,12 @@ namespace Calculator
     }
     internal class ListExp : SimpleExpressionBase
     {
-        protected override object OnCalc(IList<object> operands)
+        protected override CalculatorValue OnCalc(IList<CalculatorValue> operands)
         {
-            object r = null;
+            CalculatorValue r = CalculatorValue.NullObject;
             ArrayList al = new ArrayList();
             for (int i = 0; i < operands.Count; ++i) {
-                al.Add(operands[i]);
+                al.Add(operands[i].Get<object>());
             }
             r = al;
             return r;
@@ -2842,19 +4502,19 @@ namespace Calculator
     }
     internal class ListGetExp : SimpleExpressionBase
     {
-        protected override object OnCalc(IList<object> operands)
+        protected override CalculatorValue OnCalc(IList<CalculatorValue> operands)
         {
-            object r = null;
+            CalculatorValue r = CalculatorValue.NullObject;
             if (operands.Count >= 2) {
-                var list = operands[0] as IList;
-                var index = ToInt(operands[1]);
-                object defVal = null;
+                var list = operands[0].As<IList>();
+                var index = operands[1].Get<int>();
+                var defVal = CalculatorValue.NullObject;
                 if (operands.Count >= 3) {
                     defVal = operands[2];
                 }
                 if (null != list) {
                     if (index >= 0 && index < list.Count) {
-                        r = list[index];
+                        r = CalculatorValue.FromObject(list[index]);
                     }
                     else {
                         r = defVal;
@@ -2866,16 +4526,16 @@ namespace Calculator
     }
     internal class ListSetExp : SimpleExpressionBase
     {
-        protected override object OnCalc(IList<object> operands)
+        protected override CalculatorValue OnCalc(IList<CalculatorValue> operands)
         {
-            object r = null;
+            CalculatorValue r = CalculatorValue.NullObject;
             if (operands.Count >= 3) {
-                var list = operands[0] as IList;
-                var index = ToInt(operands[1]);
-                object val = operands[2];
+                var list = operands[0].As<IList>();
+                var index = operands[1].Get<int>();
+                var val = operands[2];
                 if (null != list) {
                     if (index >= 0 && index < list.Count) {
-                        list[index] = val;
+                        list[index] = val.Get<object>();
                     }
                 }
             }
@@ -2884,11 +4544,11 @@ namespace Calculator
     }
     internal class ListIndexOfExp : SimpleExpressionBase
     {
-        protected override object OnCalc(IList<object> operands)
+        protected override CalculatorValue OnCalc(IList<CalculatorValue> operands)
         {
-            object r = null;
+            CalculatorValue r = CalculatorValue.NullObject;
             if (operands.Count >= 2) {
-                var list = operands[0] as IList;
+                var list = operands[0].As<IList>();
                 object val = operands[1];
                 if (null != list) {
                     r = list.IndexOf(val);
@@ -2899,11 +4559,11 @@ namespace Calculator
     }
     internal class ListAddExp : SimpleExpressionBase
     {
-        protected override object OnCalc(IList<object> operands)
+        protected override CalculatorValue OnCalc(IList<CalculatorValue> operands)
         {
-            object r = null;
+            CalculatorValue r = CalculatorValue.NullObject;
             if (operands.Count >= 2) {
-                var list = operands[0] as IList;
+                var list = operands[0].As<IList>();
                 object val = operands[1];
                 if (null != list) {
                     list.Add(val);
@@ -2914,11 +4574,11 @@ namespace Calculator
     }
     internal class ListRemoveExp : SimpleExpressionBase
     {
-        protected override object OnCalc(IList<object> operands)
+        protected override CalculatorValue OnCalc(IList<CalculatorValue> operands)
         {
-            object r = null;
+            CalculatorValue r = CalculatorValue.NullObject;
             if (operands.Count >= 2) {
-                var list = operands[0] as IList;
+                var list = operands[0].As<IList>();
                 object val = operands[1];
                 if (null != list) {
                     list.Remove(val);
@@ -2929,13 +4589,13 @@ namespace Calculator
     }
     internal class ListInsertExp : SimpleExpressionBase
     {
-        protected override object OnCalc(IList<object> operands)
+        protected override CalculatorValue OnCalc(IList<CalculatorValue> operands)
         {
-            object r = null;
+            CalculatorValue r = CalculatorValue.NullObject;
             if (operands.Count >= 3) {
-                var list = operands[0] as IList;
-                var index = ToInt(operands[1]);
-                object val = operands[2];
+                var list = operands[0].As<IList>();
+                var index = operands[1].Get<int>();
+                object val = operands[2].Get<object>();
                 if (null != list) {
                     list.Insert(index, val);
                 }
@@ -2945,12 +4605,12 @@ namespace Calculator
     }
     internal class ListRemoveAtExp : SimpleExpressionBase
     {
-        protected override object OnCalc(IList<object> operands)
+        protected override CalculatorValue OnCalc(IList<CalculatorValue> operands)
         {
-            object r = null;
+            CalculatorValue r = CalculatorValue.NullObject;
             if (operands.Count >= 2) {
-                var list = operands[0] as IList;
-                var index = ToInt(operands[1]);
+                var list = operands[0].As<IList>();
+                var index = operands[1].Get<int>();
                 if (null != list) {
                     list.RemoveAt(index);
                 }
@@ -2960,11 +4620,11 @@ namespace Calculator
     }
     internal class ListClearExp : SimpleExpressionBase
     {
-        protected override object OnCalc(IList<object> operands)
+        protected override CalculatorValue OnCalc(IList<CalculatorValue> operands)
         {
-            object r = null;
+            CalculatorValue r = CalculatorValue.NullObject;
             if (operands.Count >= 1) {
-                var list = operands[0] as IList;
+                var list = operands[0].As<IList>();
                 if (null != list) {
                     list.Clear();
                 }
@@ -2974,12 +4634,12 @@ namespace Calculator
     }
     internal class ListSplitExp : SimpleExpressionBase
     {
-        protected override object OnCalc(IList<object> operands)
+        protected override CalculatorValue OnCalc(IList<CalculatorValue> operands)
         {
-            object r = null;
+            CalculatorValue r = CalculatorValue.NullObject;
             if (operands.Count >= 2) {
-                var enumer = operands[0] as IEnumerable;
-                var ct = ToInt(operands[1]);
+                var enumer = operands[0].As<IEnumerable>();
+                var ct = operands[1].Get<int>();
                 if (null != enumer) {
                     var e = enumer.GetEnumerator();
                     if (null != e) {
@@ -3009,11 +4669,11 @@ namespace Calculator
     }
     internal class HashtableSizeExp : SimpleExpressionBase
     {
-        protected override object OnCalc(IList<object> operands)
+        protected override CalculatorValue OnCalc(IList<CalculatorValue> operands)
         {
-            object r = null;
+            CalculatorValue r = CalculatorValue.NullObject;
             if (operands.Count >= 1) {
-                var dict = operands[0] as IDictionary;
+                var dict = operands[0].As<IDictionary>();
                 if (null != dict) {
                     r = dict.Count;
                 }
@@ -3023,16 +4683,16 @@ namespace Calculator
     }
     internal class HashtableExp : AbstractExpression
     {
-        protected override object DoCalc()
+        protected override CalculatorValue DoCalc()
         {
-            object r = null;
+            CalculatorValue r = CalculatorValue.NullObject;
             Hashtable dict = new Hashtable();
             for (int i = 0; i < m_Expressions.Count - 1; i += 2) {
-                var key = m_Expressions[i].Calc();
-                var val = m_Expressions[i + 1].Calc();
+                var key = m_Expressions[i].Calc().Get<object>();
+                var val = m_Expressions[i + 1].Calc().Get<object>();
                 dict.Add(key, val);
             }
-            r = dict;
+            r = CalculatorValue.FromObject(dict);
             return r;
         }
         protected override bool Load(Dsl.FunctionData funcData)
@@ -3053,18 +4713,21 @@ namespace Calculator
     }
     internal class HashtableGetExp : SimpleExpressionBase
     {
-        protected override object OnCalc(IList<object> operands)
+        protected override CalculatorValue OnCalc(IList<CalculatorValue> operands)
         {
-            object r = null;
+            CalculatorValue r = CalculatorValue.NullObject;
             if (operands.Count >= 2) {
-                var dict = operands[0] as IDictionary;
-                var index = operands[1];
-                object defVal = null;
+                var dict = operands[0].As<IDictionary>();
+                var index = operands[1].Get<object>();
+                var defVal = CalculatorValue.NullObject;
                 if (operands.Count >= 3) {
                     defVal = operands[2];
                 }
                 if (null != dict && dict.Contains(index)) {
-                    r = dict[index];
+                    r = CalculatorValue.FromObject(dict[index]);
+                }
+                else {
+                    r = defVal;
                 }
             }
             return r;
@@ -3072,13 +4735,13 @@ namespace Calculator
     }
     internal class HashtableSetExp : SimpleExpressionBase
     {
-        protected override object OnCalc(IList<object> operands)
+        protected override CalculatorValue OnCalc(IList<CalculatorValue> operands)
         {
-            object r = null;
+            CalculatorValue r = CalculatorValue.NullObject;
             if (operands.Count >= 3) {
-                var dict = operands[0] as IDictionary;
-                var index = operands[1];
-                object val = operands[2];
+                var dict = operands[0].As<IDictionary>();
+                var index = operands[1].Get<object>();
+                object val = operands[2].Get<object>();
                 if (null != dict) {
                     dict[index] = val;
                 }
@@ -3088,11 +4751,11 @@ namespace Calculator
     }
     internal class HashtableAddExp : SimpleExpressionBase
     {
-        protected override object OnCalc(IList<object> operands)
+        protected override CalculatorValue OnCalc(IList<CalculatorValue> operands)
         {
-            object r = null;
+            CalculatorValue r = CalculatorValue.NullObject;
             if (operands.Count >= 3) {
-                var dict = operands[0] as IDictionary;
+                var dict = operands[0].As<IDictionary>();
                 object key = operands[1];
                 object val = operands[2];
                 if (null != dict && null != key) {
@@ -3104,11 +4767,11 @@ namespace Calculator
     }
     internal class HashtableRemoveExp : SimpleExpressionBase
     {
-        protected override object OnCalc(IList<object> operands)
+        protected override CalculatorValue OnCalc(IList<CalculatorValue> operands)
         {
-            object r = null;
+            CalculatorValue r = CalculatorValue.NullObject;
             if (operands.Count >= 2) {
-                var dict = operands[0] as IDictionary;
+                var dict = operands[0].As<IDictionary>();
                 object key = operands[1];
                 if (null != dict && null != key) {
                     dict.Remove(key);
@@ -3119,11 +4782,11 @@ namespace Calculator
     }
     internal class HashtableClearExp : SimpleExpressionBase
     {
-        protected override object OnCalc(IList<object> operands)
+        protected override CalculatorValue OnCalc(IList<CalculatorValue> operands)
         {
-            object r = null;
+            CalculatorValue r = CalculatorValue.NullObject;
             if (operands.Count >= 1) {
-                var dict = operands[0] as IDictionary;
+                var dict = operands[0].As<IDictionary>();
                 if (null != dict) {
                     dict.Clear();
                 }
@@ -3133,11 +4796,11 @@ namespace Calculator
     }
     internal class HashtableKeysExp : SimpleExpressionBase
     {
-        protected override object OnCalc(IList<object> operands)
+        protected override CalculatorValue OnCalc(IList<CalculatorValue> operands)
         {
-            object r = null;
+            CalculatorValue r = CalculatorValue.NullObject;
             if (operands.Count >= 1) {
-                var dict = operands[0] as IDictionary;
+                var dict = operands[0].As<IDictionary>();
                 if (null != dict) {
                     var list = new ArrayList();
                     list.AddRange(dict.Keys);
@@ -3149,11 +4812,11 @@ namespace Calculator
     }
     internal class HashtableValuesExp : SimpleExpressionBase
     {
-        protected override object OnCalc(IList<object> operands)
+        protected override CalculatorValue OnCalc(IList<CalculatorValue> operands)
         {
-            object r = null;
+            CalculatorValue r = CalculatorValue.NullObject;
             if (operands.Count >= 1) {
-                var dict = operands[0] as IDictionary;
+                var dict = operands[0].As<IDictionary>();
                 if (null != dict) {
                     var list = new ArrayList();
                     list.AddRange(dict.Values);
@@ -3165,11 +4828,11 @@ namespace Calculator
     }
     internal class ListHashtableExp : SimpleExpressionBase
     {
-        protected override object OnCalc(IList<object> operands)
+        protected override CalculatorValue OnCalc(IList<CalculatorValue> operands)
         {
-            object r = null;
+            CalculatorValue r = CalculatorValue.NullObject;
             if (operands.Count >= 1) {
-                var dict = operands[0] as IDictionary;
+                var dict = operands[0].As<IDictionary>();
                 if (null != dict) {
                     var list = new ArrayList();
                     foreach (var pair in dict) {
@@ -3183,12 +4846,12 @@ namespace Calculator
     }
     internal class HashtableSplitExp : SimpleExpressionBase
     {
-        protected override object OnCalc(IList<object> operands)
+        protected override CalculatorValue OnCalc(IList<CalculatorValue> operands)
         {
-            object r = null;
+            CalculatorValue r = CalculatorValue.NullObject;
             if (operands.Count >= 2) {
-                var dict = operands[0] as IDictionary;
-                var ct = ToInt(operands[1]);
+                var dict = operands[0].As<IDictionary>();
+                var ct = operands[1].Get<int>();
                 if (null != dict) {
                     var e = dict.GetEnumerator();
                     if (null != e) {
@@ -3219,17 +4882,17 @@ namespace Calculator
     //stack与queue共用peek函数
     internal class PeekExp : SimpleExpressionBase
     {
-        protected override object OnCalc(IList<object> operands)
+        protected override CalculatorValue OnCalc(IList<CalculatorValue> operands)
         {
-            object r = null;
+            CalculatorValue r = CalculatorValue.NullObject;
             if (operands.Count >= 1) {
-                var stack = operands[0] as Stack<object>;
-                var queue = operands[0] as Queue<object>;
+                var stack = operands[0].As<Stack<object>>();
+                var queue = operands[0].As<Queue<object>>();
                 if (null != stack) {
-                    r = stack.Peek();
+                    r = CalculatorValue.FromObject(stack.Peek());
                 }
                 else if (null != queue) {
-                    r = queue.Peek();
+                    r = CalculatorValue.FromObject(queue.Peek());
                 }
             }
             return r;
@@ -3237,11 +4900,11 @@ namespace Calculator
     }
     internal class StackSizeExp : SimpleExpressionBase
     {
-        protected override object OnCalc(IList<object> operands)
+        protected override CalculatorValue OnCalc(IList<CalculatorValue> operands)
         {
-            object r = 0;
+            int r = 0;
             if (operands.Count >= 1) {
-                var stack = operands[0] as Stack<object>;
+                var stack = operands[0].As<Stack<object>>();
                 if (null != stack) {
                     r = stack.Count;
                 }
@@ -3251,24 +4914,24 @@ namespace Calculator
     }
     internal class StackExp : SimpleExpressionBase
     {
-        protected override object OnCalc(IList<object> operands)
+        protected override CalculatorValue OnCalc(IList<CalculatorValue> operands)
         {
-            object r = null;
+            CalculatorValue r = CalculatorValue.NullObject;
             var stack = new Stack<object>();
             for (int i = 0; i < operands.Count; ++i) {
-                stack.Push(operands[i]);
+                stack.Push(operands[i].Get<object>());
             }
-            r = stack;
+            r = CalculatorValue.FromObject(stack);
             return r;
         }
     }
     internal class PushExp : SimpleExpressionBase
     {
-        protected override object OnCalc(IList<object> operands)
+        protected override CalculatorValue OnCalc(IList<CalculatorValue> operands)
         {
-            object r = null;
+            CalculatorValue r = CalculatorValue.NullObject;
             if (operands.Count >= 2) {
-                var stack = operands[0] as Stack<object>;
+                var stack = operands[0].As<Stack<object>>();
                 var val = operands[1];
                 if (null != stack) {
                     stack.Push(val);
@@ -3279,13 +4942,13 @@ namespace Calculator
     }
     internal class PopExp : SimpleExpressionBase
     {
-        protected override object OnCalc(IList<object> operands)
+        protected override CalculatorValue OnCalc(IList<CalculatorValue> operands)
         {
-            object r = null;
+            CalculatorValue r = CalculatorValue.NullObject;
             if (operands.Count >= 1) {
-                var stack = operands[0] as Stack<object>;
+                var stack = operands[0].As<Stack<object>>();
                 if (null != stack) {
-                    r = stack.Pop();
+                    r = CalculatorValue.FromObject(stack.Pop());
                 }
             }
             return r;
@@ -3293,11 +4956,11 @@ namespace Calculator
     }
     internal class StackClearExp : SimpleExpressionBase
     {
-        protected override object OnCalc(IList<object> operands)
+        protected override CalculatorValue OnCalc(IList<CalculatorValue> operands)
         {
-            object r = null;
+            CalculatorValue r = CalculatorValue.NullObject;
             if (operands.Count >= 1) {
-                var stack = operands[0] as Stack<object>;
+                var stack = operands[0].As<Stack<object>>();
                 if (null != stack) {
                     stack.Clear();
                 }
@@ -3307,11 +4970,11 @@ namespace Calculator
     }
     internal class QueueSizeExp : SimpleExpressionBase
     {
-        protected override object OnCalc(IList<object> operands)
+        protected override CalculatorValue OnCalc(IList<CalculatorValue> operands)
         {
-            object r = 0;
+            int r = 0;
             if (operands.Count >= 1) {
-                var queue = operands[0] as Queue<object>;
+                var queue = operands[0].As<Queue<object>>();
                 if (null != queue) {
                     r = queue.Count;
                 }
@@ -3321,24 +4984,24 @@ namespace Calculator
     }
     internal class QueueExp : SimpleExpressionBase
     {
-        protected override object OnCalc(IList<object> operands)
+        protected override CalculatorValue OnCalc(IList<CalculatorValue> operands)
         {
-            object r = null;
+            CalculatorValue r = CalculatorValue.NullObject;
             var queue = new Queue<object>();
             for (int i = 0; i < operands.Count; ++i) {
-                queue.Enqueue(operands[i]);
+                queue.Enqueue(operands[i].Get<object>());
             }
-            r = queue;
+            r = CalculatorValue.FromObject(queue);
             return r;
         }
     }
     internal class EnqueueExp : SimpleExpressionBase
     {
-        protected override object OnCalc(IList<object> operands)
+        protected override CalculatorValue OnCalc(IList<CalculatorValue> operands)
         {
-            object r = null;
+            CalculatorValue r = CalculatorValue.NullObject;
             if (operands.Count >= 2) {
-                var queue = operands[0] as Queue<object>;
+                var queue = operands[0].As<Queue<object>>();
                 var val = operands[1];
                 if (null != queue) {
                     queue.Enqueue(val);
@@ -3349,13 +5012,13 @@ namespace Calculator
     }
     internal class DequeueExp : SimpleExpressionBase
     {
-        protected override object OnCalc(IList<object> operands)
+        protected override CalculatorValue OnCalc(IList<CalculatorValue> operands)
         {
-            object r = null;
+            CalculatorValue r = CalculatorValue.NullObject;
             if (operands.Count >= 1) {
-                var queue = operands[0] as Queue<object>;
+                var queue = operands[0].As<Queue<object>>();
                 if (null != queue) {
-                    r = queue.Dequeue();
+                    r = CalculatorValue.FromObject(queue.Dequeue());
                 }
             }
             return r;
@@ -3363,11 +5026,11 @@ namespace Calculator
     }
     internal class QueueClearExp : SimpleExpressionBase
     {
-        protected override object OnCalc(IList<object> operands)
+        protected override CalculatorValue OnCalc(IList<CalculatorValue> operands)
         {
-            object r = null;
+            CalculatorValue r = CalculatorValue.NullObject;
             if (operands.Count >= 1) {
-                var queue = operands[0] as Queue<object>;
+                var queue = operands[0].As<Queue<object>>();
                 if (null != queue) {
                     queue.Clear();
                 }
@@ -3377,12 +5040,12 @@ namespace Calculator
     }
     internal class SetEnvironmentExp : SimpleExpressionBase
     {
-        protected override object OnCalc(IList<object> operands)
+        protected override CalculatorValue OnCalc(IList<CalculatorValue> operands)
         {
-            object ret = null;
+            var ret = CalculatorValue.NullObject;
             if (operands.Count >= 2) {
-                var key = operands[0] as string;
-                var val = operands[1] as string;
+                var key = operands[0].AsString;
+                var val = operands[1].AsString;
                 val = Environment.ExpandEnvironmentVariables(val);
                 Environment.SetEnvironmentVariable(key, val);
             }
@@ -3391,11 +5054,11 @@ namespace Calculator
     }
     internal class GetEnvironmentExp : SimpleExpressionBase
     {
-        protected override object OnCalc(IList<object> operands)
+        protected override CalculatorValue OnCalc(IList<CalculatorValue> operands)
         {
-            object ret = string.Empty;
+            string ret = string.Empty;
             if (operands.Count >= 1) {
-                var key = operands[0] as string;
+                var key = operands[0].AsString;
                 return Environment.GetEnvironmentVariable(key);
             }
             return ret;
@@ -3403,11 +5066,11 @@ namespace Calculator
     }
     internal class ExpandEnvironmentsExp : SimpleExpressionBase
     {
-        protected override object OnCalc(IList<object> operands)
+        protected override CalculatorValue OnCalc(IList<CalculatorValue> operands)
         {
-            object ret = string.Empty;
+            string ret = string.Empty;
             if (operands.Count >= 1) {
-                var key = operands[0] as string;
+                var key = operands[0].AsString;
                 return Environment.ExpandEnvironmentVariables(key);
             }
             return ret;
@@ -3415,18 +5078,18 @@ namespace Calculator
     }
     internal class EnvironmentsExp : SimpleExpressionBase
     {
-        protected override object OnCalc(IList<object> operands)
+        protected override CalculatorValue OnCalc(IList<CalculatorValue> operands)
         {
-            return Environment.GetEnvironmentVariables();
+            return CalculatorValue.FromObject(Environment.GetEnvironmentVariables());
         }
     }
     internal class SetCurrentDirectoryExp : SimpleExpressionBase
     {
-        protected override object OnCalc(IList<object> operands)
+        protected override CalculatorValue OnCalc(IList<CalculatorValue> operands)
         {
-            object ret = string.Empty;
+            string ret = string.Empty;
             if (operands.Count >= 1) {
-                var dir = operands[0] as string;
+                var dir = operands[0].AsString;
                 Environment.CurrentDirectory = Environment.ExpandEnvironmentVariables(dir);
                 ret = dir;
             }
@@ -3435,24 +5098,24 @@ namespace Calculator
     }
     internal class GetCurrentDirectoryExp : SimpleExpressionBase
     {
-        protected override object OnCalc(IList<object> operands)
+        protected override CalculatorValue OnCalc(IList<CalculatorValue> operands)
         {
             return Environment.CurrentDirectory;
         }
     }
     internal class CommandLineExp : SimpleExpressionBase
     {
-        protected override object OnCalc(IList<object> operands)
+        protected override CalculatorValue OnCalc(IList<CalculatorValue> operands)
         {
             return Environment.CommandLine;
         }
     }
     internal class CommandLineArgsExp : SimpleExpressionBase
     {
-        protected override object OnCalc(IList<object> operands)
+        protected override CalculatorValue OnCalc(IList<CalculatorValue> operands)
         {
             if (operands.Count >= 1) {
-                string name = operands[0] as string;
+                string name = operands[0].AsString;
                 if (!string.IsNullOrEmpty(name)) {
                     string[] args = System.Environment.GetCommandLineArgs();
                     int suffixIndex = Array.FindIndex(args, item => item == name);
@@ -3463,38 +5126,38 @@ namespace Calculator
                 return string.Empty;
             }
             else {
-                return Environment.GetCommandLineArgs();
+                return CalculatorValue.FromObject(Environment.GetCommandLineArgs());
             }
         }
     }
     internal class OsExp : SimpleExpressionBase
     {
-        protected override object OnCalc(IList<object> operands)
+        protected override CalculatorValue OnCalc(IList<CalculatorValue> operands)
         {
             return Environment.OSVersion.VersionString;
         }
     }
     internal class OsPlatformExp : SimpleExpressionBase
     {
-        protected override object OnCalc(IList<object> operands)
+        protected override CalculatorValue OnCalc(IList<CalculatorValue> operands)
         {
             return Environment.OSVersion.Platform.ToString();
         }
     }
     internal class OsVersionExp : SimpleExpressionBase
     {
-        protected override object OnCalc(IList<object> operands)
+        protected override CalculatorValue OnCalc(IList<CalculatorValue> operands)
         {
             return Environment.OSVersion.Version.ToString();
         }
     }
     internal class GetFullPathExp : SimpleExpressionBase
     {
-        protected override object OnCalc(IList<object> operands)
+        protected override CalculatorValue OnCalc(IList<CalculatorValue> operands)
         {
-            object ret = string.Empty;
+            string ret = string.Empty;
             if (operands.Count >= 1) {
-                var path = operands[0] as string;
+                var path = operands[0].AsString;
                 if (null != path) {
                     path = Environment.ExpandEnvironmentVariables(path);
                     return Path.GetFullPath(path);
@@ -3505,11 +5168,11 @@ namespace Calculator
     }
     internal class GetPathRootExp : SimpleExpressionBase
     {
-        protected override object OnCalc(IList<object> operands)
+        protected override CalculatorValue OnCalc(IList<CalculatorValue> operands)
         {
-            object ret = string.Empty;
+            string ret = string.Empty;
             if (operands.Count >= 1) {
-                var path = operands[0] as string;
+                var path = operands[0].AsString;
                 if (null != path) {
                     path = Environment.ExpandEnvironmentVariables(path);
                     return Path.GetPathRoot(path);
@@ -3520,32 +5183,32 @@ namespace Calculator
     }
     internal class GetRandomFileNameExp : SimpleExpressionBase
     {
-        protected override object OnCalc(IList<object> operands)
+        protected override CalculatorValue OnCalc(IList<CalculatorValue> operands)
         {
             return Path.GetRandomFileName();
         }
     }
     internal class GetTempFileNameExp : SimpleExpressionBase
     {
-        protected override object OnCalc(IList<object> operands)
+        protected override CalculatorValue OnCalc(IList<CalculatorValue> operands)
         {
             return Path.GetTempFileName();
         }
     }
     internal class GetTempPathExp : SimpleExpressionBase
     {
-        protected override object OnCalc(IList<object> operands)
+        protected override CalculatorValue OnCalc(IList<CalculatorValue> operands)
         {
             return Path.GetTempPath();
         }
     }
     internal class HasExtensionExp : SimpleExpressionBase
     {
-        protected override object OnCalc(IList<object> operands)
+        protected override CalculatorValue OnCalc(IList<CalculatorValue> operands)
         {
-            object ret = false;
+            bool ret = false;
             if (operands.Count >= 1) {
-                var path = operands[0] as string;
+                var path = operands[0].AsString;
                 if (null != path) {
                     path = Environment.ExpandEnvironmentVariables(path);
                     return Path.HasExtension(path);
@@ -3556,11 +5219,11 @@ namespace Calculator
     }
     internal class IsPathRootedExp : SimpleExpressionBase
     {
-        protected override object OnCalc(IList<object> operands)
+        protected override CalculatorValue OnCalc(IList<CalculatorValue> operands)
         {
-            object ret = false;
+            bool ret = false;
             if (operands.Count >= 1) {
-                var path = operands[0] as string;
+                var path = operands[0].AsString;
                 if (null != path) {
                     path = Environment.ExpandEnvironmentVariables(path);
                     return Path.IsPathRooted(path);
@@ -3571,11 +5234,11 @@ namespace Calculator
     }
     internal class GetFileNameExp : SimpleExpressionBase
     {
-        protected override object OnCalc(IList<object> operands)
+        protected override CalculatorValue OnCalc(IList<CalculatorValue> operands)
         {
-            object r = null;
+            CalculatorValue r = CalculatorValue.NullObject;
             if (operands.Count >= 1) {
-                var path = operands[0] as string;
+                var path = operands[0].AsString;
                 if (null != path) {
                     path = Environment.ExpandEnvironmentVariables(path);
                     r = Path.GetFileName(path);
@@ -3586,11 +5249,11 @@ namespace Calculator
     }
     internal class GetFileNameWithoutExtensionExp : SimpleExpressionBase
     {
-        protected override object OnCalc(IList<object> operands)
+        protected override CalculatorValue OnCalc(IList<CalculatorValue> operands)
         {
-            object r = null;
+            CalculatorValue r = CalculatorValue.NullObject;
             if (operands.Count >= 1) {
-                var path = operands[0] as string;
+                var path = operands[0].AsString;
                 if (null != path) {
                     path = Environment.ExpandEnvironmentVariables(path);
                     r = Path.GetFileNameWithoutExtension(path);
@@ -3601,11 +5264,11 @@ namespace Calculator
     }
     internal class GetExtensionExp : SimpleExpressionBase
     {
-        protected override object OnCalc(IList<object> operands)
+        protected override CalculatorValue OnCalc(IList<CalculatorValue> operands)
         {
-            object r = null;
+            CalculatorValue r = CalculatorValue.NullObject;
             if (operands.Count >= 1) {
-                var path = operands[0] as string;
+                var path = operands[0].AsString;
                 if (null != path) {
                     path = Environment.ExpandEnvironmentVariables(path);
                     r = Path.GetExtension(path);
@@ -3616,11 +5279,11 @@ namespace Calculator
     }
     internal class GetDirectoryNameExp : SimpleExpressionBase
     {
-        protected override object OnCalc(IList<object> operands)
+        protected override CalculatorValue OnCalc(IList<CalculatorValue> operands)
         {
-            object r = null;
+            CalculatorValue r = CalculatorValue.NullObject;
             if (operands.Count >= 1) {
-                var path = operands[0] as string;
+                var path = operands[0].AsString;
                 if (null != path) {
                     path = Environment.ExpandEnvironmentVariables(path);
                     r = Path.GetDirectoryName(path);
@@ -3631,12 +5294,12 @@ namespace Calculator
     }
     internal class CombinePathExp : SimpleExpressionBase
     {
-        protected override object OnCalc(IList<object> operands)
+        protected override CalculatorValue OnCalc(IList<CalculatorValue> operands)
         {
-            object r = null;
+            CalculatorValue r = CalculatorValue.NullObject;
             if (operands.Count >= 2) {
-                var path1 = operands[0] as string;
-                var path2 = operands[1] as string;
+                var path1 = operands[0].AsString;
+                var path2 = operands[1].AsString;
                 if (null != path1 && null != path2) {
                     path1 = Environment.ExpandEnvironmentVariables(path1);
                     path2 = Environment.ExpandEnvironmentVariables(path2);
@@ -3648,12 +5311,12 @@ namespace Calculator
     }
     internal class ChangeExtensionExp : SimpleExpressionBase
     {
-        protected override object OnCalc(IList<object> operands)
+        protected override CalculatorValue OnCalc(IList<CalculatorValue> operands)
         {
-            object r = null;
+            CalculatorValue r = CalculatorValue.NullObject;
             if (operands.Count >= 2) {
-                var path = operands[0] as string;
-                var ext = operands[1] as string;
+                var path = operands[0].AsString;
+                var ext = operands[1].AsString;
                 if (null != path && null != ext) {
                     path = Environment.ExpandEnvironmentVariables(path);
                     r = Path.ChangeExtension(path, ext);
@@ -3664,23 +5327,26 @@ namespace Calculator
     }
     internal class EchoExp : SimpleExpressionBase
     {
-        protected override object OnCalc(IList<object> operands)
+        protected override CalculatorValue OnCalc(IList<CalculatorValue> operands)
         {
-            object r = null;
+            CalculatorValue r = CalculatorValue.NullObject;
             if (operands.Count >= 1) {
                 var obj = operands[0];
-                if (null != obj) {
-                    var fmt = obj as string;
+                if (obj.IsString) {
+                    var fmt = obj.StringVal;
                     if (operands.Count > 1 && null != fmt) {
                         ArrayList arrayList = new ArrayList();
                         for (int i = 1; i < operands.Count; ++i) {
-                            arrayList.Add(operands[i]);
+                            arrayList.Add(operands[i].Get<object>());
                         }
                         Console.WriteLine(fmt, arrayList.ToArray());
                     }
                     else {
-                        Console.WriteLine(obj);
+                        Console.WriteLine(obj.Get<object>());
                     }
+                }
+                else {
+                    Console.WriteLine(obj.Get<object>());
                 }
             }
             else {
@@ -3691,25 +5357,26 @@ namespace Calculator
     }
     internal class CallStackExp : SimpleExpressionBase
     {
-        protected override object OnCalc(IList<object> operands)
+        protected override CalculatorValue OnCalc(IList<CalculatorValue> operands)
         {
-            object r = System.Environment.StackTrace;
-            return r;
+            var r = System.Environment.StackTrace;
+            return CalculatorValue.FromObject(r);
         }
     }
     internal class CallExp : SimpleExpressionBase
     {
-        protected override object OnCalc(IList<object> operands)
+        protected override CalculatorValue OnCalc(IList<CalculatorValue> operands)
         {
-            object r = null;
+            CalculatorValue r = CalculatorValue.NullObject;
             if (operands.Count >= 1) {
-                var proc = operands[0] as string;
+                var proc = operands[0].AsString;
                 if (null != proc) {
-                    ArrayList arrayList = new ArrayList();
+                    var args = Calculator.NewCalculatorValueList();
                     for (int i = 1; i < operands.Count; ++i) {
-                        arrayList.Add(operands[i]);
+                        args.Add(operands[i]);
                     }
-                    r = Calculator.Calc(proc, arrayList.ToArray());
+                    r = Calculator.Calc(proc, args);
+                    Calculator.RecycleCalculatorValueList(args);
                 }
             }
             return r;
@@ -3717,10 +5384,10 @@ namespace Calculator
     }
     internal class ReturnExp : SimpleExpressionBase
     {
-        protected override object OnCalc(IList<object> operands)
+        protected override CalculatorValue OnCalc(IList<CalculatorValue> operands)
         {
             Calculator.RunState = RunStateEnum.Return;
-            object r = null;
+            CalculatorValue r = CalculatorValue.NullObject;
             if (operands.Count >= 1) {
                 r = operands[0];
             }
@@ -3729,27 +5396,27 @@ namespace Calculator
     }
     internal class RedirectExp : SimpleExpressionBase
     {
-        protected override object OnCalc(IList<object> operands)
+        protected override CalculatorValue OnCalc(IList<CalculatorValue> operands)
         {
             Calculator.RunState = RunStateEnum.Redirect;
             if (operands.Count >= 1) {
                 List<string> args = new List<string>();
                 for (int i = 0; i < operands.Count; ++i) {
-                    var arg = operands[i] as string;
+                    var arg = operands[i].ToString();
                     args.Add(arg);
                 }
-                return args;
+                return CalculatorValue.FromObject(args);
             }
-            return null;
+            return CalculatorValue.NullObject;
         }
     }
     internal class CalcMd5Exp : SimpleExpressionBase
     {
-        protected override object OnCalc(IList<object> operands)
+        protected override CalculatorValue OnCalc(IList<CalculatorValue> operands)
         {
-            object r = null;
+            CalculatorValue r = CalculatorValue.NullObject;
             if (operands.Count >= 1) {
-                var file = operands[0] as string;
+                var file = operands[0].AsString;
                 if (null != file) {
                     r = CalcMD5(file);
                 }
@@ -3786,7 +5453,7 @@ namespace Calculator
     }
     public sealed class DslCalculator
     {
-        public IDictionary<string, object> NamedGlobalVariables
+        public IDictionary<string, CalculatorValue> NamedGlobalVariables
         {
             get { return m_NamedGlobalVariables; }
         }
@@ -3967,17 +5634,17 @@ namespace Calculator
         {
             m_NamedGlobalVariables.Clear();
         }
-        public bool TryGetGlobalVariable(string v, out object result)
+        public bool TryGetGlobalVariable(string v, out CalculatorValue result)
         {
             return m_NamedGlobalVariables.TryGetValue(v, out result);
         }
-        public object GetGlobalVariable(string v)
+        public CalculatorValue GetGlobalVariable(string v)
         {
-            object result = null;
+            CalculatorValue result;
             m_NamedGlobalVariables.TryGetValue(v, out result);
             return result;
         }
-        public void SetGlobalVariable(string v, object val)
+        public void SetGlobalVariable(string v, CalculatorValue val)
         {
             var vars = m_NamedGlobalVariables;
             vars[v] = val;
@@ -4083,22 +5750,65 @@ namespace Calculator
                 }
             }
         }
-        public object Calc(string proc, params object[] args)
+        public List<CalculatorValue> NewCalculatorValueList()
         {
-            object ret = 0;
+            return m_Pool.Alloc();
+        }
+        public void RecycleCalculatorValueList(List<CalculatorValue> list)
+        {
+            list.Clear();
+            m_Pool.Recycle(list);
+        }
+        public CalculatorValue Calc(string proc)
+        {
+            var args = NewCalculatorValueList();
+            var r = Calc(proc, args);
+            RecycleCalculatorValueList(args);
+            return r;
+        }
+        public CalculatorValue Calc(string proc, CalculatorValue arg1)
+        {
+            var args = NewCalculatorValueList();
+            args.Add(arg1);
+            var r = Calc(proc, args);
+            RecycleCalculatorValueList(args);
+            return r;
+        }
+        public CalculatorValue Calc(string proc, CalculatorValue arg1, CalculatorValue arg2)
+        {
+            var args = NewCalculatorValueList();
+            args.Add(arg1);
+            args.Add(arg2);
+            var r = Calc(proc, args);
+            RecycleCalculatorValueList(args);
+            return r;
+        }
+        public CalculatorValue Calc(string proc, CalculatorValue arg1, CalculatorValue arg2, CalculatorValue arg3)
+        {
+            var args = NewCalculatorValueList();
+            args.Add(arg1);
+            args.Add(arg2);
+            args.Add(arg3);
+            var r = Calc(proc, args);
+            RecycleCalculatorValueList(args);
+            return r;
+        }
+        public CalculatorValue Calc(string proc, List<CalculatorValue> args)
+        {
+            CalculatorValue ret = 0;
             List<IExpression> exps;
             if (m_Procs.TryGetValue(proc, out exps)) {
                 var si = new StackInfo();
-                si.Args = args;
+                si.Args.AddRange(args);
                 m_Stack.Push(si);
                 try {
                     List<string> names;
                     if (m_ProcArgNames.TryGetValue(proc, out names)) {
                         for (int i = 0; i < names.Count; ++i) {
-                            if (i < args.Length)
+                            if (i < args.Count)
                                 SetVariable(names[i], args[i]);
                             else
-                                SetVariable(names[i], null);
+                                SetVariable(names[i], CalculatorValue.NullObject);
                         }
                     }
                     for (int i = 0; i < exps.Count; ++i) {
@@ -4155,24 +5865,24 @@ namespace Calculator
             get { return m_RunState; }
             internal set { m_RunState = value; }
         }
-        internal IList<object> Arguments
+        internal IList<CalculatorValue> Arguments
         {
             get {
                 var stackInfo = m_Stack.Peek();
                 return stackInfo.Args;
             }
         }
-        internal bool TryGetVariable(int v, out object result)
+        internal bool TryGetVariable(int v, out CalculatorValue result)
         {
             return Variables.TryGetValue(v, out result);
         }
-        internal object GetVariable(int v)
+        internal CalculatorValue GetVariable(int v)
         {
-            object result = null;
+            CalculatorValue result;
             Variables.TryGetValue(v, out result);
             return result;
         }
-        internal void SetVariable(int v, object val)
+        internal void SetVariable(int v, CalculatorValue val)
         {
             Variables[v] = val;
         }
@@ -4180,7 +5890,7 @@ namespace Calculator
         {
             return Variables.Remove(v);
         }
-        internal bool TryGetVariable(string v, out object result)
+        internal bool TryGetVariable(string v, out CalculatorValue result)
         {
             bool ret = false;
             if (v.Length > 0) {
@@ -4195,13 +5905,13 @@ namespace Calculator
                 }
             }
             else {
-                result = null;
+                result = CalculatorValue.NullObject;
             }
             return ret;
         }
-        internal object GetVariable(string v)
+        internal CalculatorValue GetVariable(string v)
         {
-            object result = null;
+            CalculatorValue result = CalculatorValue.NullObject;
             if (v.Length > 0) {
                 if (v[0] == '@') {
                     result = GetGlobalVariable(v);
@@ -4215,7 +5925,7 @@ namespace Calculator
             }
             return result;
         }
-        internal void SetVariable(string v, object val)
+        internal void SetVariable(string v, CalculatorValue val)
         {
             if (v.Length > 0) {
                 if (v[0] == '@') {
@@ -4521,14 +6231,14 @@ namespace Calculator
             }
         }
 
-        private Dictionary<int, object> Variables
+        private Dictionary<int, CalculatorValue> Variables
         {
             get {
                 var stackInfo = m_Stack.Peek();
                 return stackInfo.Vars;
             }
         }
-        private Dictionary<string, object> NamedVariables
+        private Dictionary<string, CalculatorValue> NamedVariables
         {
             get {
                 var stackInfo = m_Stack.Peek();
@@ -4538,16 +6248,17 @@ namespace Calculator
 
         private class StackInfo
         {
-            internal IList<object> Args = null;
-            internal Dictionary<int, object> Vars = new Dictionary<int, object>();
-            internal Dictionary<string, object> NamedVars = new Dictionary<string, object>();
+            internal List<CalculatorValue> Args = new List<CalculatorValue>();
+            internal Dictionary<int, CalculatorValue> Vars = new Dictionary<int, CalculatorValue>();
+            internal Dictionary<string, CalculatorValue> NamedVars = new Dictionary<string, CalculatorValue>();
         }
 
         private RunStateEnum m_RunState = RunStateEnum.Normal;
         private Dictionary<string, List<string>> m_ProcArgNames = new Dictionary<string, List<string>>();
         private Dictionary<string, List<IExpression>> m_Procs = new Dictionary<string, List<IExpression>>();
         private Stack<StackInfo> m_Stack = new Stack<StackInfo>();
-        private Dictionary<string, object> m_NamedGlobalVariables = new Dictionary<string, object>();
+        private Dictionary<string, CalculatorValue> m_NamedGlobalVariables = new Dictionary<string, CalculatorValue>();
         private Dictionary<string, IExpressionFactory> m_ExpressionFactories = new Dictionary<string, IExpressionFactory>();
+        private CalculatorValueListPool m_Pool = new CalculatorValueListPool(16);
     }
 }

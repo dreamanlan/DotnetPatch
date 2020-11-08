@@ -8,35 +8,35 @@ namespace Calculator
     //---------------------------------------------------------------------------------------------------------------
     internal class BeginCommand : SimpleExpressionBase
     {
-        protected override object OnCalc(IList<object> operands)
+        protected override CalculatorValue OnCalc(IList<CalculatorValue> operands)
         {
-            string info = operands[0] as string;
+            string info = operands[0].AsString;
             ScriptProcessor.Begin(info);
             return 0;
         }
     }
     internal class EndCommand : SimpleExpressionBase
     {
-        protected override object OnCalc(IList<object> operands)
+        protected override CalculatorValue OnCalc(IList<CalculatorValue> operands)
         {
-            string info = operands[0] as string;
+            string info = operands[0].AsString;
             ScriptProcessor.End(info);
             return 0;
         }
     }
     internal class BeginFileCommand : SimpleExpressionBase
     {
-        protected override object OnCalc(IList<object> operands)
+        protected override CalculatorValue OnCalc(IList<CalculatorValue> operands)
         {
-            string file = operands[0] as string;
-            string info = operands[1] as string;
+            string file = operands[0].AsString;
+            string info = operands[1].AsString;
             ScriptProcessor.BeginFile(file, info);
             return 0;
         }
     }
     internal class EndFileCommand : SimpleExpressionBase
     {
-        protected override object OnCalc(IList<object> operands)
+        protected override CalculatorValue OnCalc(IList<CalculatorValue> operands)
         {
             ScriptProcessor.EndFile();
             return 0;
@@ -44,38 +44,38 @@ namespace Calculator
     }
     internal class BeginReplaceCommand : SimpleExpressionBase
     {
-        protected override object OnCalc(IList<object> operands)
+        protected override CalculatorValue OnCalc(IList<CalculatorValue> operands)
         {
-            string file = operands[0] as string;
+            string file = operands[0].AsString;
             ScriptProcessor.BeginReplace(file);
             return 0;
         }
     }
     internal class ReplaceCommand : SimpleExpressionBase
     {
-        protected override object OnCalc(IList<object> operands)
+        protected override CalculatorValue OnCalc(IList<CalculatorValue> operands)
         {
-            string file = operands[0] as string;
-            string srcClass = operands[1] as string;
-            string targetClass = operands[2] as string;
+            string file = operands[0].AsString;
+            string srcClass = operands[1].AsString;
+            string targetClass = operands[2].AsString;
             ScriptProcessor.Replace(file, srcClass, targetClass);
             return 0;
         }
     }
     internal class EndReplaceCommand : SimpleExpressionBase
     {
-        protected override object OnCalc(IList<object> operands)
+        protected override CalculatorValue OnCalc(IList<CalculatorValue> operands)
         {
-            string file = operands[0] as string;
+            string file = operands[0].AsString;
             ScriptProcessor.EndReplace(file);
             return 0;
         }
     }
     internal class BeginExtendCommand : SimpleExpressionBase
     {
-        protected override object OnCalc(IList<object> operands)
+        protected override CalculatorValue OnCalc(IList<CalculatorValue> operands)
         {
-            string file = operands[0] as string;
+            string file = operands[0].AsString;
             uint newSize = CastTo<uint>(operands[1]);
             ScriptProcessor.BeginExtend(file, newSize);
             return 0;
@@ -83,11 +83,11 @@ namespace Calculator
     }
     internal class ExtendCommand : SimpleExpressionBase
     {
-        protected override object OnCalc(IList<object> operands)
+        protected override CalculatorValue OnCalc(IList<CalculatorValue> operands)
         {
-            string file = operands[0] as string;
-            string className = operands[1] as string;
-            string methodName = operands[2] as string;
+            string file = operands[0].AsString;
+            string className = operands[1].AsString;
+            string methodName = operands[2].AsString;
             uint insertSize = CastTo<uint>(operands[3]);
             ScriptProcessor.Extend(file, className, methodName, insertSize);
             return 0;
@@ -95,27 +95,27 @@ namespace Calculator
     }
     internal class EndExtendCommand : SimpleExpressionBase
     {
-        protected override object OnCalc(IList<object> operands)
+        protected override CalculatorValue OnCalc(IList<CalculatorValue> operands)
         {
-            string file = operands[0] as string;
+            string file = operands[0].AsString;
             ScriptProcessor.EndExtend(file);
             return 0;
         }
     }
     internal class BeginModifyCommand : SimpleExpressionBase
     {
-        protected override object OnCalc(IList<object> operands)
+        protected override CalculatorValue OnCalc(IList<CalculatorValue> operands)
         {
-            string file = operands[0] as string;
+            string file = operands[0].AsString;
             ScriptProcessor.BeginModify(file);
             return 0;
         }
     }
     internal class EndModifyCommand : SimpleExpressionBase
     {
-        protected override object OnCalc(IList<object> operands)
+        protected override CalculatorValue OnCalc(IList<CalculatorValue> operands)
         {
-            string file = operands[0] as string;
+            string file = operands[0].AsString;
             ScriptProcessor.EndModify(file);
             return 0;
         }
@@ -123,11 +123,11 @@ namespace Calculator
     //---------------------------------------------------------------------------------------------------------------
     internal class WriteLoadArgCommand : SimpleExpressionBase
     {
-        protected override object OnCalc(IList<object> operands)
+        protected override CalculatorValue OnCalc(IList<CalculatorValue> operands)
         {
-            string file = operands[0] as string;
-            string className = operands[1] as string;
-            string methodName = operands[2] as string;
+            string file = operands[0].AsString;
+            string className = operands[1].AsString;
+            string methodName = operands[2].AsString;
             uint pos = CastTo<uint>(operands[3]);
             int index = CastTo<int>(operands[4]);
             ScriptProcessor.WriteLoadArg(file, className, methodName, pos, index);
@@ -136,11 +136,11 @@ namespace Calculator
     }
     internal class WriteLoadLocalCommand : SimpleExpressionBase
     {
-        protected override object OnCalc(IList<object> operands)
+        protected override CalculatorValue OnCalc(IList<CalculatorValue> operands)
         {
-            string file = operands[0] as string;
-            string className = operands[1] as string;
-            string methodName = operands[2] as string;
+            string file = operands[0].AsString;
+            string className = operands[1].AsString;
+            string methodName = operands[2].AsString;
             uint pos = CastTo<uint>(operands[3]);
             int index = CastTo<int>(operands[4]);
             ScriptProcessor.WriteLoadLocal(file, className, methodName, pos, index);
@@ -149,67 +149,67 @@ namespace Calculator
     }
     internal class WriteLoadFieldCommand : SimpleExpressionBase
     {
-        protected override object OnCalc(IList<object> operands)
+        protected override CalculatorValue OnCalc(IList<CalculatorValue> operands)
         {
-            string file = operands[0] as string;
-            string className = operands[1] as string;
-            string methodName = operands[2] as string;
+            string file = operands[0].AsString;
+            string className = operands[1].AsString;
+            string methodName = operands[2].AsString;
             uint pos = CastTo<uint>(operands[3]);
-            string cn = operands[4] as string;
-            string fn = operands[5] as string;
+            string cn = operands[4].AsString;
+            string fn = operands[5].AsString;
             ScriptProcessor.WriteLoadField(file, className, methodName, pos, cn, fn);
             return 0;
         }
     }
     internal class WriteLoadStaticFieldCommand : SimpleExpressionBase
     {
-        protected override object OnCalc(IList<object> operands)
+        protected override CalculatorValue OnCalc(IList<CalculatorValue> operands)
         {
-            string file = operands[0] as string;
-            string className = operands[1] as string;
-            string methodName = operands[2] as string;
+            string file = operands[0].AsString;
+            string className = operands[1].AsString;
+            string methodName = operands[2].AsString;
             uint pos = CastTo<uint>(operands[3]);
-            string cn = operands[4] as string;
-            string fn = operands[5] as string;
+            string cn = operands[4].AsString;
+            string fn = operands[5].AsString;
             ScriptProcessor.WriteLoadStaticField(file, className, methodName, pos, cn, fn);
             return 0;
         }
     }
     internal class WriteCallCommand : SimpleExpressionBase
     {
-        protected override object OnCalc(IList<object> operands)
+        protected override CalculatorValue OnCalc(IList<CalculatorValue> operands)
         {
-            string file = operands[0] as string;
-            string className = operands[1] as string;
-            string methodName = operands[2] as string;
+            string file = operands[0].AsString;
+            string className = operands[1].AsString;
+            string methodName = operands[2].AsString;
             uint pos = CastTo<uint>(operands[3]);
-            string cn = operands[4] as string;
-            string mn = operands[5] as string;
+            string cn = operands[4].AsString;
+            string mn = operands[5].AsString;
             ScriptProcessor.WriteCall(file, className, methodName, pos, cn, mn);
             return 0;
         }
     }
     internal class WriteCallVirtCommand : SimpleExpressionBase
     {
-        protected override object OnCalc(IList<object> operands)
+        protected override CalculatorValue OnCalc(IList<CalculatorValue> operands)
         {
-            string file = operands[0] as string;
-            string className = operands[1] as string;
-            string methodName = operands[2] as string;
+            string file = operands[0].AsString;
+            string className = operands[1].AsString;
+            string methodName = operands[2].AsString;
             uint pos = CastTo<uint>(operands[3]);
-            string cn = operands[4] as string;
-            string mn = operands[5] as string;
+            string cn = operands[4].AsString;
+            string mn = operands[5].AsString;
             ScriptProcessor.WriteCallVirt(file, className, methodName, pos, cn, mn);
             return 0;
         }
     }
     internal class WriteNopsCommand : SimpleExpressionBase
     {
-        protected override object OnCalc(IList<object> operands)
+        protected override CalculatorValue OnCalc(IList<CalculatorValue> operands)
         {
-            string file = operands[0] as string;
-            string className = operands[1] as string;
-            string methodName = operands[2] as string;
+            string file = operands[0].AsString;
+            string className = operands[1].AsString;
+            string methodName = operands[2].AsString;
             uint pos = CastTo<uint>(operands[3]);
             int size = CastTo<int>(operands[4]);
             ScriptProcessor.WriteNops(file, className, methodName, pos, size);
@@ -218,21 +218,23 @@ namespace Calculator
     }
     internal class GetFileListCommand : SimpleExpressionBase
     {
-        protected override object OnCalc(IList<object> operands)
+        protected override CalculatorValue OnCalc(IList<CalculatorValue> operands)
         {
-            return ScriptProcessor.GetFileList();
+            return CalculatorValue.FromObject(ScriptProcessor.GetFileList());
         }
     }
     //---------------------------------------------------------------------------------------------------------------
     internal class LogCommand : SimpleExpressionBase
     {
-        protected override object OnCalc(IList<object> operands)
+        protected override CalculatorValue OnCalc(IList<CalculatorValue> operands)
         {
             if (operands.Count > 0) {
-                string format = operands[0] as string;
+                string format = operands[0].AsString;
                 List<object> vargs = new List<object>();
-                vargs.AddRange(operands);
-                vargs.RemoveAt(0);
+                for(int i = 1; i < operands.Count; ++i) {
+                    var opd = operands[i].Get<object>();
+                    vargs.Add(opd);
+                }
                 MethodBodyModifier.ErrorTxts.Add(string.Format(format, vargs.ToArray()));
             }
             return 0;
