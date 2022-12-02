@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using DotnetPatch;
@@ -59,6 +60,44 @@ namespace DslExpression
             string srcClass = operands[1].AsString;
             string targetClass = operands[2].AsString;
             ScriptProcessor.Replace(file, srcClass, targetClass);
+            return 0;
+        }
+    }
+    internal class ReplaceAssemblyRefNameCommand : SimpleExpressionBase
+    {
+        protected override CalculatorValue OnCalc(IList<CalculatorValue> operands)
+        {
+            string file = operands[0].AsString;
+            string srcName = operands[1].AsString;
+            string targetName = operands[2].AsString;
+            ScriptProcessor.ReplaceAssemblyRefName(file, srcName, targetName);
+            return 0;
+        }
+    }
+    internal class RedirectAssemblyCommand : SimpleExpressionBase
+    {
+        protected override CalculatorValue OnCalc(IList<CalculatorValue> operands)
+        {
+            string file = operands[0].AsString;
+            string targetAssem = operands[1].AsString;
+            List<string> srcAssems = new List<string>();
+            for (int i = 2; i < operands.Count; ++i) {
+                var str = operands[i].AsString;
+                if (null != str) {
+                    srcAssems.Add(str);
+                }
+                else {
+                    var strList = operands[i].As<IList>();
+                    if (null != strList) {
+                        foreach (var strObj in strList) {
+                            var tempStr = strObj as string;
+                            if (null != tempStr)
+                                srcAssems.Add(tempStr);
+                        }
+                    }
+                }
+            }
+            ScriptProcessor.RedirectAssembly(file, targetAssem, srcAssems);
             return 0;
         }
     }
@@ -232,10 +271,10 @@ namespace DslExpression
                 string format = operands[0].AsString;
                 List<object> vargs = new List<object>();
                 for(int i = 1; i < operands.Count; ++i) {
-                    var opd = operands[i].Get<object>();
+                    var opd = operands[i].GetObject();
                     vargs.Add(opd);
                 }
-                MethodBodyModifier.ErrorTxts.Add(string.Format(format, vargs.ToArray()));
+                ClrFileModifier.ResultTexts.Add(string.Format(format, vargs.ToArray()));
             }
             return 0;
         }

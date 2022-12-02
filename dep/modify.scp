@@ -1,4 +1,4 @@
-proc(main)
+script(main)
 {
 	$files = getfilelist();
 	begin("开始脚本处理");

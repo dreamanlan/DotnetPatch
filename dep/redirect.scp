@@ -1,0 +1,29 @@
+script(main)
+{
+	$files = getfilelist();
+	begin("开始脚本处理");
+	looplist($files){
+		$file=$$;
+		beginfile($file,"开始对"+$file+"进行修改。。。");
+		beginreplace($file);
+		redirectassembly($file,"UnityEditor",
+			"UnityEngine.CoreModule"
+			);
+		redirectassembly($file,"UnityEngine",
+			"UnityEngine.UIModule",
+			"UnityEngine.TextRenderingModule",
+			"UnityEngine.PhysicsModule",
+			"UnityEngine.Physics2DModule",
+			"UnityEngine.IMGUIModule",
+			"UnityEngine.AnimationModule",
+			"UnityEngine.UIElementsModule",
+			"UnityEngine.InputLegacyModule",
+			"UnityEngine.CoreModule",
+			"UnityEngine.TilemapModule",
+			"UnityEngine.SpriteShapeModule"
+			);
+		endreplace($file);
+		endfile($file);
+	};
+	end("结束脚本处理");
+};

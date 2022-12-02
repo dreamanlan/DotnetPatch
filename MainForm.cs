@@ -8,6 +8,7 @@ using System.Windows.Forms;
 using System.IO;
 using System.CodeDom.Compiler;
 using Microsoft.CSharp;
+using System.Security.Cryptography;
 
 namespace DotnetPatch
 {
@@ -55,12 +56,14 @@ namespace DotnetPatch
             }
 
             OpenFileDialog ofd = new OpenFileDialog();
-            ofd.DefaultExt = "exe";
-            ofd.Filter = "exeÎÄ¼ş|*.exe|dllÎÄ¼ş|*.dll||";
+            if (!string.IsNullOrEmpty(m_LastInputDir)) {
+                ofd.InitialDirectory = m_LastInputDir;
+            }
+            ofd.Filter = "exe/dllæ–‡ä»¶|*.exe;*.dll|æ‰€æœ‰æ–‡ä»¶|*.*||";
             ofd.CheckPathExists = true;
             ofd.CheckFileExists = true;
             ofd.Multiselect = true;
-            ofd.Title = "ÇëÖ¸¶¨ÒªÌí¼ÓµÄ.net³ÌĞòÎÄ¼ş";
+            ofd.Title = "è¯·æŒ‡å®šè¦æ·»åŠ çš„.netç¨‹åºæ–‡ä»¶";
             if (DialogResult.OK == ofd.ShowDialog())
             {
                 foreach (string s in ofd.FileNames)
@@ -72,6 +75,7 @@ namespace DotnetPatch
                 {
                     string as0 = ofd.FileNames[0];
                     string path = Path.GetDirectoryName(as0);
+                    m_LastInputDir = path;
                     exportDir.Text = Path.GetDirectoryName(path);
                 }
                 statusLabel.Text = "OK.";
@@ -89,11 +93,15 @@ namespace DotnetPatch
         {
             string path = exportDir.Text.Trim();
             FolderBrowserDialog fbd = new FolderBrowserDialog();
-            fbd.Description = "ÇëÖ¸¶¨Ò»¸öÊä³öÄ¿Â¼£¨×¢Òâ²»ÒªÊ¹ÓÃÔ­ÎÄ¼şËùÔÚÄ¿Â¼£¬·ñÔò»á¸²¸ÇÔ­ÎÄ¼ş£¡£©";
+            if (!string.IsNullOrEmpty(m_LastOutputDir)) {
+                fbd.SelectedPath = m_LastOutputDir;
+            }
+            fbd.Description = "è¯·æŒ‡å®šä¸€ä¸ªè¾“å‡ºç›®å½•ï¼ˆæ³¨æ„ä¸è¦ä½¿ç”¨åŸæ–‡ä»¶æ‰€åœ¨ç›®å½•ï¼Œå¦åˆ™ä¼šè¦†ç›–åŸæ–‡ä»¶ï¼ï¼‰";
             fbd.ShowNewFolderButton = true;
             fbd.SelectedPath = path;
             if (DialogResult.OK == fbd.ShowDialog())
             {
+                m_LastOutputDir= fbd.SelectedPath;
                 exportDir.Text = fbd.SelectedPath;
                 statusLabel.Text = "OK.";
             }
@@ -105,27 +113,29 @@ namespace DotnetPatch
         
         private void replaceMethodBody_Click(object sender, EventArgs e)
         {
-            if (assemblyList.Items.Count <= 0)
+            if (assemblyList.Items.Count <= 0) {
+                MessageBox.Show("è¯·å…ˆæ·»åŠ è¦å¤„ç†çš„dotnet exe/dllï¼");
                 return;
+            }
             string path = exportDir.Text.Trim();
             if (path.Length <= 0) {
-                MessageBox.Show("ÇëÏÈÑ¡ÔñÒ»¸öÊä³öÄ¿Â¼£¡");
+                MessageBox.Show("è¯·å…ˆé€‰æ‹©ä¸€ä¸ªè¾“å‡ºç›®å½•ï¼");
                 return;
             }
             
             int curNum = 0;
             int totalNum = assemblyList.Items.Count;
             progressBar.Value = 0;
-            statusLabel.Text = "¿ªÊ¼·½·¨ÌåÌæ»»......";
+            statusLabel.Text = "å¼€å§‹æ–¹æ³•ä½“æ›¿æ¢......";
 
-            MethodBodyModifier.ErrorTxts.Clear();
-            Dictionary<string, MethodBodyModifier> methodBodyModifiers = new Dictionary<string, MethodBodyModifier>();
+            ClrFileModifier.ResultTexts.Clear();
+            Dictionary<string, ClrFileModifier> methodBodyModifiers = new Dictionary<string, ClrFileModifier>();
             foreach (string s in assemblyList.Items) {
-                statusLabel.Text = "¶ÔÎÄ¼ş " + s + " ½øĞĞ·½·¨ÌåÌæ»»ÖĞ......";
+                statusLabel.Text = "å¯¹æ–‡ä»¶ " + s + " è¿›è¡Œæ–¹æ³•ä½“æ›¿æ¢ä¸­......";
                 Application.DoEvents();
 
                 if (!methodBodyModifiers.ContainsKey(s)) {
-                    MethodBodyModifier methodBodyModifier = new MethodBodyModifier(s, path);
+                    ClrFileModifier methodBodyModifier = new ClrFileModifier(s, path);
                     methodBodyModifiers[s] = methodBodyModifier;
                 }
                 methodBodyModifiers[s].BeginReplace();
@@ -137,37 +147,49 @@ namespace DotnetPatch
                 Application.DoEvents();
             }
             progressBar.Value = 0;
-            statusLabel.Text = "·½·¨ÌåÌæ»»Íê±Ï.";
-            resultCtrl.Text = string.Join("\r\n", MethodBodyModifier.ErrorTxts.ToArray());
-            MethodBodyModifier.ErrorTxts.Clear();
+            statusLabel.Text = "æ–¹æ³•ä½“æ›¿æ¢å®Œæ¯•.";
+            resultCtrl.Text = string.Join("\r\n", ClrFileModifier.ResultTexts.ToArray());
+            ClrFileModifier.ResultTexts.Clear();
+
+            MessageBox.Show($"æ–¹æ³•ä½“æ›¿æ¢å®Œæ¯•ï¼Œä¿®æ”¹æ–‡ä»¶åœ¨{exportDir.Text}ç›®å½•ä¸‹");
         }
 
         private void execScript_Click(object sender, EventArgs e)
         {
-            if (assemblyList.Items.Count <= 0)
+            if (assemblyList.Items.Count <= 0) {
+                MessageBox.Show("è¯·å…ˆæ·»åŠ è¦å¤„ç†çš„dotnet exe/dllï¼");
                 return;
+            }
             string path = exportDir.Text.Trim();
             if (path.Length <= 0) {
-                MessageBox.Show("ÇëÏÈÑ¡ÔñÒ»¸öÊä³öÄ¿Â¼£¡");
+                MessageBox.Show("è¯·å…ˆé€‰æ‹©ä¸€ä¸ªè¾“å‡ºç›®å½•ï¼");
                 return;
             }
 
             OpenFileDialog ofd = new OpenFileDialog();
+            ofd.InitialDirectory = m_LastScriptDir;
             ofd.DefaultExt = "scp";
-            ofd.Filter = "½Å±¾ÎÄ¼ş|*.scp||";
+            ofd.Filter = "è„šæœ¬æ–‡ä»¶|*.scp|æ‰€æœ‰æ–‡ä»¶|*.*||";
             ofd.CheckPathExists = true;
             ofd.CheckFileExists = true;
             ofd.Multiselect = false;
-            ofd.Title = "ÇëÖ¸¶¨½Å±¾ÎÄ¼ş";
+            ofd.Title = "è¯·æŒ‡å®šè„šæœ¬æ–‡ä»¶";
             if (DialogResult.OK == ofd.ShowDialog()) {
                 string file = ofd.FileName;
+                m_LastScriptDir = Path.GetDirectoryName(file);
 
                 List<string> files = new List<string>();
                 foreach (string s in assemblyList.Items) {
                     files.Add(s);
                 }
                 ScriptProcessor.Start(files, path, file);
+
+                MessageBox.Show($"è„šæœ¬æ‰§è¡Œå®Œæˆï¼Œä¿®æ”¹æ–‡ä»¶åœ¨{exportDir.Text}ç›®å½•ä¸‹");
             }
         }
+
+        private string m_LastInputDir = string.Empty;
+        private string m_LastOutputDir = string.Empty;
+        private string m_LastScriptDir = Environment.CurrentDirectory;
     }
 }

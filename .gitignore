@@ -5,3 +5,5 @@ obj
 *.suo
 *.user
 *.opensdf
+*.vsidx
+*.lock
