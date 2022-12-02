@@ -6,6 +6,7 @@ script(main)
 		$file=$$;
 		beginfile($file,"开始对"+$file+"进行修改。。。");
 		beginreplace($file);
+		replaceassemblyrefname($file, "UnityEngine.CoreModule", "UnityEngine");
 		redirectassembly($file,"UnityEditor",
 			"UnityEngine.CoreModule"
 			);
