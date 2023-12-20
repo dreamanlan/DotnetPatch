@@ -534,7 +534,8 @@ namespace DslExpression
                 return Type == c_CharType;
             }
         }
-        public bool IsSignedInteger {
+        public bool IsSignedInteger
+        {
             get {
                 switch (Type) {
                     case c_SByteType:
@@ -547,7 +548,8 @@ namespace DslExpression
                 }
             }
         }
-        public bool IsUnsignedInteger {
+        public bool IsUnsignedInteger
+        {
             get {
                 switch (Type) {
                     case c_ByteType:
@@ -837,7 +839,7 @@ namespace DslExpression
                 return CalculatorValueConverter.From<T>(ToDecimal());
             else if (t == typeof(CalculatorValue))
                 return CalculatorValueConverter.From<T>(this);
-            else if(t == typeof(object))
+            else if (t == typeof(object))
                 return CalculatorValueConverter.From<T>(ToObject());
             else
                 return CalculatorValueConverter.CastTo<T>(ToObject());
@@ -2111,7 +2113,7 @@ namespace DslExpression
                 if (m_VarIx < int.MaxValue) {
                     ret = Calculator.GetGlobalVaraibleByIndex(m_VarIx);
                 }
-                else if(Calculator.TryGetGlobalVariable(m_VarId, out var val)) {
+                else if (Calculator.TryGetGlobalVariable(m_VarId, out var val)) {
                     ret = val;
                 }
                 else {
@@ -2540,6 +2542,211 @@ namespace DslExpression
 
         private IExpression m_Op;
     }
+    internal sealed class SinExp : AbstractExpression
+    {
+        protected override CalculatorValue DoCalc()
+        {
+            double v1 = m_Op.Calc().GetDouble();
+            CalculatorValue v = (double)Math.Sin(v1);
+            return v;
+        }
+        protected override bool Load(IList<IExpression> exps)
+        {
+            m_Op = exps[0];
+            return true;
+        }
+
+        private IExpression m_Op;
+    }
+    internal sealed class CosExp : AbstractExpression
+    {
+        protected override CalculatorValue DoCalc()
+        {
+            double v1 = m_Op.Calc().GetDouble();
+            CalculatorValue v = (double)Math.Cos(v1);
+            return v;
+        }
+        protected override bool Load(IList<IExpression> exps)
+        {
+            m_Op = exps[0];
+            return true;
+        }
+
+        private IExpression m_Op;
+    }
+    internal sealed class TanExp : AbstractExpression
+    {
+        protected override CalculatorValue DoCalc()
+        {
+            double v1 = m_Op.Calc().GetDouble();
+            CalculatorValue v = (double)Math.Tan(v1);
+            return v;
+        }
+        protected override bool Load(IList<IExpression> exps)
+        {
+            m_Op = exps[0];
+            return true;
+        }
+
+        private IExpression m_Op;
+    }
+    internal sealed class AsinExp : AbstractExpression
+    {
+        protected override CalculatorValue DoCalc()
+        {
+            double v1 = m_Op.Calc().GetDouble();
+            CalculatorValue v = (double)Math.Asin(v1);
+            return v;
+        }
+        protected override bool Load(IList<IExpression> exps)
+        {
+            m_Op = exps[0];
+            return true;
+        }
+
+        private IExpression m_Op;
+    }
+    internal sealed class AcosExp : AbstractExpression
+    {
+        protected override CalculatorValue DoCalc()
+        {
+            double v1 = m_Op.Calc().GetDouble();
+            CalculatorValue v = (double)Math.Acos(v1);
+            return v;
+        }
+        protected override bool Load(IList<IExpression> exps)
+        {
+            m_Op = exps[0];
+            return true;
+        }
+
+        private IExpression m_Op;
+    }
+    internal sealed class AtanExp : AbstractExpression
+    {
+        protected override CalculatorValue DoCalc()
+        {
+            double v1 = m_Op.Calc().GetDouble();
+            CalculatorValue v = (double)Math.Atan(v1);
+            return v;
+        }
+        protected override bool Load(IList<IExpression> exps)
+        {
+            m_Op = exps[0];
+            return true;
+        }
+
+        private IExpression m_Op;
+    }
+    internal sealed class Atan2Exp : AbstractExpression
+    {
+        protected override CalculatorValue DoCalc()
+        {
+            double v1 = m_Op1.Calc().GetDouble();
+            double v2 = m_Op2.Calc().GetDouble();
+            CalculatorValue v = (double)Math.Atan2(v1, v2);
+            return v;
+        }
+        protected override bool Load(IList<IExpression> exps)
+        {
+            m_Op1 = exps[0];
+            m_Op2 = exps[1];
+            return true;
+        }
+
+        private IExpression m_Op1;
+        private IExpression m_Op2;
+    }
+    internal sealed class SinhExp : AbstractExpression
+    {
+        protected override CalculatorValue DoCalc()
+        {
+            double v1 = m_Op.Calc().GetDouble();
+            CalculatorValue v = Math.Sinh(v1);
+            return v;
+        }
+        protected override bool Load(IList<IExpression> exps)
+        {
+            m_Op = exps[0];
+            return true;
+        }
+
+        private IExpression m_Op;
+    }
+    internal sealed class CoshExp : AbstractExpression
+    {
+        protected override CalculatorValue DoCalc()
+        {
+            double v1 = m_Op.Calc().GetDouble();
+            CalculatorValue v = Math.Cosh(v1);
+            return v;
+        }
+        protected override bool Load(IList<IExpression> exps)
+        {
+            m_Op = exps[0];
+            return true;
+        }
+
+        private IExpression m_Op;
+    }
+    internal sealed class TanhExp : AbstractExpression
+    {
+        protected override CalculatorValue DoCalc()
+        {
+            double v1 = m_Op.Calc().GetDouble();
+            CalculatorValue v = Math.Tanh(v1);
+            return v;
+        }
+        protected override bool Load(IList<IExpression> exps)
+        {
+            m_Op = exps[0];
+            return true;
+        }
+
+        private IExpression m_Op;
+    }
+    internal sealed class RndIntExp : AbstractExpression
+    {
+        protected override CalculatorValue DoCalc()
+        {
+            long v1 = m_Op1.Calc().GetLong();
+            long v2 = m_Op2.Calc().GetLong();
+            CalculatorValue v = (long)s_Random.Next((int)v1, (int)v2);
+            return v;
+        }
+        protected override bool Load(IList<IExpression> exps)
+        {
+            m_Op1 = exps[0];
+            m_Op2 = exps[1];
+            return true;
+        }
+
+        private IExpression m_Op1;
+        private IExpression m_Op2;
+
+        private static Random s_Random = new Random();
+    }
+    internal sealed class RndFloatExp : AbstractExpression
+    {
+        protected override CalculatorValue DoCalc()
+        {
+            double v1 = m_Op1.Calc().GetDouble();
+            double v2 = m_Op2.Calc().GetDouble();
+            CalculatorValue v = s_Random.NextDouble() * (v2 - v1) + v1;
+            return v;
+        }
+        protected override bool Load(IList<IExpression> exps)
+        {
+            m_Op1 = exps[0];
+            m_Op2 = exps[1];
+            return true;
+        }
+
+        private IExpression m_Op1;
+        private IExpression m_Op2;
+
+        private static Random s_Random = new Random();
+    }
     internal sealed class PowExp : AbstractExpression
     {
         protected override CalculatorValue DoCalc()
@@ -2639,20 +2846,287 @@ namespace DslExpression
 
         private IExpression m_Op1;
     }
-    internal sealed class ClampExp : AbstractExpression
+    internal sealed class RoundExp : AbstractExpression
     {
         protected override CalculatorValue DoCalc()
         {
             double v1 = m_Op1.Calc().GetDouble();
-            double v2 = m_Op2.Calc().GetDouble();
-            double v3 = m_Op3.Calc().GetDouble();
+            CalculatorValue v = Math.Round(v1);
+            return v;
+        }
+        protected override bool Load(IList<IExpression> exps)
+        {
+            m_Op1 = exps[0];
+            return true;
+        }
+
+        private IExpression m_Op1;
+    }
+    internal sealed class FloorToIntExp : AbstractExpression
+    {
+        protected override CalculatorValue DoCalc()
+        {
+            double v1 = m_Op1.Calc().GetDouble();
+            CalculatorValue v = (int)Math.Floor(v1);
+            return v;
+        }
+        protected override bool Load(IList<IExpression> exps)
+        {
+            m_Op1 = exps[0];
+            return true;
+        }
+
+        private IExpression m_Op1;
+    }
+    internal sealed class CeilToIntExp : AbstractExpression
+    {
+        protected override CalculatorValue DoCalc()
+        {
+            double v1 = m_Op1.Calc().GetDouble();
+            CalculatorValue v = (int)Math.Ceiling(v1);
+            return v;
+        }
+        protected override bool Load(IList<IExpression> exps)
+        {
+            m_Op1 = exps[0];
+            return true;
+        }
+
+        private IExpression m_Op1;
+    }
+    internal sealed class RoundToIntExp : AbstractExpression
+    {
+        protected override CalculatorValue DoCalc()
+        {
+            double v1 = m_Op1.Calc().GetDouble();
+            CalculatorValue v = (int)Math.Round(v1);
+            return v;
+        }
+        protected override bool Load(IList<IExpression> exps)
+        {
+            m_Op1 = exps[0];
+            return true;
+        }
+
+        private IExpression m_Op1;
+    }
+    internal sealed class BoolExp : AbstractExpression
+    {
+        protected override CalculatorValue DoCalc()
+        {
+            bool v1 = m_Op1.Calc().GetBool();
+            CalculatorValue v = v1;
+            return v;
+        }
+        protected override bool Load(IList<IExpression> exps)
+        {
+            m_Op1 = exps[0];
+            return true;
+        }
+
+        private IExpression m_Op1;
+    }
+    internal sealed class SByteExp : AbstractExpression
+    {
+        protected override CalculatorValue DoCalc()
+        {
+            sbyte v1 = m_Op1.Calc().GetSByte();
+            CalculatorValue v = v1;
+            return v;
+        }
+        protected override bool Load(IList<IExpression> exps)
+        {
+            m_Op1 = exps[0];
+            return true;
+        }
+
+        private IExpression m_Op1;
+    }
+    internal sealed class ByteExp : AbstractExpression
+    {
+        protected override CalculatorValue DoCalc()
+        {
+            byte v1 = m_Op1.Calc().GetByte();
+            CalculatorValue v = v1;
+            return v;
+        }
+        protected override bool Load(IList<IExpression> exps)
+        {
+            m_Op1 = exps[0];
+            return true;
+        }
+
+        private IExpression m_Op1;
+    }
+    internal sealed class CharExp : AbstractExpression
+    {
+        protected override CalculatorValue DoCalc()
+        {
+            char v1 = m_Op1.Calc().GetChar();
+            CalculatorValue v = v1;
+            return v;
+        }
+        protected override bool Load(IList<IExpression> exps)
+        {
+            m_Op1 = exps[0];
+            return true;
+        }
+
+        private IExpression m_Op1;
+    }
+    internal sealed class ShortExp : AbstractExpression
+    {
+        protected override CalculatorValue DoCalc()
+        {
+            short v1 = m_Op1.Calc().GetShort();
+            CalculatorValue v = v1;
+            return v;
+        }
+        protected override bool Load(IList<IExpression> exps)
+        {
+            m_Op1 = exps[0];
+            return true;
+        }
+
+        private IExpression m_Op1;
+    }
+    internal sealed class UShortExp : AbstractExpression
+    {
+        protected override CalculatorValue DoCalc()
+        {
+            ushort v1 = m_Op1.Calc().GetUShort();
+            CalculatorValue v = v1;
+            return v;
+        }
+        protected override bool Load(IList<IExpression> exps)
+        {
+            m_Op1 = exps[0];
+            return true;
+        }
+
+        private IExpression m_Op1;
+    }
+    internal sealed class IntExp : AbstractExpression
+    {
+        protected override CalculatorValue DoCalc()
+        {
+            int v1 = m_Op1.Calc().GetInt();
+            CalculatorValue v = v1;
+            return v;
+        }
+        protected override bool Load(IList<IExpression> exps)
+        {
+            m_Op1 = exps[0];
+            return true;
+        }
+
+        private IExpression m_Op1;
+    }
+    internal sealed class UIntExp : AbstractExpression
+    {
+        protected override CalculatorValue DoCalc()
+        {
+            uint v1 = m_Op1.Calc().GetUInt();
+            CalculatorValue v = v1;
+            return v;
+        }
+        protected override bool Load(IList<IExpression> exps)
+        {
+            m_Op1 = exps[0];
+            return true;
+        }
+
+        private IExpression m_Op1;
+    }
+    internal sealed class LongExp : AbstractExpression
+    {
+        protected override CalculatorValue DoCalc()
+        {
+            long v1 = m_Op1.Calc().GetLong();
+            CalculatorValue v = v1;
+            return v;
+        }
+        protected override bool Load(IList<IExpression> exps)
+        {
+            m_Op1 = exps[0];
+            return true;
+        }
+
+        private IExpression m_Op1;
+    }
+    internal sealed class ULongExp : AbstractExpression
+    {
+        protected override CalculatorValue DoCalc()
+        {
+            ulong v1 = m_Op1.Calc().GetULong();
+            CalculatorValue v = v1;
+            return v;
+        }
+        protected override bool Load(IList<IExpression> exps)
+        {
+            m_Op1 = exps[0];
+            return true;
+        }
+
+        private IExpression m_Op1;
+    }
+    internal sealed class FloatExp : AbstractExpression
+    {
+        protected override CalculatorValue DoCalc()
+        {
+            float v1 = m_Op1.Calc().GetFloat();
+            CalculatorValue v = v1;
+            return v;
+        }
+        protected override bool Load(IList<IExpression> exps)
+        {
+            m_Op1 = exps[0];
+            return true;
+        }
+
+        private IExpression m_Op1;
+    }
+    internal sealed class DoubleExp : AbstractExpression
+    {
+        protected override CalculatorValue DoCalc()
+        {
+            double v1 = m_Op1.Calc().GetDouble();
+            CalculatorValue v = v1;
+            return v;
+        }
+        protected override bool Load(IList<IExpression> exps)
+        {
+            m_Op1 = exps[0];
+            return true;
+        }
+
+        private IExpression m_Op1;
+    }
+    internal sealed class DecimalExp : AbstractExpression
+    {
+        protected override CalculatorValue DoCalc()
+        {
+            decimal v1 = m_Op1.Calc().GetDecimal();
+            CalculatorValue v = v1;
+            return v;
+        }
+        protected override bool Load(IList<IExpression> exps)
+        {
+            m_Op1 = exps[0];
+            return true;
+        }
+
+        private IExpression m_Op1;
+    }
+    internal sealed class LerpExp : AbstractExpression
+    {
+        protected override CalculatorValue DoCalc()
+        {
+            double a = m_Op1.Calc().GetDouble();
+            double b = m_Op2.Calc().GetDouble();
+            double t = m_Op3.Calc().GetDouble();
             CalculatorValue v;
-            if (v3 < v1)
-                v = v1;
-            else if (v3 > v2)
-                v = v2;
-            else
-                v = v3;
+            v = a + (b - a) * ClampExp.Clamp01(t);
             return v;
         }
         protected override bool Load(IList<IExpression> exps)
@@ -2666,6 +3140,248 @@ namespace DslExpression
         private IExpression m_Op1;
         private IExpression m_Op2;
         private IExpression m_Op3;
+    }
+    internal sealed class LerpUnclampedExp : AbstractExpression
+    {
+        protected override CalculatorValue DoCalc()
+        {
+            double a = m_Op1.Calc().GetDouble();
+            double b = m_Op2.Calc().GetDouble();
+            double t = m_Op3.Calc().GetDouble();
+            CalculatorValue v = a + (b - a) * t;
+            return v;
+        }
+        protected override bool Load(IList<IExpression> exps)
+        {
+            m_Op1 = exps[0];
+            m_Op2 = exps[1];
+            m_Op3 = exps[2];
+            return true;
+        }
+
+        private IExpression m_Op1;
+        private IExpression m_Op2;
+        private IExpression m_Op3;
+    }
+    internal sealed class LerpAngleExp : AbstractExpression
+    {
+        protected override CalculatorValue DoCalc()
+        {
+            double a = m_Op1.Calc().GetDouble();
+            double b = m_Op2.Calc().GetDouble();
+            double t = m_Op3.Calc().GetDouble();
+            double num = Repeat(b - a, 360.0);
+            if (num > 180f) {
+                num -= 360f;
+            }
+            CalculatorValue v = a + num * ClampExp.Clamp01(t);
+            return v;
+        }
+        protected override bool Load(IList<IExpression> exps)
+        {
+            m_Op1 = exps[0];
+            m_Op2 = exps[1];
+            m_Op3 = exps[2];
+            return true;
+        }
+
+        private IExpression m_Op1;
+        private IExpression m_Op2;
+        private IExpression m_Op3;
+
+        public static double Repeat(double t, double length)
+        {
+            return ClampExp.Clamp(t - Math.Floor(t / length) * length, 0f, length);
+        }
+    }
+    internal sealed class SmoothStepExp : AbstractExpression
+    {
+        protected override CalculatorValue DoCalc()
+        {
+            double from = m_Op1.Calc().GetDouble();
+            double to = m_Op2.Calc().GetDouble();
+            double t = m_Op3.Calc().GetDouble();
+            t = ClampExp.Clamp01(t);
+            t = -2.0 * t * t * t + 3.0 * t * t;
+            CalculatorValue v = to * t + from * (1.0 - t);
+            return v;
+        }
+        protected override bool Load(IList<IExpression> exps)
+        {
+            m_Op1 = exps[0];
+            m_Op2 = exps[1];
+            m_Op3 = exps[2];
+            return true;
+        }
+
+        private IExpression m_Op1;
+        private IExpression m_Op2;
+        private IExpression m_Op3;
+    }
+    internal sealed class Clamp01Exp : AbstractExpression
+    {
+        protected override CalculatorValue DoCalc()
+        {
+            double v1 = m_Op.Calc().GetDouble();
+            CalculatorValue v = ClampExp.Clamp01(v1);
+            return v;
+        }
+        protected override bool Load(IList<IExpression> exps)
+        {
+            m_Op = exps[0];
+            return true;
+        }
+
+        private IExpression m_Op;
+    }
+    internal sealed class ClampExp : AbstractExpression
+    {
+        protected override CalculatorValue DoCalc()
+        {
+            double v1 = m_Op1.Calc().GetDouble();
+            double v2 = m_Op2.Calc().GetDouble();
+            double v3 = m_Op3.Calc().GetDouble();
+            CalculatorValue v;
+            if (v2 <= v3) {
+                if (v1 < v2)
+                    v = v2;
+                else if (v1 > v3)
+                    v = v3;
+                else
+                    v = v1;
+            }
+            else {
+                if (v1 > v2)
+                    v = v2;
+                else if (v1 < v3)
+                    v = v3;
+                else
+                    v = v1;
+            }
+            return v;
+        }
+        protected override bool Load(IList<IExpression> exps)
+        {
+            m_Op1 = exps[0];
+            m_Op2 = exps[1];
+            m_Op3 = exps[2];
+            return true;
+        }
+
+        private IExpression m_Op1;
+        private IExpression m_Op2;
+        private IExpression m_Op3;
+
+        public static double Clamp(double value, double min, double max)
+        {
+            if (value < min) {
+                value = min;
+            }
+            else if (value > max) {
+                value = max;
+            }
+            return value;
+        }
+        public static double Clamp01(double value)
+        {
+            if (value < 0f) {
+                return 0f;
+            }
+            if (value > 1f) {
+                return 1f;
+            }
+            return value;
+        }
+    }
+    internal sealed class ApproximatelyExp : AbstractExpression
+    {
+        protected override CalculatorValue DoCalc()
+        {
+            float v1 = m_Op1.Calc().GetFloat();
+            float v2 = m_Op2.Calc().GetFloat();
+            CalculatorValue v = Approximately(v1, v2) ? 1 : 0;
+            return v;
+        }
+        protected override bool Load(IList<IExpression> exps)
+        {
+            m_Op1 = exps[0];
+            m_Op2 = exps[1];
+            return true;
+        }
+
+        private IExpression m_Op1;
+        private IExpression m_Op2;
+
+        public static bool Approximately(double a, double b)
+        {
+            return Math.Abs(b - a) < Math.Max(1E-06 * Math.Max(Math.Abs(a), Math.Abs(b)), double.Epsilon * 8.0);
+        }
+    }
+    internal sealed class IsPowerOfTwoExp : AbstractExpression
+    {
+        protected override CalculatorValue DoCalc()
+        {
+            int v1 = m_Op1.Calc().GetInt();
+            int v = IsPowerOfTwo(v1) ? 1 : 0;
+            return v;
+        }
+        protected override bool Load(IList<IExpression> exps)
+        {
+            m_Op1 = exps[0];
+            return true;
+        }
+
+        private IExpression m_Op1;
+
+        public bool IsPowerOfTwo(int v)
+        {
+            int n = (int)Math.Round(Math.Log(v) / Math.Log(2));
+            return (int)Math.Round(Math.Pow(2, n)) == v;
+        }
+    }
+    internal sealed class ClosestPowerOfTwoExp : AbstractExpression
+    {
+        protected override CalculatorValue DoCalc()
+        {
+            int v1 = m_Op1.Calc().GetInt();
+            int v = ClosestPowerOfTwo(v1);
+            return v;
+        }
+        protected override bool Load(IList<IExpression> exps)
+        {
+            m_Op1 = exps[0];
+            return true;
+        }
+
+        private IExpression m_Op1;
+
+        public int ClosestPowerOfTwo(int v)
+        {
+            int n = (int)Math.Round(Math.Log(v) / Math.Log(2));
+            return (int)Math.Round(Math.Pow(2, n));
+        }
+    }
+    internal sealed class NextPowerOfTwoExp : AbstractExpression
+    {
+        protected override CalculatorValue DoCalc()
+        {
+            int v1 = m_Op1.Calc().GetInt();
+            int v = NextPowerOfTwo(v1);
+            return v;
+        }
+        protected override bool Load(IList<IExpression> exps)
+        {
+            m_Op1 = exps[0];
+            return true;
+        }
+
+        private IExpression m_Op1;
+
+        public int NextPowerOfTwo(int v)
+        {
+            int n = (int)Math.Round(Math.Log(v) / Math.Log(2));
+            return (int)Math.Round(Math.Pow(2, n + 1));
+        }
     }
     internal sealed class DistExp : AbstractExpression
     {
@@ -2996,7 +3712,7 @@ namespace DslExpression
             //标准if语句的处理
             foreach (var fd in statementData.Functions) {
                 var fData = fd.AsFunction;
-                if (fData.GetId() == "if" || fData.GetId() == "elseif") {
+                if (fData.GetId() == "if" || fData.GetId() == "elseif" || fData.GetId() == "elif") {
                     IfExp.Clause item = new IfExp.Clause();
                     if (fData.IsHighOrder && fData.LowerOrderFunction.GetParamNum() > 0) {
                         Dsl.ISyntaxComponent cond = fData.LowerOrderFunction.GetParam(0);
@@ -5956,13 +6672,51 @@ namespace DslExpression
             Register("max", new ExpressionFactoryHelper<MaxExp>());
             Register("min", new ExpressionFactoryHelper<MinExp>());
             Register("abs", new ExpressionFactoryHelper<AbsExp>());
+            Register("sin", new ExpressionFactoryHelper<SinExp>());
+            Register("cos", new ExpressionFactoryHelper<CosExp>());
+            Register("tan", new ExpressionFactoryHelper<TanExp>());
+            Register("asin", new ExpressionFactoryHelper<AsinExp>());
+            Register("acos", new ExpressionFactoryHelper<AcosExp>());
+            Register("atan", new ExpressionFactoryHelper<AtanExp>());
+            Register("atan2", new ExpressionFactoryHelper<Atan2Exp>());
+            Register("sinh", new ExpressionFactoryHelper<SinhExp>());
+            Register("cosh", new ExpressionFactoryHelper<CoshExp>());
+            Register("tanh", new ExpressionFactoryHelper<TanhExp>());
+            Register("rndint", new ExpressionFactoryHelper<RndIntExp>());
+            Register("rndfloat", new ExpressionFactoryHelper<RndFloatExp>());
             Register("pow", new ExpressionFactoryHelper<PowExp>());
             Register("sqrt", new ExpressionFactoryHelper<SqrtExp>());
             Register("log", new ExpressionFactoryHelper<LogExp>());
             Register("log10", new ExpressionFactoryHelper<Log10Exp>());
             Register("floor", new ExpressionFactoryHelper<FloorExp>());
             Register("ceil", new ExpressionFactoryHelper<CeilExp>());
+            Register("round", new ExpressionFactoryHelper<RoundExp>());
+            Register("floortoint", new ExpressionFactoryHelper<FloorToIntExp>());
+            Register("ceiltoint", new ExpressionFactoryHelper<CeilToIntExp>());
+            Register("roundtoint", new ExpressionFactoryHelper<RoundToIntExp>());
+            Register("bool", new ExpressionFactoryHelper<BoolExp>());
+            Register("sbyte", new ExpressionFactoryHelper<SByteExp>());
+            Register("byte", new ExpressionFactoryHelper<ByteExp>());
+            Register("char", new ExpressionFactoryHelper<CharExp>());
+            Register("short", new ExpressionFactoryHelper<ShortExp>());
+            Register("ushort", new ExpressionFactoryHelper<UShortExp>());
+            Register("int", new ExpressionFactoryHelper<IntExp>());
+            Register("uint", new ExpressionFactoryHelper<UIntExp>());
+            Register("long", new ExpressionFactoryHelper<LongExp>());
+            Register("ulong", new ExpressionFactoryHelper<ULongExp>());
+            Register("float", new ExpressionFactoryHelper<FloatExp>());
+            Register("double", new ExpressionFactoryHelper<DoubleExp>());
+            Register("decimal", new ExpressionFactoryHelper<DecimalExp>());
+            Register("lerp", new ExpressionFactoryHelper<LerpExp>());
+            Register("lerpunclamped", new ExpressionFactoryHelper<LerpUnclampedExp>());
+            Register("lerpangle", new ExpressionFactoryHelper<LerpAngleExp>());
+            Register("smoothstep", new ExpressionFactoryHelper<SmoothStepExp>());
+            Register("clamp01", new ExpressionFactoryHelper<Clamp01Exp>());
             Register("clamp", new ExpressionFactoryHelper<ClampExp>());
+            Register("approximately", new ExpressionFactoryHelper<ApproximatelyExp>());
+            Register("ispoweroftwo", new ExpressionFactoryHelper<IsPowerOfTwoExp>());
+            Register("closestpoweroftwo", new ExpressionFactoryHelper<ClosestPowerOfTwoExp>());
+            Register("nextpoweroftwo", new ExpressionFactoryHelper<NextPowerOfTwoExp>());
             Register("dist", new ExpressionFactoryHelper<DistExp>());
             Register("distsqr", new ExpressionFactoryHelper<DistSqrExp>());
             Register(">", new ExpressionFactoryHelper<GreatExp>());
@@ -6581,7 +7335,7 @@ namespace DslExpression
                                         if (member == "orderby" || member == "orderbydesc" || member == "where" || member == "top") {
                                             apiName = "linq";
                                         }
-                                        else if(innerParamClass == (int)Dsl.FunctionData.ParamClassEnum.PARAM_CLASS_PERIOD) {
+                                        else if (innerParamClass == (int)Dsl.FunctionData.ParamClassEnum.PARAM_CLASS_PERIOD) {
                                             apiName = "dotnetcall";
                                         }
                                         else {
@@ -6614,7 +7368,7 @@ namespace DslExpression
                                   paramClass == (int)Dsl.FunctionData.ParamClassEnum.PARAM_CLASS_BRACKET) {
                                     //obj.property or obj[property] or obj.(property) or obj.[property] or obj.{property} -> dotnetget(obj,property)
                                     Dsl.FunctionData newCall = new Dsl.FunctionData();
-                                    if(paramClass == (int)Dsl.FunctionData.ParamClassEnum.PARAM_CLASS_PERIOD)
+                                    if (paramClass == (int)Dsl.FunctionData.ParamClassEnum.PARAM_CLASS_PERIOD)
                                         newCall.Name = new Dsl.ValueData("dotnetget", Dsl.ValueData.ID_TOKEN);
                                     else
                                         newCall.Name = new Dsl.ValueData("collectionget", Dsl.ValueData.ID_TOKEN);
