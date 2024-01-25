@@ -3139,6 +3139,46 @@ namespace DslExpression
 
         private IExpression m_Op1;
     }
+    internal sealed class UtofExp : AbstractExpression
+    {
+        protected override CalculatorValue DoCalc()
+        {
+            uint v1 = m_Op1.Calc().GetUInt();
+            float v2 = 0;
+            unsafe {
+                v2 = *(float*)&v1;
+            }
+            CalculatorValue v = v2;
+            return v;
+        }
+        protected override bool Load(IList<IExpression> exps)
+        {
+            m_Op1 = exps[0];
+            return true;
+        }
+
+        private IExpression m_Op1;
+    }
+    internal sealed class FtouExp : AbstractExpression
+    {
+        protected override CalculatorValue DoCalc()
+        {
+            float v1 = m_Op1.Calc().GetFloat();
+            uint v2 = 0;
+            unsafe {
+                v2 = *(uint*)&v1;
+            }
+            CalculatorValue v = v2;
+            return v;
+        }
+        protected override bool Load(IList<IExpression> exps)
+        {
+            m_Op1 = exps[0];
+            return true;
+        }
+
+        private IExpression m_Op1;
+    }
     internal sealed class LerpExp : AbstractExpression
     {
         protected override CalculatorValue DoCalc()
@@ -6728,6 +6768,8 @@ namespace DslExpression
             Register("float", new ExpressionFactoryHelper<FloatExp>());
             Register("double", new ExpressionFactoryHelper<DoubleExp>());
             Register("decimal", new ExpressionFactoryHelper<DecimalExp>());
+            Register("ftou", new ExpressionFactoryHelper<FtouExp>());
+            Register("utof", new ExpressionFactoryHelper<UtofExp>());
             Register("lerp", new ExpressionFactoryHelper<LerpExp>());
             Register("lerpunclamped", new ExpressionFactoryHelper<LerpUnclampedExp>());
             Register("lerpangle", new ExpressionFactoryHelper<LerpAngleExp>());
