@@ -2655,7 +2655,7 @@ namespace DslExpression
         protected override CalculatorValue DoCalc()
         {
             double v1 = m_Op.Calc().GetDouble();
-            CalculatorValue v = (double)Math.Sin(v1);
+            CalculatorValue v = Math.Sin(v1);
             return v;
         }
         protected override bool Load(IList<IExpression> exps)
@@ -2671,7 +2671,7 @@ namespace DslExpression
         protected override CalculatorValue DoCalc()
         {
             double v1 = m_Op.Calc().GetDouble();
-            CalculatorValue v = (double)Math.Cos(v1);
+            CalculatorValue v = Math.Cos(v1);
             return v;
         }
         protected override bool Load(IList<IExpression> exps)
@@ -2687,7 +2687,7 @@ namespace DslExpression
         protected override CalculatorValue DoCalc()
         {
             double v1 = m_Op.Calc().GetDouble();
-            CalculatorValue v = (double)Math.Tan(v1);
+            CalculatorValue v = Math.Tan(v1);
             return v;
         }
         protected override bool Load(IList<IExpression> exps)
@@ -2703,7 +2703,7 @@ namespace DslExpression
         protected override CalculatorValue DoCalc()
         {
             double v1 = m_Op.Calc().GetDouble();
-            CalculatorValue v = (double)Math.Asin(v1);
+            CalculatorValue v = Math.Asin(v1);
             return v;
         }
         protected override bool Load(IList<IExpression> exps)
@@ -2719,7 +2719,7 @@ namespace DslExpression
         protected override CalculatorValue DoCalc()
         {
             double v1 = m_Op.Calc().GetDouble();
-            CalculatorValue v = (double)Math.Acos(v1);
+            CalculatorValue v = Math.Acos(v1);
             return v;
         }
         protected override bool Load(IList<IExpression> exps)
@@ -2735,7 +2735,7 @@ namespace DslExpression
         protected override CalculatorValue DoCalc()
         {
             double v1 = m_Op.Calc().GetDouble();
-            CalculatorValue v = (double)Math.Atan(v1);
+            CalculatorValue v = Math.Atan(v1);
             return v;
         }
         protected override bool Load(IList<IExpression> exps)
@@ -2752,7 +2752,7 @@ namespace DslExpression
         {
             double v1 = m_Op1.Calc().GetDouble();
             double v2 = m_Op2.Calc().GetDouble();
-            CalculatorValue v = (double)Math.Atan2(v1, v2);
+            CalculatorValue v = Math.Atan2(v1, v2);
             return v;
         }
         protected override bool Load(IList<IExpression> exps)
@@ -2861,7 +2861,7 @@ namespace DslExpression
         {
             double v1 = m_Op1.Calc().GetDouble();
             double v2 = m_Op2.Calc().GetDouble();
-            CalculatorValue v = (double)Math.Pow((float)v1, (float)v2);
+            CalculatorValue v = Math.Pow(v1, v2);
             return v;
         }
         protected override bool Load(IList<IExpression> exps)
@@ -2879,7 +2879,39 @@ namespace DslExpression
         protected override CalculatorValue DoCalc()
         {
             double v1 = m_Op1.Calc().GetDouble();
-            CalculatorValue v = (double)Math.Sqrt((float)v1);
+            CalculatorValue v = Math.Sqrt(v1);
+            return v;
+        }
+        protected override bool Load(IList<IExpression> exps)
+        {
+            m_Op1 = exps[0];
+            return true;
+        }
+
+        private IExpression m_Op1;
+    }
+    internal sealed class ExpExp : AbstractExpression
+    {
+        protected override CalculatorValue DoCalc()
+        {
+            double v1 = m_Op1.Calc().GetDouble();
+            CalculatorValue v = Math.Exp(v1);
+            return v;
+        }
+        protected override bool Load(IList<IExpression> exps)
+        {
+            m_Op1 = exps[0];
+            return true;
+        }
+
+        private IExpression m_Op1;
+    }
+    internal sealed class Exp2Exp : AbstractExpression
+    {
+        protected override CalculatorValue DoCalc()
+        {
+            double v1 = m_Op1.Calc().GetDouble();
+            CalculatorValue v = Math.Pow(2, v1);
             return v;
         }
         protected override bool Load(IList<IExpression> exps)
@@ -2895,7 +2927,36 @@ namespace DslExpression
         protected override CalculatorValue DoCalc()
         {
             double v1 = m_Op1.Calc().GetDouble();
-            CalculatorValue v = (double)Math.Log((float)v1);
+            if (m_ArgNum == 1) {
+                CalculatorValue v = Math.Log(v1);
+                return v;
+            }
+            else {
+                double v2 = m_Op2.Calc().GetDouble();
+                CalculatorValue v = Math.Log(v1, v2);
+                return v;
+            }
+        }
+        protected override bool Load(IList<IExpression> exps)
+        {
+            m_ArgNum = exps.Count;
+            m_Op1 = exps[0];
+            if (m_ArgNum > 1) {
+                m_Op2 = exps[1];
+            }
+            return true;
+        }
+
+        private int m_ArgNum;
+        private IExpression m_Op1;
+        private IExpression m_Op2;
+    }
+    internal sealed class Log2Exp : AbstractExpression
+    {
+        protected override CalculatorValue DoCalc()
+        {
+            double v1 = m_Op1.Calc().GetDouble();
+            CalculatorValue v = Math.Log(v1)/Math.Log(2);
             return v;
         }
         protected override bool Load(IList<IExpression> exps)
@@ -2911,7 +2972,7 @@ namespace DslExpression
         protected override CalculatorValue DoCalc()
         {
             double v1 = m_Op1.Calc().GetDouble();
-            CalculatorValue v = (double)Math.Log10((float)v1);
+            CalculatorValue v = Math.Log10(v1);
             return v;
         }
         protected override bool Load(IList<IExpression> exps)
@@ -6954,7 +7015,10 @@ namespace DslExpression
             Register("rndfloat", "rndfloat(min,max) api", new ExpressionFactoryHelper<RndFloatExp>());
             Register("pow", "pow(v1,v2) api", new ExpressionFactoryHelper<PowExp>());
             Register("sqrt", "sqrt(v) api", new ExpressionFactoryHelper<SqrtExp>());
+            Register("exp", "exp(v) api", new ExpressionFactoryHelper<ExpExp>());
+            Register("exp2", "exp2(v) api", new ExpressionFactoryHelper<Exp2Exp>());
             Register("log", "log(v) api", new ExpressionFactoryHelper<LogExp>());
+            Register("log2", "log2(v) api", new ExpressionFactoryHelper<Log2Exp>());
             Register("log10", "log10(v) api", new ExpressionFactoryHelper<Log10Exp>());
             Register("floor", "floor(v) api", new ExpressionFactoryHelper<FloorExp>());
             Register("ceil", "ceil(v) api", new ExpressionFactoryHelper<CeilExp>());
