@@ -1,0 +1,87 @@
+{
+  "Version": 1,
+  "WorkspaceRootPath": "F:\\GitHub\\DotnetPatch\\",
+  "Documents": [
+    {
+      "AbsoluteMoniker": "D:0:0:{96284113-E412-4BC5-88F8-2EDE21EC3ABD}|DotnetPatch.csproj|f:\\github\\dotnetpatch\\clrfilemodifier.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{96284113-E412-4BC5-88F8-2EDE21EC3ABD}|DotnetPatch.csproj|solutionrelative:clrfilemodifier.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{96284113-E412-4BC5-88F8-2EDE21EC3ABD}|DotnetPatch.csproj|f:\\github\\dotnetpatch\\script\\commands.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{96284113-E412-4BC5-88F8-2EDE21EC3ABD}|DotnetPatch.csproj|solutionrelative:script\\commands.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{96284113-E412-4BC5-88F8-2EDE21EC3ABD}|DotnetPatch.csproj|f:\\github\\dotnetpatch\\mainform.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{96284113-E412-4BC5-88F8-2EDE21EC3ABD}|DotnetPatch.csproj|solutionrelative:mainform.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{96284113-E412-4BC5-88F8-2EDE21EC3ABD}|DotnetPatch.csproj|f:\\github\\dotnetpatch\\script\\dslcalculator.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{96284113-E412-4BC5-88F8-2EDE21EC3ABD}|DotnetPatch.csproj|solutionrelative:script\\dslcalculator.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    }
+  ],
+  "DocumentGroupContainers": [
+    {
+      "Orientation": 0,
+      "VerticalTabListWidth": 256,
+      "DocumentGroups": [
+        {
+          "DockedWidth": 200,
+          "SelectedChildIndex": 1,
+          "Children": [
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "MainForm.cs",
+              "DocumentMoniker": "F:\\GitHub\\DotnetPatch\\MainForm.cs",
+              "RelativeDocumentMoniker": "MainForm.cs",
+              "ToolTip": "F:\\GitHub\\DotnetPatch\\MainForm.cs",
+              "RelativeToolTip": "MainForm.cs",
+              "ViewState": "AQIAAK8AAAAAAAAAAADgv8IAAAABAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-06-18T10:35:30.402Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "ClrFileModifier.cs",
+              "DocumentMoniker": "F:\\GitHub\\DotnetPatch\\ClrFileModifier.cs",
+              "RelativeDocumentMoniker": "ClrFileModifier.cs",
+              "ToolTip": "F:\\GitHub\\DotnetPatch\\ClrFileModifier.cs",
+              "RelativeToolTip": "ClrFileModifier.cs",
+              "ViewState": "AQIAAOMBAAAAAAAAAIAxwAYCAAA1AAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-06-18T10:35:30.406Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 3,
+              "Title": "DslCalculator.cs",
+              "DocumentMoniker": "F:\\GitHub\\DotnetPatch\\Script\\DslCalculator.cs",
+              "RelativeDocumentMoniker": "Script\\DslCalculator.cs",
+              "ToolTip": "F:\\GitHub\\DotnetPatch\\Script\\DslCalculator.cs",
+              "RelativeToolTip": "Script\\DslCalculator.cs",
+              "ViewState": "AQIAAEEXAAAAAAAAAIAwwOUXAAAMAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-06-18T10:35:30.408Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "Commands.cs",
+              "DocumentMoniker": "F:\\GitHub\\DotnetPatch\\Script\\Commands.cs",
+              "RelativeDocumentMoniker": "Script\\Commands.cs",
+              "ToolTip": "F:\\GitHub\\DotnetPatch\\Script\\Commands.cs",
+              "RelativeToolTip": "Script\\Commands.cs",
+              "ViewState": "AQIAAAAAAAAAAAAAAAAAAAsAAAAlAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-06-18T10:35:30.411Z",
+              "EditorCaption": ""
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

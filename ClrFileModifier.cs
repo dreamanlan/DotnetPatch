@@ -494,29 +494,29 @@ namespace DotnetPatch
             s_Calculator.Init();
 
             //注册Gm命令
-            s_Calculator.Register("begin", new ExpressionFactoryHelper<BeginCommand>());
-            s_Calculator.Register("end", new ExpressionFactoryHelper<EndCommand>());
-            s_Calculator.Register("beginfile", new ExpressionFactoryHelper<BeginFileCommand>());
-            s_Calculator.Register("endfile", new ExpressionFactoryHelper<EndFileCommand>());
-            s_Calculator.Register("beginreplace", new ExpressionFactoryHelper<BeginReplaceCommand>());
-            s_Calculator.Register("replace", new ExpressionFactoryHelper<ReplaceCommand>());
-            s_Calculator.Register("replaceassemblyrefname", new ExpressionFactoryHelper<ReplaceAssemblyRefNameCommand>());
-            s_Calculator.Register("redirectassembly", new ExpressionFactoryHelper<RedirectAssemblyCommand>());
-            s_Calculator.Register("endreplace", new ExpressionFactoryHelper<EndReplaceCommand>());
-            s_Calculator.Register("beginextend", new ExpressionFactoryHelper<BeginExtendCommand>());
-            s_Calculator.Register("extend", new ExpressionFactoryHelper<ExtendCommand>());
-            s_Calculator.Register("endextend", new ExpressionFactoryHelper<EndExtendCommand>());
-            s_Calculator.Register("beginmodify", new ExpressionFactoryHelper<BeginModifyCommand>());
-            s_Calculator.Register("endmodify", new ExpressionFactoryHelper<EndModifyCommand>());
-            s_Calculator.Register("writeloadarg", new ExpressionFactoryHelper<WriteLoadArgCommand>());
-            s_Calculator.Register("writeloadlocal", new ExpressionFactoryHelper<WriteLoadLocalCommand>());
-            s_Calculator.Register("writeloadfield", new ExpressionFactoryHelper<WriteLoadFieldCommand>());
-            s_Calculator.Register("writeloadstaticfield", new ExpressionFactoryHelper<WriteLoadStaticFieldCommand>());
-            s_Calculator.Register("writecall", new ExpressionFactoryHelper<WriteCallCommand>());
-            s_Calculator.Register("writecallvirt", new ExpressionFactoryHelper<WriteCallVirtCommand>());
-            s_Calculator.Register("writenops", new ExpressionFactoryHelper<WriteNopsCommand>());
-            s_Calculator.Register("getfilelist", new ExpressionFactoryHelper<GetFileListCommand>());
-            s_Calculator.Register("log", new ExpressionFactoryHelper<LogCommand>());
+            s_Calculator.Register("begin", string.Empty, new ExpressionFactoryHelper<BeginCommand>());
+            s_Calculator.Register("end", string.Empty, new ExpressionFactoryHelper<EndCommand>());
+            s_Calculator.Register("beginfile", string.Empty, new ExpressionFactoryHelper<BeginFileCommand>());
+            s_Calculator.Register("endfile", string.Empty, new ExpressionFactoryHelper<EndFileCommand>());
+            s_Calculator.Register("beginreplace", string.Empty, new ExpressionFactoryHelper<BeginReplaceCommand>());
+            s_Calculator.Register("replace", string.Empty, new ExpressionFactoryHelper<ReplaceCommand>());
+            s_Calculator.Register("replaceassemblyrefname", string.Empty, new ExpressionFactoryHelper<ReplaceAssemblyRefNameCommand>());
+            s_Calculator.Register("redirectassembly", string.Empty, new ExpressionFactoryHelper<RedirectAssemblyCommand>());
+            s_Calculator.Register("endreplace", string.Empty, new ExpressionFactoryHelper<EndReplaceCommand>());
+            s_Calculator.Register("beginextend", string.Empty, new ExpressionFactoryHelper<BeginExtendCommand>());
+            s_Calculator.Register("extend", string.Empty, new ExpressionFactoryHelper<ExtendCommand>());
+            s_Calculator.Register("endextend", string.Empty, new ExpressionFactoryHelper<EndExtendCommand>());
+            s_Calculator.Register("beginmodify", string.Empty, new ExpressionFactoryHelper<BeginModifyCommand>());
+            s_Calculator.Register("endmodify", string.Empty, new ExpressionFactoryHelper<EndModifyCommand>());
+            s_Calculator.Register("writeloadarg", string.Empty, new ExpressionFactoryHelper<WriteLoadArgCommand>());
+            s_Calculator.Register("writeloadlocal", string.Empty, new ExpressionFactoryHelper<WriteLoadLocalCommand>());
+            s_Calculator.Register("writeloadfield", string.Empty, new ExpressionFactoryHelper<WriteLoadFieldCommand>());
+            s_Calculator.Register("writeloadstaticfield", string.Empty, new ExpressionFactoryHelper<WriteLoadStaticFieldCommand>());
+            s_Calculator.Register("writecall", string.Empty, new ExpressionFactoryHelper<WriteCallCommand>());
+            s_Calculator.Register("writecallvirt", string.Empty, new ExpressionFactoryHelper<WriteCallVirtCommand>());
+            s_Calculator.Register("writenops", string.Empty, new ExpressionFactoryHelper<WriteNopsCommand>());
+            s_Calculator.Register("getfilelist", string.Empty, new ExpressionFactoryHelper<GetFileListCommand>());
+            s_Calculator.Register("log", string.Empty, new ExpressionFactoryHelper<LogCommand>());
         }
         public static void Start(IList<string> files, string outputPath, string scpFile)
         {
