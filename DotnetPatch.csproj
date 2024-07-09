@@ -13,8 +13,17 @@
     <Content Include="PENCIL12.ICO" />
   </ItemGroup>
   <ItemGroup>
+    <Reference Include="Common">
+      <HintPath>dep\Common.dll</HintPath>
+    </Reference>
+    <Reference Include="DotnetStoryScript">
+      <HintPath>dep\DotnetStoryScript.dll</HintPath>
+    </Reference>
     <Reference Include="Dsl">
       <HintPath>dep\Dsl.dll</HintPath>
+    </Reference>
+    <Reference Include="ScriptFrameworkLibrary">
+      <HintPath>dep\ScriptFrameworkLibrary.dll</HintPath>
     </Reference>
   </ItemGroup>
 </Project>

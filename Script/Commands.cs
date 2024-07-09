@@ -3,8 +3,11 @@ using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using DotnetPatch;
+using ScriptableFramework;
+using DotnetStoryScript;
+using DotnetStoryScript.DslExpression;
 
-namespace DslExpression
+namespace DotnetStoryScript.DslExpression
 {
     //---------------------------------------------------------------------------------------------------------------
     internal class BeginCommand : SimpleExpressionBase

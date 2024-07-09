@@ -3,20 +3,16 @@
   "WorkspaceRootPath": "F:\\GitHub\\DotnetPatch\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{96284113-E412-4BC5-88F8-2EDE21EC3ABD}|DotnetPatch.csproj|f:\\github\\dotnetpatch\\clrfilemodifier.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{96284113-E412-4BC5-88F8-2EDE21EC3ABD}|DotnetPatch.csproj|solutionrelative:clrfilemodifier.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
       "AbsoluteMoniker": "D:0:0:{96284113-E412-4BC5-88F8-2EDE21EC3ABD}|DotnetPatch.csproj|F:\\GitHub\\DotnetPatch\\script\\commands.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{96284113-E412-4BC5-88F8-2EDE21EC3ABD}|DotnetPatch.csproj|solutionrelative:script\\commands.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{96284113-E412-4BC5-88F8-2EDE21EC3ABD}|DotnetPatch.csproj|F:\\GitHub\\DotnetPatch\\mainform.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{96284113-E412-4BC5-88F8-2EDE21EC3ABD}|DotnetPatch.csproj|solutionrelative:mainform.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{96284113-E412-4BC5-88F8-2EDE21EC3ABD}|DotnetPatch.csproj|f:\\github\\dotnetpatch\\clrfilemodifier.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{96284113-E412-4BC5-88F8-2EDE21EC3ABD}|DotnetPatch.csproj|solutionrelative:clrfilemodifier.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{96284113-E412-4BC5-88F8-2EDE21EC3ABD}|DotnetPatch.csproj|F:\\GitHub\\DotnetPatch\\script\\dslcalculator.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{96284113-E412-4BC5-88F8-2EDE21EC3ABD}|DotnetPatch.csproj|solutionrelative:script\\dslcalculator.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{96284113-E412-4BC5-88F8-2EDE21EC3ABD}|DotnetPatch.csproj|F:\\GitHub\\DotnetPatch\\mainform.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{96284113-E412-4BC5-88F8-2EDE21EC3ABD}|DotnetPatch.csproj|solutionrelative:mainform.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     }
   ],
   "DocumentGroupContainers": [
@@ -26,16 +22,8 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 3,
+          "SelectedChildIndex": 2,
           "Children": [
-            {
-              "$type": "Bookmark",
-              "Name": "ST:0:0:{eefa5220-e298-11d0-8f78-00a0c9110057}"
-            },
-            {
-              "$type": "Bookmark",
-              "Name": "ST:0:0:{d3750d8a-574b-4fb3-b7e2-aa8af40e8231}"
-            },
             {
               "$type": "Document",
               "DocumentIndex": 2,
@@ -50,66 +38,29 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 0,
+              "DocumentIndex": 1,
               "Title": "ClrFileModifier.cs",
               "DocumentMoniker": "F:\\GitHub\\DotnetPatch\\ClrFileModifier.cs",
               "RelativeDocumentMoniker": "ClrFileModifier.cs",
               "ToolTip": "F:\\GitHub\\DotnetPatch\\ClrFileModifier.cs",
               "RelativeToolTip": "ClrFileModifier.cs",
-              "ViewState": "AQIAAOMBAAAAAAAAAIAxwAYCAAA1AAAA",
+              "ViewState": "AQIAAAAAAAAAAAAAAAAAAOoBAAAnAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2024-06-18T10:35:30.406Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 3,
-              "Title": "DslCalculator.cs",
-              "DocumentMoniker": "F:\\GitHub\\DotnetPatch\\Script\\DslCalculator.cs",
-              "RelativeDocumentMoniker": "Script\\DslCalculator.cs",
-              "ToolTip": "F:\\GitHub\\DotnetPatch\\Script\\DslCalculator.cs",
-              "RelativeToolTip": "Script\\DslCalculator.cs",
-              "ViewState": "AQIAAEEXAAAAAAAAAIAwwOUXAAAMAAAA",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2024-06-18T10:35:30.408Z"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 1,
+              "DocumentIndex": 0,
               "Title": "Commands.cs",
               "DocumentMoniker": "F:\\GitHub\\DotnetPatch\\Script\\Commands.cs",
               "RelativeDocumentMoniker": "Script\\Commands.cs",
               "ToolTip": "F:\\GitHub\\DotnetPatch\\Script\\Commands.cs",
               "RelativeToolTip": "Script\\Commands.cs",
-              "ViewState": "AQIAAAAAAAAAAAAAAAAAAAsAAAAlAAAA",
+              "ViewState": "AQIAAAAAAAAAAAAAAAAAAAkAAAAcAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2024-06-18T10:35:30.411Z"
-            }
-          ]
-        },
-        {
-          "DockedWidth": 221,
-          "SelectedChildIndex": -1,
-          "Children": [
-            {
-              "$type": "Bookmark",
-              "Name": "ST:0:0:{a80febb4-e7e0-4147-b476-21aaf2453969}"
-            },
-            {
-              "$type": "Bookmark",
-              "Name": "ST:0:0:{004be353-6879-467c-9d1e-9ac23cdf6d49}"
-            },
-            {
-              "$type": "Bookmark",
-              "Name": "ST:0:0:{68487888-204a-11d3-87eb-00c04f7971a5}"
-            },
-            {
-              "$type": "Bookmark",
-              "Name": "ST:0:0:{d78612c7-9962-4b83-95d9-268046dad23a}"
-            },
-            {
-              "$type": "Bookmark",
-              "Name": "ST:0:0:{34e76e81-ee4a-11d0-ae2e-00a0c90fffc3}"
+              "WhenOpened": "2024-06-18T10:35:30.411Z",
+              "EditorCaption": ""
             }
           ]
         }
