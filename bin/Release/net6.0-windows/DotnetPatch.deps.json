@@ -8,10 +8,29 @@
     ".NETCoreApp,Version=v6.0": {
       "DotnetPatch/1.0.0": {
         "dependencies": {
-          "Dsl": "0.0.0.0"
+          "Common": "1.0.0.0",
+          "DotnetStoryScript": "1.0.0.0",
+          "Dsl": "0.0.0.0",
+          "ScriptFrameworkLibrary": "1.0.0.0"
         },
         "runtime": {
           "DotnetPatch.dll": {}
+        }
+      },
+      "Common/1.0.0.0": {
+        "runtime": {
+          "Common.dll": {
+            "assemblyVersion": "1.0.0.0",
+            "fileVersion": "1.0.0.0"
+          }
+        }
+      },
+      "DotnetStoryScript/1.0.0.0": {
+        "runtime": {
+          "DotnetStoryScript.dll": {
+            "assemblyVersion": "1.0.0.0",
+            "fileVersion": "1.0.0.0"
+          }
         }
       },
       "Dsl/0.0.0.0": {
@@ -19,6 +38,22 @@
           "Dsl.dll": {
             "assemblyVersion": "0.0.0.0",
             "fileVersion": "0.0.0.0"
+          }
+        }
+      },
+      "ScriptFrameworkLibrary/1.0.0.0": {
+        "runtime": {
+          "ScriptFrameworkLibrary.dll": {
+            "assemblyVersion": "1.0.0.0",
+            "fileVersion": "1.0.0.0"
+          }
+        }
+      },
+      "LitJson/1.0.0.0": {
+        "runtime": {
+          "LitJson.dll": {
+            "assemblyVersion": "1.0.0.0",
+            "fileVersion": "1.0.0.0"
           }
         }
       }
@@ -30,7 +65,27 @@
       "serviceable": false,
       "sha512": ""
     },
+    "Common/1.0.0.0": {
+      "type": "reference",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "DotnetStoryScript/1.0.0.0": {
+      "type": "reference",
+      "serviceable": false,
+      "sha512": ""
+    },
     "Dsl/0.0.0.0": {
+      "type": "reference",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "ScriptFrameworkLibrary/1.0.0.0": {
+      "type": "reference",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "LitJson/1.0.0.0": {
       "type": "reference",
       "serviceable": false,
       "sha512": ""

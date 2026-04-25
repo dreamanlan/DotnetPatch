@@ -492,7 +492,7 @@ namespace DotnetPatch
     {
         public static void Init()
         {
-            s_Calculator.Init();
+            s_Calculator.NewApiRegistry();
 
             //注册Gm命令
             s_Calculator.Register("begin", string.Empty, new ExpressionFactoryHelper<BeginCommand>());
