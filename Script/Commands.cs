@@ -12,7 +12,7 @@ namespace DotnetStoryScript.DslExpression
     //---------------------------------------------------------------------------------------------------------------
     internal class BeginCommand : SimpleExpressionBase
     {
-        protected override BoxedValue OnCalc(IList<BoxedValue> operands)
+        protected override BoxedValue OnCalc(DslCalculator calculator, IList<BoxedValue> operands)
         {
             string info = operands[0].AsString;
             ScriptProcessor.Begin(info);
@@ -21,7 +21,7 @@ namespace DotnetStoryScript.DslExpression
     }
     internal class EndCommand : SimpleExpressionBase
     {
-        protected override BoxedValue OnCalc(IList<BoxedValue> operands)
+        protected override BoxedValue OnCalc(DslCalculator calculator, IList<BoxedValue> operands)
         {
             string info = operands[0].AsString;
             ScriptProcessor.End(info);
@@ -30,7 +30,7 @@ namespace DotnetStoryScript.DslExpression
     }
     internal class BeginFileCommand : SimpleExpressionBase
     {
-        protected override BoxedValue OnCalc(IList<BoxedValue> operands)
+        protected override BoxedValue OnCalc(DslCalculator calculator, IList<BoxedValue> operands)
         {
             string file = operands[0].AsString;
             string info = operands[1].AsString;
@@ -40,7 +40,7 @@ namespace DotnetStoryScript.DslExpression
     }
     internal class EndFileCommand : SimpleExpressionBase
     {
-        protected override BoxedValue OnCalc(IList<BoxedValue> operands)
+        protected override BoxedValue OnCalc(DslCalculator calculator, IList<BoxedValue> operands)
         {
             ScriptProcessor.EndFile();
             return 0;
@@ -48,7 +48,7 @@ namespace DotnetStoryScript.DslExpression
     }
     internal class BeginReplaceCommand : SimpleExpressionBase
     {
-        protected override BoxedValue OnCalc(IList<BoxedValue> operands)
+        protected override BoxedValue OnCalc(DslCalculator calculator, IList<BoxedValue> operands)
         {
             string file = operands[0].AsString;
             ScriptProcessor.BeginReplace(file);
@@ -57,7 +57,7 @@ namespace DotnetStoryScript.DslExpression
     }
     internal class ReplaceCommand : SimpleExpressionBase
     {
-        protected override BoxedValue OnCalc(IList<BoxedValue> operands)
+        protected override BoxedValue OnCalc(DslCalculator calculator, IList<BoxedValue> operands)
         {
             string file = operands[0].AsString;
             string srcClass = operands[1].AsString;
@@ -68,7 +68,7 @@ namespace DotnetStoryScript.DslExpression
     }
     internal class ReplaceAssemblyRefNameCommand : SimpleExpressionBase
     {
-        protected override BoxedValue OnCalc(IList<BoxedValue> operands)
+        protected override BoxedValue OnCalc(DslCalculator calculator, IList<BoxedValue> operands)
         {
             string file = operands[0].AsString;
             string srcName = operands[1].AsString;
@@ -79,7 +79,7 @@ namespace DotnetStoryScript.DslExpression
     }
     internal class RedirectAssemblyCommand : SimpleExpressionBase
     {
-        protected override BoxedValue OnCalc(IList<BoxedValue> operands)
+        protected override BoxedValue OnCalc(DslCalculator calculator, IList<BoxedValue> operands)
         {
             string file = operands[0].AsString;
             string targetAssem = operands[1].AsString;
@@ -106,7 +106,7 @@ namespace DotnetStoryScript.DslExpression
     }
     internal class EndReplaceCommand : SimpleExpressionBase
     {
-        protected override BoxedValue OnCalc(IList<BoxedValue> operands)
+        protected override BoxedValue OnCalc(DslCalculator calculator, IList<BoxedValue> operands)
         {
             string file = operands[0].AsString;
             ScriptProcessor.EndReplace(file);
@@ -115,7 +115,7 @@ namespace DotnetStoryScript.DslExpression
     }
     internal class BeginExtendCommand : SimpleExpressionBase
     {
-        protected override BoxedValue OnCalc(IList<BoxedValue> operands)
+        protected override BoxedValue OnCalc(DslCalculator calculator, IList<BoxedValue> operands)
         {
             string file = operands[0].AsString;
             uint newSize = CastTo<uint>(operands[1]);
@@ -125,7 +125,7 @@ namespace DotnetStoryScript.DslExpression
     }
     internal class ExtendCommand : SimpleExpressionBase
     {
-        protected override BoxedValue OnCalc(IList<BoxedValue> operands)
+        protected override BoxedValue OnCalc(DslCalculator calculator, IList<BoxedValue> operands)
         {
             string file = operands[0].AsString;
             string className = operands[1].AsString;
@@ -137,7 +137,7 @@ namespace DotnetStoryScript.DslExpression
     }
     internal class EndExtendCommand : SimpleExpressionBase
     {
-        protected override BoxedValue OnCalc(IList<BoxedValue> operands)
+        protected override BoxedValue OnCalc(DslCalculator calculator, IList<BoxedValue> operands)
         {
             string file = operands[0].AsString;
             ScriptProcessor.EndExtend(file);
@@ -146,7 +146,7 @@ namespace DotnetStoryScript.DslExpression
     }
     internal class BeginModifyCommand : SimpleExpressionBase
     {
-        protected override BoxedValue OnCalc(IList<BoxedValue> operands)
+        protected override BoxedValue OnCalc(DslCalculator calculator, IList<BoxedValue> operands)
         {
             string file = operands[0].AsString;
             ScriptProcessor.BeginModify(file);
@@ -155,7 +155,7 @@ namespace DotnetStoryScript.DslExpression
     }
     internal class EndModifyCommand : SimpleExpressionBase
     {
-        protected override BoxedValue OnCalc(IList<BoxedValue> operands)
+        protected override BoxedValue OnCalc(DslCalculator calculator, IList<BoxedValue> operands)
         {
             string file = operands[0].AsString;
             ScriptProcessor.EndModify(file);
@@ -165,7 +165,7 @@ namespace DotnetStoryScript.DslExpression
     //---------------------------------------------------------------------------------------------------------------
     internal class WriteLoadArgCommand : SimpleExpressionBase
     {
-        protected override BoxedValue OnCalc(IList<BoxedValue> operands)
+        protected override BoxedValue OnCalc(DslCalculator calculator, IList<BoxedValue> operands)
         {
             string file = operands[0].AsString;
             string className = operands[1].AsString;
@@ -178,7 +178,7 @@ namespace DotnetStoryScript.DslExpression
     }
     internal class WriteLoadLocalCommand : SimpleExpressionBase
     {
-        protected override BoxedValue OnCalc(IList<BoxedValue> operands)
+        protected override BoxedValue OnCalc(DslCalculator calculator, IList<BoxedValue> operands)
         {
             string file = operands[0].AsString;
             string className = operands[1].AsString;
@@ -191,7 +191,7 @@ namespace DotnetStoryScript.DslExpression
     }
     internal class WriteLoadFieldCommand : SimpleExpressionBase
     {
-        protected override BoxedValue OnCalc(IList<BoxedValue> operands)
+        protected override BoxedValue OnCalc(DslCalculator calculator, IList<BoxedValue> operands)
         {
             string file = operands[0].AsString;
             string className = operands[1].AsString;
@@ -205,7 +205,7 @@ namespace DotnetStoryScript.DslExpression
     }
     internal class WriteLoadStaticFieldCommand : SimpleExpressionBase
     {
-        protected override BoxedValue OnCalc(IList<BoxedValue> operands)
+        protected override BoxedValue OnCalc(DslCalculator calculator, IList<BoxedValue> operands)
         {
             string file = operands[0].AsString;
             string className = operands[1].AsString;
@@ -219,7 +219,7 @@ namespace DotnetStoryScript.DslExpression
     }
     internal class WriteCallCommand : SimpleExpressionBase
     {
-        protected override BoxedValue OnCalc(IList<BoxedValue> operands)
+        protected override BoxedValue OnCalc(DslCalculator calculator, IList<BoxedValue> operands)
         {
             string file = operands[0].AsString;
             string className = operands[1].AsString;
@@ -233,7 +233,7 @@ namespace DotnetStoryScript.DslExpression
     }
     internal class WriteCallVirtCommand : SimpleExpressionBase
     {
-        protected override BoxedValue OnCalc(IList<BoxedValue> operands)
+        protected override BoxedValue OnCalc(DslCalculator calculator, IList<BoxedValue> operands)
         {
             string file = operands[0].AsString;
             string className = operands[1].AsString;
@@ -247,7 +247,7 @@ namespace DotnetStoryScript.DslExpression
     }
     internal class WriteNopsCommand : SimpleExpressionBase
     {
-        protected override BoxedValue OnCalc(IList<BoxedValue> operands)
+        protected override BoxedValue OnCalc(DslCalculator calculator, IList<BoxedValue> operands)
         {
             string file = operands[0].AsString;
             string className = operands[1].AsString;
@@ -260,7 +260,7 @@ namespace DotnetStoryScript.DslExpression
     }
     internal class GetFileListCommand : SimpleExpressionBase
     {
-        protected override BoxedValue OnCalc(IList<BoxedValue> operands)
+        protected override BoxedValue OnCalc(DslCalculator calculator, IList<BoxedValue> operands)
         {
             return BoxedValue.FromObject(ScriptProcessor.GetFileList());
         }
@@ -268,7 +268,7 @@ namespace DotnetStoryScript.DslExpression
     //---------------------------------------------------------------------------------------------------------------
     internal class LogCommand : SimpleExpressionBase
     {
-        protected override BoxedValue OnCalc(IList<BoxedValue> operands)
+        protected override BoxedValue OnCalc(DslCalculator calculator, IList<BoxedValue> operands)
         {
             if (operands.Count > 0) {
                 string format = operands[0].AsString;
