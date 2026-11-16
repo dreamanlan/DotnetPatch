@@ -1,16 +1,16 @@
 script(main)
 {
-	$files = getfilelist();
+	$files = get_file_list();
 	begin("开始脚本处理");
-	looplist($files){
+	loop_list($files){
 		$file=$$;
-		beginfile($file,"开始对"+$file+"进行修改。。。");
-		beginreplace($file);
-		replaceassemblyrefname($file, "UnityEngine.CoreModule", "UnityEngine");
-		redirectassembly($file,"UnityEditor",
+		begin_file($file,"开始对"+$file+"进行修改。。。");
+		begin_replace($file);
+		replace_assembly_ref_name($file, "UnityEngine.CoreModule", "UnityEngine");
+		redirect_assembly($file,"UnityEditor",
 			"UnityEngine.CoreModule"
 			);
-		redirectassembly($file,"UnityEngine",
+		redirect_assembly($file,"UnityEngine",
 			"UnityEngine.UIModule",
 			"UnityEngine.TextRenderingModule",
 			"UnityEngine.PhysicsModule",
@@ -23,8 +23,8 @@ script(main)
 			"UnityEngine.TilemapModule",
 			"UnityEngine.SpriteShapeModule"
 			);
-		endreplace($file);
-		endfile($file);
+		end_replace($file);
+		end_file($file);
 	};
 	end("结束脚本处理");
 };

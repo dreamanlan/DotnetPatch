@@ -8,23 +8,23 @@
 
 		proc(main)
 		{
-			$files = getfilelist();
+			$files = get_file_list();
 			begin("开始脚本处理");
-			looplist($files){
+			loop_list($files){
 				$file=$$;
-				beginfile($file,"开始对"+$file+"进行修改。。。");
-				beginreplace($file);
+				begin_file($file,"开始对"+$file+"进行修改。。。");
+				begin_replace($file);
 				replace($file,"Game","GamePatch");
-				endreplace($file);
-				beginmodify($file);
-				writeloadarg($file,"PlayerController","Update",0x38,0);
-				writeloadfield($file,"PlayerController","Update",0x39,"PlayerController","m_player");
-				writeloadarg($file,"PlayerController","Update",0x3e,0);
-				writeloadfield($file,"PlayerController","Update",0x3f,"PlayerController","m_moveElapseTime");
-				writecall($file,"PlayerController","Update",0x44,"DebugConsoleHelper","Move");
-				writenops($file,"PlayerController","Update",0x49,0x22);
-				endmodify($file);
-				endfile($file);
+				end_replace($file);
+				begin_modify($file);
+				write_load_arg($file,"PlayerController","Update",0x38,0);
+				write_load_field($file,"PlayerController","Update",0x39,"PlayerController","m_player");
+				write_load_arg($file,"PlayerController","Update",0x3e,0);
+				write_load_field($file,"PlayerController","Update",0x3f,"PlayerController","m_moveElapseTime");
+				write_call($file,"PlayerController","Update",0x44,"DebugConsoleHelper","Move");
+				write_nops($file,"PlayerController","Update",0x49,0x22);
+				end_modify($file);
+				end_file($file);
 			};
 			end("结束脚本处理");
 		};
@@ -34,26 +34,26 @@
 
     begin(string tip);	//开始脚本处理
     end(string tip);	//结束脚本处理
-    beginfile(string file, string tip);	//开始处理文件
-    endfile(string file);	//结束处理文件
-    beginreplace(string file);	//开始方法体替换
+    begin_file(string file, string tip);	//开始处理文件
+    end_file(string file);	//结束处理文件
+    begin_replace(string file);	//开始方法体替换
     replace(string file, string srcclass, string repclass);	//替换方法体
-    endreplace(string file);	//结束方法体替换
-    beginextend(string file);	//开始扩展方法大小
+    end_replace(string file);	//结束方法体替换
+    begin_extend(string file);	//开始扩展方法大小
     extend(string file, string classname, string methodname, uint insertsize); //在指定的方法开始插入指定字节数
-    endextend(string file);	//结束方法大小扩展
-    beginmodify(string file);	//开始文件方法修改
-    endmodify(string file);	//结束文件方法修改
+    end_extend(string file);	//结束方法大小扩展
+    begin_modify(string file);	//开始文件方法修改
+    end_modify(string file);	//结束文件方法修改
     
-    writeloadarg(string file, string classname, string methodname, uint pos, int index);	//写入loadarg指令
-    writeloadlocal(string file, string classname, string methodname, uint pos, int index);	//写入loadlocal指令
-    writeloadfield(string file, string classname, string methodname, uint pos, string loadClass, string loadField);	//写入loadfield指令
-    writeloadstaticfield(string file, string classname, string methodname, uint pos, string loadClass, string loadField);	//写入loadstaticfield指令
-    writecall(string file, string classname, string methodname, uint pos, string callClass, string callMethod);	//写入call指令
-    writecallvirt(string file, string classname, string methodname, uint pos, string callClass, string callMethod);	//写入callvirt指令
-    writenops(string file, string classname, string methodname, uint pos, int size);	//写入多个nop指令
+    write_load_arg(string file, string classname, string methodname, uint pos, int index);	//写入loadarg指令
+    write_load_local(string file, string classname, string methodname, uint pos, int index);	//写入loadlocal指令
+    write_load_field(string file, string classname, string methodname, uint pos, string loadClass, string loadField);	//写入loadfield指令
+    write_load_static_field(string file, string classname, string methodname, uint pos, string loadClass, string loadField);	//写入loadstaticfield指令
+    write_call(string file, string classname, string methodname, uint pos, string callClass, string callMethod);	//写入call指令
+    write_call_virt(string file, string classname, string methodname, uint pos, string callClass, string callMethod);	//写入callvirt指令
+    write_nops(string file, string classname, string methodname, uint pos, int size);	//写入多个nop指令
     
-    getfilelist();	//获取当前添加的待处理文件列表
+    get_file_list();	//获取当前添加的待处理文件列表
     log(format[,arg1,arg2,...]);	//输出日志到错误信息窗口，格式与参数的规则与string.Format方法相同
     
 另外，基于dsl的简单计算脚本支持如下命令：
@@ -62,7 +62,7 @@
 		比较：> >= < <= == !=
 		逻辑：&& || !
 		函数：max min abs clamp
-		语句：if while loop looplist foreach
+		语句：if while loop loop_list for_each_value
 		位置变量与参数访问：arg(index) var(index)
 		赋值：‘变量名 = 值’ 或 ‘var(index) = 值’
 		
@@ -83,12 +83,12 @@
 			语句列表;
 		};
 		
-		looplist(list){
+		loop_list(list){
 			$$ 为列表遍历到的当前无素
 			语句列表;
 		};
 		
-		foreach(e1,e2,...){
+		for_each_value(e1,e2,...){
 			$$ 为列表遍历到的当前无素
 			语句列表;
 		};
